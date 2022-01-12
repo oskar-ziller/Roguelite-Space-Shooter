@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 331699789be65064592bcf210b6896ef, type: 3}
+  m_Name: CreepingFrostSpell
+  m_EditorClassIdentifier: 
+  internalName: CreepingFrost
+  prettyName: Creeping Frost
+  spellGemSO: {fileID: 11400000, guid: 32ab7df4a890e754e946b096065c157d, type: 2}
+  msBetweenCasts: 250
+  castTimeMs: 200
+  projectileSpeed: 42
+  projectileLifetimeSeconds: 7
+  projectileCount: 1

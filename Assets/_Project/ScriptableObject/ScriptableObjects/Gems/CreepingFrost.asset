@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e922f77dfc0db745979fc522eec6c74, type: 3}
+  m_Name: CreepingFrost
+  m_EditorClassIdentifier: 
+  modifiers:
+  - modifier: {fileID: 11400000, guid: 485888f690f0943498ea02e8ec223e89, type: 2}
+    min: 35
+    max: 2415
+  - modifier: {fileID: 11400000, guid: f287a39cac42b7345836095102541341, type: 2}
+    min: 4
+    max: 12
+  - modifier: {fileID: 11400000, guid: 9e346463b3f01314290dc665be30b9a7, type: 2}
+    min: 21
+    max: 1491
+  - modifier: {fileID: 11400000, guid: 6f610086f72adba44834d7b702207634, type: 2}
+    min: 4
+    max: 12
+  - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
+    min: 5
+    max: 8
+  name: Creeping Frost
+  gemColor: {r: 0, g: 0.014742366, b: 0.7075472, a: 1}
+  spellSO: {fileID: 11400000, guid: f34051d563bba1b4794c1f97c1db879a, type: 2}
+  description: 'Fire an icy projectile that bursts on impact, dealing area damage
+    and creating a chilling area that deals cold damage over time. '

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e922f77dfc0db745979fc522eec6c74, type: 3}
+  m_Name: Pierce
+  m_EditorClassIdentifier: 
+  modifiers:
+  - modifier: {fileID: 11400000, guid: 3bb1b214df5e8d849ab0be11dee181ac, type: 2}
+    min: 2
+    max: 4
+  - modifier: {fileID: 11400000, guid: a324c46ecc91e7b47bc1901b1def7d01, type: 2}
+    min: 0
+    max: 19
+  name: Pierce
+  gemColor: {r: 0.23239583, g: 0.6415094, b: 0.3991937, a: 1}
+  spellSO: {fileID: 0}
+  description: After hitting, projectiles go through the enemy

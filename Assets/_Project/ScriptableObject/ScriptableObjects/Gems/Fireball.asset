@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e922f77dfc0db745979fc522eec6c74, type: 3}
+  m_Name: Fireball
+  m_EditorClassIdentifier: 
+  modifiers:
+  - modifier: {fileID: 11400000, guid: 559c0136b503b174db6423f72defb87c, type: 2}
+    min: 10
+    max: 11743
+  - modifier: {fileID: 11400000, guid: e71cf720cf27e4b4296f190dda0f7dd0, type: 2}
+    min: 15
+    max: 60
+  - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
+    min: 5
+    max: 7
+  name: Fireball
+  gemColor: {r: 0.8018868, g: 0.12655279, b: 0.055980746, a: 1}
+  spellSO: {fileID: 11400000, guid: 5c81a95ece82fa24a8a6a535808fcb82, type: 2}
+  description: Unleashes a ball of fire towards a target which explodes, damaging
+    nearby foes
