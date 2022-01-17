@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811041538341145891}
-  m_LocalRotation: {x: 0.51651645, y: -0.48103175, z: -0.5175015, w: 0.4837474}
-  m_LocalPosition: {x: -0.98, y: 1.01, z: -1.1}
+  m_LocalRotation: {x: 0.3414144, y: -0.61583304, z: -0.34749067, w: 0.61922234}
+  m_LocalPosition: {x: -0.004547119, y: 0.005134554, z: 0.008380813}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1811041540053058861}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0.106, y: -89.792, z: -93.968}
+  m_LocalEulerAnglesHint: {x: -0.296, y: -89.52, z: -58.306}
 --- !u!114 &1811041538341145894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,13 +191,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811041539056241963}
-  m_LocalRotation: {x: 0.51651645, y: -0.48103175, z: -0.5175015, w: 0.4837474}
-  m_LocalPosition: {x: -0.98, y: 1.01, z: -1.1}
+  m_LocalRotation: {x: 0.3414144, y: -0.61583304, z: -0.34749067, w: 0.61922234}
+  m_LocalPosition: {x: -0.004547119, y: 0.005134554, z: 0.008380813}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1811041540053058861}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0.106, y: -89.792, z: -93.968}
+  m_LocalEulerAnglesHint: {x: -0.296, y: -89.52, z: -58.306}
 --- !u!114 &1811041539056241967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1058,7 +1058,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1811041540053058861}
   m_Layer: 0
-  m_Name: SpotLightPrefab
+  m_Name: SpotLightRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1072,7 +1072,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811041540053058858}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -72.24994, y: 41.277157, z: 693.3584}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1811041539056241966}
@@ -1106,13 +1106,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3349814839686843810}
-  m_LocalRotation: {x: 0.08233164, y: 0.1944021, z: 0.016377391, w: 0.97732353}
-  m_LocalPosition: {x: -0, y: 5.7, z: 0.25}
+  m_LocalRotation: {x: -0.13031538, y: -0.05654891, z: 0.98985004, w: 0.0041444753}
+  m_LocalPosition: {x: 0.92999554, y: -1.2699753, z: 0.890008}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1811041540053058861}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 8.891, y: 22.789, z: 3.715}
+  m_LocalEulerAnglesHint: {x: 6.365, y: -15.073, z: 178.677}
 --- !u!108 &1708049922207799763
 Light:
   m_ObjectHideFlags: 0
@@ -1126,7 +1126,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.5415094, b: 0.5415094, a: 1}
   m_Intensity: 50
-  m_Range: 45
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -1166,7 +1166,7 @@ Light:
   m_RenderingLayerMask: 1
   m_Lightmapping: 2
   m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 2, y: 15}
+  m_AreaSize: {x: 2, y: 9.19}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
@@ -1199,13 +1199,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6577168047040971211}
-  m_LocalRotation: {x: 0.08233208, y: -0.19440037, z: -0.016376097, w: 0.9773238}
-  m_LocalPosition: {x: -0, y: 5.7, z: 0.25}
+  m_LocalRotation: {x: 0.13031702, y: -0.055693917, z: 0.98984987, w: -0.010632759}
+  m_LocalPosition: {x: 0.92999554, y: -1.2700353, z: 0.8899959}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1811041540053058861}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 8.891, y: -22.789, z: -3.715}
+  m_LocalEulerAnglesHint: {x: 6.17, y: 15.111, z: 182.05}
 --- !u!108 &1231811271504866594
 Light:
   m_ObjectHideFlags: 0
@@ -1219,7 +1219,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.5415094, b: 0.5415094, a: 1}
   m_Intensity: 50
-  m_Range: 45
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -1259,7 +1259,7 @@ Light:
   m_RenderingLayerMask: 1
   m_Lightmapping: 2
   m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 2, y: 15}
+  m_AreaSize: {x: 2.0002575, y: 9.19}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0

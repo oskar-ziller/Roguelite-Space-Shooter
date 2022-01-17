@@ -209,6 +209,16 @@
                 "value": "{\"m_Value\":false}"
             },
             {
+                "type": "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                "key": "SelectVertexColor.restrictToSelectedObjects",
+                "value": "{\"m_Value\":false}"
+            },
+            {
+                "type": "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                "key": "SelectMaterial.restrictToSelectedObjects",
+                "value": "{\"m_Value\":false}"
+            },
+            {
                 "type": "UnityEngine.ProBuilder.UnwrapParameters, Unity.ProBuilder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "lightmapping.defaultLightmapUnwrapParameters",
                 "value": "{\"m_Value\":{\"m_HardAngle\":88.0,\"m_PackMargin\":20.0,\"m_AngleError\":8.0,\"m_AreaError\":15.0}}"
@@ -221,7 +231,7 @@
             {
                 "type": "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
                 "key": "ExtrudeFaces.distance",
-                "value": "{\"m_Value\":2.0}"
+                "value": "{\"m_Value\":0.10000000149011612}"
             },
             {
                 "type": "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
@@ -254,6 +264,11 @@
                 "value": "{\"m_Value\":15.0}"
             },
             {
+                "type": "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                "key": "WeldVertices.weldDistance",
+                "value": "{\"m_Value\":0.10000000149011612}"
+            },
+            {
                 "type": "UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "mesh.userMaterial",
                 "value": "{\"m_Value\":{\"fileID\":2100000,\"guid\":\"28d7e05730d1b0a4599ee550dfdb98ed\",\"type\":2}}"
@@ -281,7 +296,7 @@
             {
                 "type": "UnityEngine.ProBuilder.SelectionModifierBehavior, Unity.ProBuilder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "editor.rectSelectModifier",
-                "value": "{\"m_Value\":2}"
+                "value": "{\"m_Value\":0}"
             },
             {
                 "type": "UnityEngine.ProBuilder.RectSelectMode, Unity.ProBuilder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -301,7 +316,7 @@
             {
                 "type": "UnityEngine.ProBuilder.ExtrudeMethod, Unity.ProBuilder, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "editor.extrudeMethod",
-                "value": "{\"m_Value\":0}"
+                "value": "{\"m_Value\":1}"
             },
             {
                 "type": "UnityEditor.ProBuilder.Actions.Export+ExportFormat, Unity.ProBuilder.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -331,12 +346,17 @@
             {
                 "type": "UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "MoveElements.s_Translation",
-                "value": "{\"m_Value\":{\"x\":0.0,\"y\":0.7699999809265137,\"z\":0.0}}"
+                "value": "{\"m_Value\":{\"x\":4.269999980926514,\"y\":0.0,\"z\":0.0}}"
             },
             {
                 "type": "UnityEditor.ProBuilder.Actions.OffsetElements+CoordinateSpace, Unity.ProBuilder.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "key": "MoveElements.s_CoordinateSpace",
                 "value": "{\"m_Value\":3}"
+            },
+            {
+                "type": "UnityEditor.ProBuilder.Actions.DuplicateFaces+DuplicateFaceSetting, Unity.ProBuilder.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "key": "DuplicateFaces.target",
+                "value": "{\"m_Value\":1}"
             }
         ]
     }
