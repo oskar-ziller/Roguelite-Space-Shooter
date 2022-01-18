@@ -24,13 +24,13 @@ MonoBehaviour:
   m_OpaqueDownsampling: 1
   m_SupportsTerrainHoles: 1
   m_SupportsHDR: 1
-  m_MSAA: 2
+  m_MSAA: 8
   m_RenderScale: 2
   m_MainLightRenderingMode: 1
   m_MainLightShadowsSupported: 0
   m_MainLightShadowmapResolution: 256
   m_AdditionalLightsRenderingMode: 2
-  m_AdditionalLightsPerObjectLimit: 3
+  m_AdditionalLightsPerObjectLimit: 5
   m_AdditionalLightShadowsSupported: 0
   m_AdditionalLightsShadowmapResolution: 1024
   m_ShadowDistance: 0

@@ -186,7 +186,7 @@ namespace MeteorGame
 
 
             var val = packSpawnPosHeightCurve.Evaluate(level / maxLevel);
-            var target = startPosMinHeight + val * startPosMaxHeight + generator.regionSize / 2;
+            var target = startPosMinHeight + val * startPosMaxHeight;
 
             var randx = random.Next(-spawnAreaSize/2 + generator.regionSize / 2, spawnAreaSize/2 - generator.regionSize / 2);
             var randz = random.Next(-spawnAreaSize/2 + generator.regionSize / 2, spawnAreaSize/2 - generator.regionSize / 2);
