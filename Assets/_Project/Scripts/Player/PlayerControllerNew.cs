@@ -23,8 +23,8 @@ namespace MeteorGame
 
     public struct FrameInput
     {
-        public float Vertical;
-        public float Horizontal;
+        public float Z;
+        public float X;
         public bool JumpDown;
         public bool JumpUp;
 
@@ -46,10 +46,11 @@ namespace MeteorGame
         public bool JumpingThisFrame { get; private set; }
         public bool LandingThisFrame { get; private set; }
         public Vector3 RawMovement { get; private set; }
-        public bool Grounded => _colDown;
+        public bool Grounded => isGrounded;
 
         private Vector3 _lastPosition;
-        private float _currentHorizontalSpeed, _currentVerticalSpeed;
+        private float horizontalVelX, horizontalVelY, verticalVel;
+
 
         private void Update()
         {
@@ -58,7 +59,7 @@ namespace MeteorGame
             _lastPosition = transform.position;
 
             GatherInput();
-            RunCollisionChecks();
+            RunGroundedChecks();
 
             CalculateWalk(); // Horizontal movement
 
@@ -71,7 +72,6 @@ namespace MeteorGame
             */
         }
 
-
         #region Gather Input
 
         private void GatherInput()
@@ -80,8 +80,8 @@ namespace MeteorGame
             {
                 JumpDown = UnityEngine.Input.GetButtonDown("Jump"),
                 JumpUp = UnityEngine.Input.GetButtonUp("Jump"),
-                Horizontal = UnityEngine.Input.GetAxisRaw("Horizontal"),
-                Vertical = UnityEngine.Input.GetAxisRaw("Vertical")
+                X = UnityEngine.Input.GetAxisRaw("Horizontal"),
+                Z = UnityEngine.Input.GetAxisRaw("Vertical")
             };
             if (Input.JumpDown)
             {
@@ -100,39 +100,52 @@ namespace MeteorGame
         [SerializeField] [Range(0.1f, 0.3f)] private float _rayBuffer = 0.1f; // Prevents side detectors hitting the ground
 
         private RayRange _raysUp, _raysRight, _raysDown, _raysLeft;
-        private bool _colUp, _colRight, _colDown, _colLeft;
+        private bool _colUp, _colRight, isGrounded, _colLeft;
 
         private float _timeLeftGrounded;
 
         // We use these raycast checks for pre-collision information
-        private void RunCollisionChecks()
+        private void RunGroundedChecks()
         {
             // Generate ray ranges. 
-            CalculateRayRanged();
+            //CalculateRayRanged();
 
             // Ground
             LandingThisFrame = false;
-            var groundedCheck = RunDetection(_raysDown);
+            bool groundedCheck = GroundedCheck();
 
-            if (_colDown && !groundedCheck) _timeLeftGrounded = Time.time; // Only trigger when first leaving
-            
-            else if (!_colDown && groundedCheck)
+            if (isGrounded && !groundedCheck)
+            {
+                _timeLeftGrounded = Time.time; // Only trigger when first leaving
+            }
+            else if (!isGrounded && groundedCheck)
             {
                 _coyoteUsable = true; // Only trigger when first touching
                 LandingThisFrame = true;
             }
 
-            _colDown = groundedCheck;
+            isGrounded = groundedCheck;
 
-            // The rest
-            _colUp = RunDetection(_raysUp);
-            _colLeft = RunDetection(_raysLeft);
-            _colRight = RunDetection(_raysRight);
+            //// The rest
+            //_colUp = RunDetection(_raysUp);
+            //_colLeft = RunDetection(_raysLeft);
+            //_colRight = RunDetection(_raysRight);
 
-            bool RunDetection(RayRange range)
-            {
-                return EvaluateRayPositions(range).Any(point => Physics.Raycast(point, range.Dir, _detectionRayLength, _groundLayer));
-            }
+            //bool RunDetection(RayRange range)
+            //{
+            //    return EvaluateRayPositions(range).Any(point => Physics.Raycast(point, range.Dir, _detectionRayLength, _groundLayer));
+            //}
+        }
+
+        [Tooltip("Transform at our feet to know where collider begins")]
+        [SerializeField] private Transform feetTransform;
+
+        [Tooltip("The size of the radi to check beneath our feet")]
+        [SerializeField] private float groundedCheckRadi = 0.1f;
+
+        private bool GroundedCheck()
+        {
+            return Physics.OverlapSphere(feetTransform.position, groundedCheckRadi, _groundLayer, QueryTriggerInteraction.Ignore).Count() > 0;
         }
 
         private void CalculateRayRanged()
@@ -180,7 +193,7 @@ namespace MeteorGame
 
             // Draw the future position. Handy for visualizing gravity
             Gizmos.color = Color.red;
-            var move = new Vector3(_currentHorizontalSpeed, _currentVerticalSpeed) * Time.deltaTime;
+            var move = new Vector3(horizontalVelX, verticalVel) * Time.deltaTime;
             Gizmos.DrawWireCube(transform.position + move, _characterBounds.size);
         }
 
@@ -196,28 +209,28 @@ namespace MeteorGame
 
         private void CalculateWalk()
         {
-            if (Input.Horizontal != 0)
+            if (Input.X != 0)
             {
                 // Set horizontal move speed
-                _currentHorizontalSpeed += Input.Horizontal * _acceleration * Time.deltaTime;
+                horizontalVelX += Input.X * _acceleration * Time.deltaTime;
 
                 // clamped by max frame movement
-                _currentHorizontalSpeed = Mathf.Clamp(_currentHorizontalSpeed, -_moveClamp, _moveClamp);
+                horizontalVelX = Mathf.Clamp(horizontalVelX, -_moveClamp, _moveClamp);
 
                 // Apply bonus at the apex of a jump
-                var apexBonus = Mathf.Sign(Input.Horizontal) * _apexBonus * _apexPoint;
-                _currentHorizontalSpeed += apexBonus * Time.deltaTime;
+                var apexBonus = Mathf.Sign(Input.X) * _apexBonus * _apexPoint;
+                horizontalVelX += apexBonus * Time.deltaTime;
             }
             else
             {
                 // No input. Let's slow the character down
-                _currentHorizontalSpeed = Mathf.MoveTowards(_currentHorizontalSpeed, 0, _deAcceleration * Time.deltaTime);
+                horizontalVelX = Mathf.MoveTowards(horizontalVelX, 0, _deAcceleration * Time.deltaTime);
             }
 
-            if (_currentHorizontalSpeed > 0 && _colRight || _currentHorizontalSpeed < 0 && _colLeft)
+            if (horizontalVelX > 0 && _colRight || horizontalVelX < 0 && _colLeft)
             {
                 // Don't walk through walls
-                _currentHorizontalSpeed = 0;
+                horizontalVelX = 0;
             }
         }
 
@@ -232,21 +245,21 @@ namespace MeteorGame
 
         private void CalculateGravity()
         {
-            if (_colDown)
+            if (isGrounded)
             {
                 // Move out of the ground
-                if (_currentVerticalSpeed < 0) _currentVerticalSpeed = 0;
+                if (verticalVel < 0) verticalVel = 0;
             }
             else
             {
                 // Add downward force while ascending if we ended the jump early
-                var fallSpeed = _endedJumpEarly && _currentVerticalSpeed > 0 ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
+                var fallSpeed = _endedJumpEarly && verticalVel > 0 ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
 
                 // Fall
-                _currentVerticalSpeed -= fallSpeed * Time.deltaTime;
+                verticalVel -= fallSpeed * Time.deltaTime;
 
                 // Clamp
-                if (_currentVerticalSpeed < _fallClamp) _currentVerticalSpeed = _fallClamp;
+                if (verticalVel < _fallClamp) verticalVel = _fallClamp;
             }
         }
 
@@ -263,12 +276,12 @@ namespace MeteorGame
         private bool _endedJumpEarly = true;
         private float _apexPoint; // Becomes 1 at the apex of a jump
         private float _lastJumpPressed;
-        private bool CanUseCoyote => _coyoteUsable && !_colDown && _timeLeftGrounded + _coyoteTimeThreshold > Time.time;
-        private bool HasBufferedJump => _colDown && _lastJumpPressed + _jumpBuffer > Time.time;
+        private bool CanUseCoyote => _coyoteUsable && !isGrounded && _timeLeftGrounded + _coyoteTimeThreshold > Time.time;
+        private bool HasBufferedJump => isGrounded && _lastJumpPressed + _jumpBuffer > Time.time;
 
         private void CalculateJumpApex()
         {
-            if (!_colDown)
+            if (!isGrounded)
             {
                 // Gets stronger the closer to the top of the jump
                 _apexPoint = Mathf.InverseLerp(_jumpApexThreshold, 0, Mathf.Abs(Velocity.y));
@@ -285,7 +298,7 @@ namespace MeteorGame
             // Jump if: grounded or within coyote threshold || sufficient jump buffer
             if (Input.JumpDown && CanUseCoyote || HasBufferedJump)
             {
-                _currentVerticalSpeed = _jumpHeight;
+                verticalVel = _jumpHeight;
                 _endedJumpEarly = false;
                 _coyoteUsable = false;
                 _timeLeftGrounded = float.MinValue;
@@ -297,7 +310,7 @@ namespace MeteorGame
             }
 
             // End the jump early if button released
-            if (!_colDown && Input.JumpUp && !_endedJumpEarly && Velocity.y > 0)
+            if (!isGrounded && Input.JumpUp && !_endedJumpEarly && Velocity.y > 0)
             {
                 // _currentVerticalSpeed = 0;
                 _endedJumpEarly = true;
@@ -305,7 +318,7 @@ namespace MeteorGame
 
             if (_colUp)
             {
-                if (_currentVerticalSpeed > 0) _currentVerticalSpeed = 0;
+                if (verticalVel > 0) verticalVel = 0;
             }
         }
 
@@ -321,7 +334,7 @@ namespace MeteorGame
         private void MoveCharacter()
         {
             var pos = transform.position;
-            RawMovement = new Vector3(_currentHorizontalSpeed, _currentVerticalSpeed); // Used externally
+            RawMovement = new Vector3(horizontalVelX, verticalVel); // Used externally
             var move = RawMovement * Time.deltaTime;
             var furthestPoint = pos + move;
 
@@ -348,7 +361,7 @@ namespace MeteorGame
                     // We've landed on a corner or hit our head on a ledge. Nudge the player gently
                     if (i == 1)
                     {
-                        if (_currentVerticalSpeed < 0) _currentVerticalSpeed = 0;
+                        if (verticalVel < 0) verticalVel = 0;
                         var dir = transform.position - hit.transform.position;
                         transform.position += dir.normalized * move.magnitude;
                     }
