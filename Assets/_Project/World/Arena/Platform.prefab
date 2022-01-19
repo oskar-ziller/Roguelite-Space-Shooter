@@ -44,10 +44,10 @@ GameObject:
   - component: {fileID: 757397796580689152}
   - component: {fileID: 2712799342170805428}
   - component: {fileID: 7860350684896721130}
-  - component: {fileID: 4904276431658448367}
+  - component: {fileID: 4153919900025862818}
   m_Layer: 0
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -302,8 +302,8 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8160845691133811940}
   m_Mesh: {fileID: 0}
---- !u!64 &4904276431658448367
-MeshCollider:
+--- !u!65 &4153919900025862818
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -312,10 +312,9 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  serializedVersion: 2
+  m_Size: {x: 6.776558, y: 0.3, z: 21}
+  m_Center: {x: 3.611721, y: 0.3000992, z: -10.5}
 --- !u!1 &8979059398092759714
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,10 +327,9 @@ GameObject:
   - component: {fileID: 2111231143593860659}
   - component: {fileID: 9019597180921308504}
   - component: {fileID: 6382911457128358849}
-  - component: {fileID: 8000517770763461403}
   m_Layer: 0
   m_Name: Glow
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -734,18 +732,4 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8979059398092759714}
-  m_Mesh: {fileID: 0}
---- !u!64 &8000517770763461403
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8979059398092759714}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
   m_Mesh: {fileID: 0}

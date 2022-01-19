@@ -14,13 +14,36 @@ namespace MeteorGame
         Grounded
     }
 
+    public struct FrameInput
+    {
+        public float z;
+        public float x;
+        public bool jumpPressed;
+        public bool jumpReleased;
+        public bool jumpDown;
+        public bool boostDown;
+
+        public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
+    }
+
+
 
     public class PlayerController : MonoBehaviour
     {
         #region Variables
 
-        [SerializeField]
-        private float maxGroundAcceleration = 10f, maxAirAcceleration = 1f, maxGroundDeceleration = 10f, maxAirDeceleration = 10f;
+
+        [SerializeField] private float groundAccel = 10f;
+        [SerializeField] private float airAccel = 1f;
+        [SerializeField] private float groundDecel = 10f;
+        [SerializeField] private float airDecel = 10f;
+
+        [SerializeField] private float boostMultipAccel = 2f; // 
+        [SerializeField] private float boostMultipMaxVel = 2f; // 
+
+
+        [SerializeField] private CapsuleCollider playerCollider;
+
 
         [SerializeField]
         private float maxSpeed = 10f;
@@ -32,6 +55,8 @@ namespace MeteorGame
         //private float gravity = 9.81f;
 
 
+
+        private bool firstTime = true;
 
         //[SerializeField]
         //private Transform ground;
@@ -46,6 +71,11 @@ namespace MeteorGame
         private bool isGrounded;
         private float timeLeftGrounded;
 
+        private float currentBoostMultipAccel = 1f;
+        private float currentBoostMultipMaxVel = 1f;
+
+        int layerMaskOverlapSphere;
+
 
         //private List<GameObject> attractorsInScene;
         //private Transform currentPlanet;
@@ -57,29 +87,64 @@ namespace MeteorGame
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            layerMaskOverlapSphere = LayerMask.GetMask(new string[] { "Arena" });
         }
+
+        GameObject debugObj;
 
         void Start()
         {
+            debugObj = Instantiate(UNgroundedPrefab);
         }
 
 
+        public GameObject groundedPrefab, UNgroundedPrefab;
+
+        private void CreateObjectAtCollision(Collision collision, bool grounded)
+        {
+            Vector3 pos = collision.contactCount == 0 ? rb.position
+                                                        : collision.GetContact(0).point;
+
+            GameObject toCreate = grounded ? groundedPrefab : UNgroundedPrefab;
+            Instantiate(toCreate, pos, Quaternion.identity);
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
-            if (!isGrounded && collision.collider.tag == "Ground")
+
+            if (collision.collider.tag == "Ground")
             {
+                print($"-coll- enter isGrounded: {isGrounded} -> true");
+
                 isGrounded = true;
                 coyoteUsable = true;
                 hasBufferedJump = lastJumpPressed + _jumpBuffer > Time.time;
+                //CreateObjectAtCollision(collision, true);
             }
+
+
+            
+        }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            if (collision.collider.tag == "Ground")
+            {
+                isGrounded = true;
+            }
+
         }
 
         private void OnCollisionExit(Collision collision)
         {
-            if (isGrounded && collision.collider.tag == "Ground")
+
+            if (collision.collider.tag == "Ground")
             {
+                print($"-coll- enter isGrounded: {isGrounded} -> false");
+
                 isGrounded = false;
                 timeLeftGrounded = Time.time;
+                //CreateObjectAtCollision(collision, false);
             }
         }
 
@@ -98,13 +163,22 @@ namespace MeteorGame
             }
 
             GatherInput();
+
+            currentBoostMultipAccel = 1f;
+            currentBoostMultipMaxVel = 1f;
+
+            if (inputs.boostDown)
+            {
+                currentBoostMultipAccel = boostMultipAccel;
+                currentBoostMultipMaxVel = boostMultipMaxVel;
+            }
+
             CalculateJumpApex();
             CalculateFallSpeed();
 
             var groundVel = CalculateGroundVelocity();
             var jumpVel = CalculateJump();
             var grav = CalculateGravity();
-
 
             rb.velocity += groundVel;
             rb.velocity += jumpVel;
@@ -113,7 +187,7 @@ namespace MeteorGame
 
 
         public FrameInput inputs;
-        private float lastJumpPressed;
+        private float lastJumpPressed = float.MinValue;
         private float _apexPoint;
         private float _fallSpeed;
 
@@ -129,6 +203,7 @@ namespace MeteorGame
                 jumpPressed = UnityEngine.Input.GetButtonDown("Jump"),
                 jumpReleased = UnityEngine.Input.GetButtonUp("Jump"),
                 jumpDown = UnityEngine.Input.GetButton("Jump"),
+                boostDown = Input.GetKey(KeyCode.LeftShift),
                 x = UnityEngine.Input.GetAxisRaw("Horizontal"),
                 z = UnityEngine.Input.GetAxisRaw("Vertical")
             };
@@ -283,7 +358,6 @@ namespace MeteorGame
 
 
 
-
         private bool CanUseCoyote => coyoteUsable && !isGrounded && timeLeftGrounded + _coyoteTimeThreshold > Time.time;
         private bool coyoteUsable;
 
@@ -310,7 +384,7 @@ namespace MeteorGame
                 endedJumpEarly = false;
                 coyoteUsable = false;
                 timeLeftGrounded = float.MinValue;
-                toReturn = Vector3.up * jumpForce;
+                toReturn = Vector3.up * (jumpForce + -rb.velocity.y);
                 targetJumpVel = rb.velocity + toReturn;
                 hasBufferedJump = false;
             }
@@ -331,27 +405,57 @@ namespace MeteorGame
 
 
 
-        [Header("GRAVITY")] [SerializeField] private float fallClampDefault = -30f;
-        [SerializeField] private float fallClampMore = -70f;
+        [Header("GRAVITY")] [SerializeField] private float fallVelLimitSlow = -30f;
+        [SerializeField] private float fallVelLimitFast = -70f;
 
         private Vector3 CalculateGravity()
         {
-            //var fallSpeed = !isGrounded && !inputs.jumpDown ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
-            var fallspeed = !isGrounded && !inputs.jumpDown ? maxGravityDecel : minGravityDecel;
-            var clamp = fallspeed == maxGravityDecel ? fallClampMore : fallClampDefault;
-
-            print("fallspeed: " + fallspeed);
-
-            var vel = fallspeed * Time.deltaTime;
-            var targetVel = rb.velocity.y + vel;
-
-            // Clamp
-            if (targetVel < clamp)
+            if (isGrounded)
             {
-                vel = 0;
+                return Vector3.zero;
             }
 
-            return Vector3.up * vel;
+            float gravity = maxGravityDecel;
+
+            if (inputs.jumpDown)
+            {
+                gravity = minGravityDecel;
+            }
+
+
+            float clamp = fallVelLimitFast;
+
+            if (inputs.jumpDown)
+            {
+                clamp = fallVelLimitSlow;
+            }
+
+            //var fallSpeed = !isGrounded && !inputs.jumpDown ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
+            //var gravityVel = !inputs.jumpDown ? maxGravityDecel : minGravityDecel;
+            //var clamp = gravityVel == maxGravityDecel ? fallVelLimitFast : fallVelLimitSlow;
+
+            var magnitude = gravity * Time.deltaTime;
+
+            // if pressing jump but falling too fast for slow jump speed
+            if (rb.velocity.y < fallVelLimitSlow && inputs.jumpDown)
+            {
+                magnitude = -maxGravityDecel * Time.deltaTime;
+            }
+
+
+            //var targetVel = rb.velocity.y + vel;
+            //// Clamp
+            //if (targetVel < clamp)
+            //{
+            //    vel = 0;
+
+            //    //if (inputs.jumpDown)
+            //    //{
+            //    //    vel = airDecel;
+            //    //}
+            //}
+
+            return Vector3.up * magnitude;
         }
 
 
@@ -376,33 +480,40 @@ namespace MeteorGame
             float currentX = Vector3.Dot(currentVel, transform.right);
             float currentZ = Vector3.Dot(currentVel, transform.forward);
 
-            float acceleration = isGrounded ? maxGroundAcceleration : maxAirAcceleration;
-            float deceleration = isGrounded ? maxGroundDeceleration : maxAirDeceleration;
-
+            float acceleration = isGrounded ? groundAccel : airAccel;
+            float deceleration = isGrounded ? groundDecel : airDecel;
 
             float newX, newZ;
 
             if (inputs.inputVector.x != 0)
             {
-                newX = Mathf.MoveTowards(currentX, inputs.inputVector.x * maxSpeed, acceleration * Time.deltaTime);
+                var targetVel = inputs.inputVector.x * maxSpeed * currentBoostMultipMaxVel;
+                var a = acceleration * currentBoostMultipAccel;
+
+                newX = Mathf.MoveTowards(currentX, targetVel, a * Time.deltaTime);
             }
             else
             {
-                newX = Mathf.MoveTowards(currentX, 0, deceleration * Time.deltaTime);
+                var a = deceleration * currentBoostMultipAccel;
+                newX = Mathf.MoveTowards(currentX, 0, a * Time.deltaTime);
             }
 
 
             if (inputs.inputVector.y != 0)
             {
-                newZ = Mathf.MoveTowards(currentZ, inputs.inputVector.y * maxSpeed, acceleration * Time.deltaTime);
+
+                var targetVel = inputs.inputVector.y * maxSpeed * currentBoostMultipMaxVel;
+                var a = acceleration * currentBoostMultipAccel;
+
+                newZ = Mathf.MoveTowards(currentZ, targetVel, a * Time.deltaTime);
             }
             else
             {
-                newZ = Mathf.MoveTowards(currentZ, 0, deceleration * Time.deltaTime);
+                var a = deceleration * currentBoostMultipAccel;
+                newZ = Mathf.MoveTowards(currentZ, 0, a * Time.deltaTime);
             }
 
             // Calculate the velocities in the direction we are looking
-            var test = (newX - currentX);
             Vector3 xVel = transform.right * (newX - currentX);
             Vector3 zVel = transform.forward * (newZ - currentZ);
 

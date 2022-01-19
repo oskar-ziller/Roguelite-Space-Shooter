@@ -21,16 +21,6 @@ namespace MeteorGame
         public readonly Vector2 Start, End, Dir;
     }
 
-    public struct FrameInput
-    {
-        public float z;
-        public float x;
-        public bool jumpPressed;
-        public bool jumpReleased;
-        public bool jumpDown;
-
-        public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
-    }
 
 
     /// <summary>
