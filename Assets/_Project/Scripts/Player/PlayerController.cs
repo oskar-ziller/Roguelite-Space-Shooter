@@ -20,7 +20,7 @@ namespace MeteorGame
         #region Variables
 
         [SerializeField]
-        private float maxAcceleration = 10f, maxAirAcceleration = 1f;
+        private float maxGroundAcceleration = 10f, maxAirAcceleration = 1f, maxGroundDeceleration = 10f, maxAirDeceleration = 10f;
 
         [SerializeField]
         private float maxSpeed = 10f;
@@ -31,11 +31,7 @@ namespace MeteorGame
         //[SerializeField, Range(5f, 20f)]
         //private float gravity = 9.81f;
 
-        [SerializeField]
-        private float fallMultiplier = 2f;
 
-        [SerializeField]
-        private float lowJumpMultiplier = 2f;
 
         //[SerializeField]
         //private Transform ground;
@@ -43,14 +39,12 @@ namespace MeteorGame
 
         //public CameraController cam;
 
-        private bool isOnGround => groundContactCount > 0;
-        private int groundContactCount;
         private bool wantsToJump = false;
-        private bool wantsToStopJump = false;
 
-        private Vector2 inputVector;
         private Rigidbody rb;
         private JumpState jumpState;
+        private bool isGrounded;
+        private float timeLeftGrounded;
 
 
         //private List<GameObject> attractorsInScene;
@@ -63,20 +57,36 @@ namespace MeteorGame
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            //attractorsInScene = GameObject.FindGameObjectsWithTag("Attractor").ToList();
         }
 
         void Start()
         {
-            Physics.gravity = new Vector3(0, -9.0f, 0);
         }
+
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!isGrounded && collision.collider.tag == "Ground")
+            {
+                isGrounded = true;
+                coyoteUsable = true;
+                hasBufferedJump = lastJumpPressed + _jumpBuffer > Time.time;
+            }
+        }
+
+        private void OnCollisionExit(Collision collision)
+        {
+            if (isGrounded && collision.collider.tag == "Ground")
+            {
+                isGrounded = false;
+                timeLeftGrounded = Time.time;
+            }
+        }
+
+        Vector3 groundVel;
 
         void Update()
         {
-            //CheckPlanetChange();
-            //UpdateJumpState()
-
-
             if (Input.GetKey(KeyCode.Mouse0))
             {
                 Player.Instance.SpellSlot(1).Cast();
@@ -87,52 +97,52 @@ namespace MeteorGame
                 Player.Instance.SpellSlot(2).Cast();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space))
+            GatherInput();
+            CalculateJumpApex();
+            CalculateFallSpeed();
+
+            var groundVel = CalculateGroundVelocity();
+            var jumpVel = CalculateJump();
+            var grav = CalculateGravity();
+
+
+            rb.velocity += groundVel;
+            rb.velocity += jumpVel;
+            rb.velocity += grav;
+        }
+
+
+        public FrameInput inputs;
+        private float lastJumpPressed;
+        private float _apexPoint;
+        private float _fallSpeed;
+
+        [SerializeField] private float minGravityDecel = -1;
+        [SerializeField] private float maxGravityDecel = -2;
+        private float _jumpApexThreshold = 10;
+
+
+        private void GatherInput()
+        {
+            inputs = new FrameInput
             {
-                Jump();
-            }
-
-            if (Input.GetKeyUp(KeyCode.Space))
+                jumpPressed = UnityEngine.Input.GetButtonDown("Jump"),
+                jumpReleased = UnityEngine.Input.GetButtonUp("Jump"),
+                jumpDown = UnityEngine.Input.GetButton("Jump"),
+                x = UnityEngine.Input.GetAxisRaw("Horizontal"),
+                z = UnityEngine.Input.GetAxisRaw("Vertical")
+            };
+            if (inputs.jumpPressed)
             {
-                StopJump();
+                lastJumpPressed = Time.time;
             }
-
-
         }
 
-        private void FixedUpdate()
-        {
-            inputVector.x = Input.GetAxis("Horizontal");
-            inputVector.y = Input.GetAxis("Vertical");
-            HandleMovement();
-            groundContactCount = 0;
-        }
-
-        void OnCollisionEnter(Collision collision)
-        {
-            EvaluateCollision(collision);
-        }
-
-        void OnCollisionStay(Collision collision)
-        {
-            EvaluateCollision(collision);
-        }
 
         #endregion
 
         #region Methods
 
-        public void Jump()
-        {
-            wantsToJump = true;
-            wantsToStopJump = false;
-        }
-
-        public void StopJump()
-        {
-            wantsToJump = false;
-            wantsToStopJump = true;
-        }
 
 
         public void TurnHorizontal(float amount)
@@ -145,7 +155,7 @@ namespace MeteorGame
             Vector3 currentVel = rb.velocity;
             //float dot = Mathf.Round(Vector3.Dot(transform.up, currentVel));
 
-            if (!isOnGround)
+            if (!isGrounded)
             {
                 if (currentVel.y <= 0)
                 {
@@ -168,7 +178,7 @@ namespace MeteorGame
 
             Vector3 currentVel = rb.velocity;
 
-            Vector3 groundVel = CalculateGroundVelocity(currentVel);
+            //Vector3 groundVel = CalculateGroundVelocity(currentVel);
             //Vector3 gravityVel = Physics.gravity.y * Time.deltaTime * transform.up;
 
             Vector3 jumpVel = Vector3.zero;
@@ -229,6 +239,26 @@ namespace MeteorGame
             rb.velocity += jumpVel;
         }
 
+
+
+        private void CalculateJumpApex()
+        {
+            if (!isGrounded)
+            {
+                // Gets stronger the closer to the top of the jump
+                _apexPoint = Mathf.InverseLerp(_jumpApexThreshold, 0, Mathf.Abs(rb.velocity.y));
+            }
+            else
+            {
+                _apexPoint = 0;
+            }
+        }
+
+        private void CalculateFallSpeed()
+        {
+            _fallSpeed = Mathf.Lerp(maxGravityDecel, minGravityDecel, _apexPoint);
+        }
+
         private Vector3 CalculateJumpVelocity(Vector3 currentVel)
         {
             //if (!isOnGround)
@@ -237,7 +267,6 @@ namespace MeteorGame
             //}
 
             Vector3 jumpDirection = Vector3.up;
-
             float jumpSpeed = Mathf.Sqrt(2f * Physics.gravity.magnitude * jumpHeight);
 
             //float alignedSpeed = Vector3.Dot(currentVel, jumpDirection);
@@ -252,37 +281,137 @@ namespace MeteorGame
             return jumpDirection * jumpSpeed;
         }
 
-        private Vector3 CalculateGroundVelocity(Vector3 currentVel)
+
+
+
+        private bool CanUseCoyote => coyoteUsable && !isGrounded && timeLeftGrounded + _coyoteTimeThreshold > Time.time;
+        private bool coyoteUsable;
+
+        [SerializeField] private float _coyoteTimeThreshold = 0.1f;
+        private bool hasBufferedJump = false;
+        [SerializeField] private float _jumpBuffer = 0.1f;
+
+        private float verticalVel;
+
+        private Vector3 targetJumpVel = Vector3.zero;
+
+
+        [Header("JUMPING")] [SerializeField] private float jumpForce = 30;
+
+        private bool endedJumpEarly = true;
+
+        private Vector3 CalculateJump()
         {
-            inputVector = Vector2.ClampMagnitude(inputVector, 1f) * maxSpeed;
+            Vector3 toReturn = Vector3.zero;
+
+            // Jump if: grounded or within coyote threshold || sufficient jump buffer
+            if ((inputs.jumpPressed || hasBufferedJump) && (isGrounded || CanUseCoyote))
+            {
+                endedJumpEarly = false;
+                coyoteUsable = false;
+                timeLeftGrounded = float.MinValue;
+                toReturn = Vector3.up * jumpForce;
+                targetJumpVel = rb.velocity + toReturn;
+                hasBufferedJump = false;
+            }
+
+
+            // End the jump early if button released
+            if (!isGrounded && inputs.jumpReleased && !endedJumpEarly
+                && rb.velocity.y > targetJumpVel.y * 0.75f)
+            {
+                // _currentVerticalSpeed = 0;
+                endedJumpEarly = true;
+            }
+
+            return toReturn;
+        }
+
+
+
+
+
+        [Header("GRAVITY")] [SerializeField] private float fallClampDefault = -30f;
+        [SerializeField] private float fallClampMore = -70f;
+
+        private Vector3 CalculateGravity()
+        {
+            //var fallSpeed = !isGrounded && !inputs.jumpDown ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
+            var fallspeed = !isGrounded && !inputs.jumpDown ? maxGravityDecel : minGravityDecel;
+            var clamp = fallspeed == maxGravityDecel ? fallClampMore : fallClampDefault;
+
+            print("fallspeed: " + fallspeed);
+
+            var vel = fallspeed * Time.deltaTime;
+            var targetVel = rb.velocity.y + vel;
+
+            // Clamp
+            if (targetVel < clamp)
+            {
+                vel = 0;
+            }
+
+            return Vector3.up * vel;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private Vector3 CalculateGroundVelocity()
+        {
+            var currentVel = rb.velocity;
 
             float currentX = Vector3.Dot(currentVel, transform.right);
             float currentZ = Vector3.Dot(currentVel, transform.forward);
 
-            float acceleration = isOnGround ? maxAcceleration : maxAirAcceleration;
-            float maxSpeedChange = acceleration * Time.deltaTime;
+            float acceleration = isGrounded ? maxGroundAcceleration : maxAirAcceleration;
+            float deceleration = isGrounded ? maxGroundDeceleration : maxAirDeceleration;
 
-            float newX = Mathf.MoveTowards(currentX, inputVector.x, maxSpeedChange);
-            float newZ = Mathf.MoveTowards(currentZ, inputVector.y, maxSpeedChange);
 
-            currentVel += transform.right * (newX - currentX) + transform.forward * (newZ - currentZ);
+            float newX, newZ;
 
-            return currentVel;
-        }
-
-        private void EvaluateCollision(Collision collision)
-        {
-            for (int i = 0; i < collision.contactCount; i++)
+            if (inputs.inputVector.x != 0)
             {
-                Vector3 normal = collision.GetContact(i).normal;
-                float upDot = Vector3.Dot(transform.up, normal);
-
-                if (upDot >= 0.7f)
-                {
-                    groundContactCount++;
-                }
+                newX = Mathf.MoveTowards(currentX, inputs.inputVector.x * maxSpeed, acceleration * Time.deltaTime);
             }
+            else
+            {
+                newX = Mathf.MoveTowards(currentX, 0, deceleration * Time.deltaTime);
+            }
+
+
+            if (inputs.inputVector.y != 0)
+            {
+                newZ = Mathf.MoveTowards(currentZ, inputs.inputVector.y * maxSpeed, acceleration * Time.deltaTime);
+            }
+            else
+            {
+                newZ = Mathf.MoveTowards(currentZ, 0, deceleration * Time.deltaTime);
+            }
+
+            // Calculate the velocities in the direction we are looking
+            var test = (newX - currentX);
+            Vector3 xVel = transform.right * (newX - currentX);
+            Vector3 zVel = transform.forward * (newZ - currentZ);
+
+            Vector3 vel = xVel + zVel;
+
+            return vel;
         }
+
+
 
         #endregion
     }

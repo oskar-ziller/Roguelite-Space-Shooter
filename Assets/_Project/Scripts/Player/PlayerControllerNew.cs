@@ -23,11 +23,13 @@ namespace MeteorGame
 
     public struct FrameInput
     {
-        public float Z;
-        public float X;
-        public bool JumpDown;
-        public bool JumpUp;
+        public float z;
+        public float x;
+        public bool jumpPressed;
+        public bool jumpReleased;
+        public bool jumpDown;
 
+        public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
     }
 
 
@@ -49,49 +51,15 @@ namespace MeteorGame
         public bool Grounded => isGrounded;
 
         private Vector3 _lastPosition;
-        private float horizontalVelX, horizontalVelY, verticalVel;
+        private float newX, newZ, verticalVel;
 
+        //[Header("WALKING")]
+        //[SerializeField] private float acceleration = 90;
 
-        private void Update()
-        {
-            // Calculate velocity
-            Velocity = (transform.position - _lastPosition) / Time.deltaTime;
-            _lastPosition = transform.position;
+        [Tooltip("Maximum velocity")]
+        [SerializeField] private float moveClamp = 13;
+        [SerializeField] private float apexBonusMultiplier = 2;
 
-            GatherInput();
-            RunGroundedChecks();
-
-            CalculateWalk(); // Horizontal movement
-
-            /*
-            CalculateJumpApex(); // Affects fall speed, so calculate before gravity
-            CalculateGravity(); // Vertical movement
-            CalculateJump(); // Possibly overrides vertical
-
-            MoveCharacter(); // Actually perform the axis movement
-            */
-        }
-
-        #region Gather Input
-
-        private void GatherInput()
-        {
-            Input = new FrameInput
-            {
-                JumpDown = UnityEngine.Input.GetButtonDown("Jump"),
-                JumpUp = UnityEngine.Input.GetButtonUp("Jump"),
-                X = UnityEngine.Input.GetAxisRaw("Horizontal"),
-                Z = UnityEngine.Input.GetAxisRaw("Vertical")
-            };
-            if (Input.JumpDown)
-            {
-                _lastJumpPressed = Time.time;
-            }
-        }
-
-        #endregion
-
-        #region Collisions
 
         [Header("COLLISION")] [SerializeField] private Bounds _characterBounds;
         [SerializeField] private LayerMask _groundLayer;
@@ -99,64 +67,99 @@ namespace MeteorGame
         [SerializeField] private float _detectionRayLength = 0.1f;
         [SerializeField] [Range(0.1f, 0.3f)] private float _rayBuffer = 0.1f; // Prevents side detectors hitting the ground
 
-        private RayRange _raysUp, _raysRight, _raysDown, _raysLeft;
-        private bool _colUp, _colRight, isGrounded, _colLeft;
 
+        [SerializeField] private Rigidbody rigidBody;
+
+
+
+
+        [SerializeField] private float maxGroundAcceleration = 50f;
+        [SerializeField] private float maxAirAcceleration = 50f;
+
+        [SerializeField] private float maxGroundDeAcceleration = 60f;
+
+
+
+
+
+
+        [Header("MOVE")]
+        [SerializeField, Tooltip("Raising this value increases collision accuracy at the cost of performance.")]
+        private int _freeColliderIterations = 10;
+
+
+
+
+
+
+
+
+
+        private bool isGrounded;
         private float _timeLeftGrounded;
 
-        // We use these raycast checks for pre-collision information
-        private void RunGroundedChecks()
+
+
+        
+
+
+
+        private void OnCollisionEnter(Collision collision)
         {
-            // Generate ray ranges. 
-            //CalculateRayRanged();
-
-            // Ground
-            LandingThisFrame = false;
-            bool groundedCheck = GroundedCheck();
-
-            if (isGrounded && !groundedCheck)
+            if (!isGrounded && collision.collider.tag == "Ground")
             {
-                _timeLeftGrounded = Time.time; // Only trigger when first leaving
-            }
-            else if (!isGrounded && groundedCheck)
-            {
-                _coyoteUsable = true; // Only trigger when first touching
+                isGrounded = true;
                 LandingThisFrame = true;
+                _coyoteUsable = true; // Only trigger when first touching
             }
-
-            isGrounded = groundedCheck;
-
-            //// The rest
-            //_colUp = RunDetection(_raysUp);
-            //_colLeft = RunDetection(_raysLeft);
-            //_colRight = RunDetection(_raysRight);
-
-            //bool RunDetection(RayRange range)
-            //{
-            //    return EvaluateRayPositions(range).Any(point => Physics.Raycast(point, range.Dir, _detectionRayLength, _groundLayer));
-            //}
         }
 
-        [Tooltip("Transform at our feet to know where collider begins")]
-        [SerializeField] private Transform feetTransform;
-
-        [Tooltip("The size of the radi to check beneath our feet")]
-        [SerializeField] private float groundedCheckRadi = 0.1f;
-
-        private bool GroundedCheck()
+        private void OnCollisionExit(Collision collision)
         {
-            return Physics.OverlapSphere(feetTransform.position, groundedCheckRadi, _groundLayer, QueryTriggerInteraction.Ignore).Count() > 0;
+            if (isGrounded && collision.collider.tag == "Ground")
+            {
+                isGrounded = false;
+            }
         }
 
-        private void CalculateRayRanged()
+        private void Update()
         {
-            // This is crying out for some kind of refactor. 
-            var b = new Bounds(transform.position, _characterBounds.size);
+            newX = 0;
+            newZ = 0;
 
-            _raysDown = new RayRange(b.min.x + _rayBuffer, b.min.y, b.max.x - _rayBuffer, b.min.y, Vector2.down);
-            _raysUp = new RayRange(b.min.x + _rayBuffer, b.max.y, b.max.x - _rayBuffer, b.max.y, Vector2.up);
-            _raysLeft = new RayRange(b.min.x, b.min.y + _rayBuffer, b.min.x, b.max.y - _rayBuffer, Vector2.left);
-            _raysRight = new RayRange(b.max.x, b.min.y + _rayBuffer, b.max.x, b.max.y - _rayBuffer, Vector2.right);
+            // Calculate velocity
+            Velocity = (transform.position - _lastPosition) / Time.deltaTime;
+            _lastPosition = transform.position;
+
+            GatherInput();
+            CalculateWalk(); 
+
+            /*
+            CalculateJumpApex(); // Affects fall speed, so calculate before gravity
+            CalculateGravity(); // Vertical movement
+
+            */
+
+            CalculateJump(); // Possibly overrides vertical
+
+            MoveCharacter(); // Actually perform the axis movement
+        }
+
+        private void GatherInput()
+        {
+            Input = new FrameInput
+            {
+                jumpPressed = UnityEngine.Input.GetButtonDown("Jump"),
+                jumpReleased = UnityEngine.Input.GetButtonUp("Jump"),
+                jumpDown = UnityEngine.Input.GetButton("Jump"),
+                x = UnityEngine.Input.GetAxisRaw("Horizontal"),
+                z = UnityEngine.Input.GetAxisRaw("Vertical")
+            };
+
+            if (Input.jumpPressed)
+            {
+                _lastJumpPressed = Time.time;
+            }
         }
 
 
@@ -169,72 +172,75 @@ namespace MeteorGame
             }
         }
 
-        private void OnDrawGizmos()
-        {
-            // Bounds
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(transform.position + _characterBounds.center, _characterBounds.size);
-
-            // Rays
-            if (!Application.isPlaying)
-            {
-                CalculateRayRanged();
-                Gizmos.color = Color.blue;
-                foreach (var range in new List<RayRange> { _raysUp, _raysRight, _raysDown, _raysLeft })
-                {
-                    foreach (var point in EvaluateRayPositions(range))
-                    {
-                        Gizmos.DrawRay(point, range.Dir * _detectionRayLength);
-                    }
-                }
-            }
-
-            //if (!Application.isPlaying) return;
-
-            // Draw the future position. Handy for visualizing gravity
-            Gizmos.color = Color.red;
-            var move = new Vector3(horizontalVelX, verticalVel) * Time.deltaTime;
-            Gizmos.DrawWireCube(transform.position + move, _characterBounds.size);
-        }
-
-        #endregion
-
-
-        #region Walk
-
-        [Header("WALKING")] [SerializeField] private float _acceleration = 90;
-        [SerializeField] private float _moveClamp = 13;
-        [SerializeField] private float _deAcceleration = 60f;
-        [SerializeField] private float _apexBonus = 2;
-
         private void CalculateWalk()
         {
-            if (Input.X != 0)
-            {
-                // Set horizontal move speed
-                horizontalVelX += Input.X * _acceleration * Time.deltaTime;
+            Vector3 currentVel = rigidBody.velocity;
+            float currentVelMag = rigidBody.velocity.magnitude;
 
-                // clamped by max frame movement
-                horizontalVelX = Mathf.Clamp(horizontalVelX, -_moveClamp, _moveClamp);
+            float currentX = Vector3.Dot(currentVel, transform.right);
+            float currentZ = Vector3.Dot(currentVel, transform.forward);
+            float acceleration = isGrounded ? maxGroundAcceleration : maxAirAcceleration;
+
+
+            if (Input.x != 0)
+            {
+                if (currentX < moveClamp)
+                {
+                    newX = Input.x * acceleration * Time.deltaTime;
+                }
 
                 // Apply bonus at the apex of a jump
-                var apexBonus = Mathf.Sign(Input.X) * _apexBonus * _apexPoint;
-                horizontalVelX += apexBonus * Time.deltaTime;
+                var apexBonus = Mathf.Sign(Input.x) * apexBonusMultiplier * _apexPoint;
+                newX += apexBonus * Time.deltaTime;
             }
-            else
+            else // No input. Let's slow the character down
             {
-                // No input. Let's slow the character down
-                horizontalVelX = Mathf.MoveTowards(horizontalVelX, 0, _deAcceleration * Time.deltaTime);
+                var target = Mathf.MoveTowards(currentX, 0, maxGroundDeAcceleration * Time.deltaTime);
+                var slowDownAmount = currentX - target;
+
+                newX -= slowDownAmount;
             }
 
-            if (horizontalVelX > 0 && _colRight || horizontalVelX < 0 && _colLeft)
+            if (Input.z != 0)
             {
-                // Don't walk through walls
-                horizontalVelX = 0;
+                if (currentZ < moveClamp)
+                {
+                    newZ = Input.z * acceleration * Time.deltaTime;
+                }
+
+                // Apply bonus at the apex of a jump
+                var apexBonus = Mathf.Sign(Input.z) * apexBonusMultiplier * _apexPoint;
+                newZ += apexBonus * Time.deltaTime;
+            }
+            else // No input. Let's slow the character down
+            {
+                var target = Mathf.MoveTowards(currentZ, 0, maxGroundDeAcceleration * Time.deltaTime);
+                var slowDownAmount = currentZ - target;
+
+                newZ -= slowDownAmount;
             }
         }
 
-        #endregion
+
+        
+
+        // We cast our bounds before moving to avoid future collisions
+        private void MoveCharacter()
+        {
+            //RawMovement = new Vector3(newX * transform.right, 0, newZ); // Used externally
+
+            var right = newX * transform.right;
+            var fwd = newZ * transform.forward;
+
+
+
+            var currMoveVel = rigidBody.velocity.magnitude;
+
+            rigidBody.velocity += right;
+            rigidBody.velocity += fwd;
+
+        }
+
 
         #region Gravity
 
@@ -276,6 +282,10 @@ namespace MeteorGame
         private bool _endedJumpEarly = true;
         private float _apexPoint; // Becomes 1 at the apex of a jump
         private float _lastJumpPressed;
+
+
+
+
         private bool CanUseCoyote => _coyoteUsable && !isGrounded && _timeLeftGrounded + _coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => isGrounded && _lastJumpPressed + _jumpBuffer > Time.time;
 
@@ -296,7 +306,7 @@ namespace MeteorGame
         private void CalculateJump()
         {
             // Jump if: grounded or within coyote threshold || sufficient jump buffer
-            if (Input.JumpDown && CanUseCoyote || HasBufferedJump)
+            if (Input.jumpPressed && CanUseCoyote || HasBufferedJump)
             {
                 verticalVel = _jumpHeight;
                 _endedJumpEarly = false;
@@ -310,70 +320,20 @@ namespace MeteorGame
             }
 
             // End the jump early if button released
-            if (!isGrounded && Input.JumpUp && !_endedJumpEarly && Velocity.y > 0)
+            if (!isGrounded && Input.jumpReleased && !_endedJumpEarly && Velocity.y > 0)
             {
                 // _currentVerticalSpeed = 0;
                 _endedJumpEarly = true;
             }
-
-            if (_colUp)
-            {
-                if (verticalVel > 0) verticalVel = 0;
-            }
         }
 
+        
+        
         #endregion
 
-        #region Move
 
-        [Header("MOVE")]
-        [SerializeField, Tooltip("Raising this value increases collision accuracy at the cost of performance.")]
-        private int _freeColliderIterations = 10;
 
-        // We cast our bounds before moving to avoid future collisions
-        private void MoveCharacter()
-        {
-            var pos = transform.position;
-            RawMovement = new Vector3(horizontalVelX, verticalVel); // Used externally
-            var move = RawMovement * Time.deltaTime;
-            var furthestPoint = pos + move;
 
-            // check furthest movement. If nothing hit, move and don't do extra checks
-            var hit = Physics2D.OverlapBox(furthestPoint, _characterBounds.size, 0, _groundLayer);
-            if (!hit)
-            {
-                transform.position += move;
-                return;
-            }
-
-            // otherwise increment away from current pos; see what closest position we can move to
-            var positionToMoveTo = transform.position;
-            for (int i = 1; i < _freeColliderIterations; i++)
-            {
-                // increment to check all but furthestPoint - we did that already
-                var t = (float)i / _freeColliderIterations;
-                var posToTry = Vector2.Lerp(pos, furthestPoint, t);
-
-                if (Physics2D.OverlapBox(posToTry, _characterBounds.size, 0, _groundLayer))
-                {
-                    transform.position = positionToMoveTo;
-
-                    // We've landed on a corner or hit our head on a ledge. Nudge the player gently
-                    if (i == 1)
-                    {
-                        if (verticalVel < 0) verticalVel = 0;
-                        var dir = transform.position - hit.transform.position;
-                        transform.position += dir.normalized * move.magnitude;
-                    }
-
-                    return;
-                }
-
-                positionToMoveTo = posToTry;
-            }
-        }
-
-        #endregion
 
     }
 }
