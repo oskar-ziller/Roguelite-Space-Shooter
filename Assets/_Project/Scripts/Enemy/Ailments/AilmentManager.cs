@@ -103,7 +103,7 @@ namespace MeteorGame
 
         private void CheckForShock(SpellSlot from, float damageAmount)
         {
-            if (damageAmount == 0)
+            if (damageAmount <= 0)
             {
                 return;
             }
@@ -150,7 +150,7 @@ namespace MeteorGame
 
         private bool CheckForFreeze(SpellSlot from, int damageAmount)
         {
-            if (damageAmount == 0)
+            if (damageAmount <= 0)
             {
                 return false;
             }
@@ -238,7 +238,7 @@ namespace MeteorGame
 
         private void CheckForIgnite(SpellSlot from, float damageAmount)
         {
-            if (damageAmount == 0)
+            if (damageAmount <= 0)
             {
                 return;
             }
@@ -275,7 +275,14 @@ namespace MeteorGame
             {
                 if (Time.time - igniteTick > igniteTickIntervalSeconds)
                 {
-                    owner.IgniteTick((int)strongestIgnite.magnitude);
+                    Debug.Log($"Taking damage from {igniteStacks.Count} ignite stacks");
+                    foreach (var item in igniteStacks) // all ignites
+                    {
+                        owner.IgniteTick((int)item.magnitude);
+                    }
+
+                    // strongest ignite
+                    //owner.IgniteTick((int)strongestIgnite.magnitude);
                     igniteTick = Time.time;
                 }
             }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -126,6 +127,9 @@ namespace MeteorGame
 
         public void Init(Vector3 pos)
         {
+            baseLifeList = baseLifeArr.ToList();
+            baseLifeList.Reverse();
+
             spawnPos = pos;
 
             RepositionToSpawn();
@@ -133,7 +137,14 @@ namespace MeteorGame
             SetLevel(Mathf.RoundToInt(GameManager.Instance.GameLevel));
             //SetRandomRotation();
 
-            baseLife = (int)(baseLifeArr[maxLevel - level - 1] * 1.2f);
+
+
+            // TODO: Remove
+            //baseLife = (int)(baseLifeArr[maxLevel - level - 1] * 1.2f);
+            baseLife = (int)(baseLifeList[3] * 1f);
+
+
+
 
             var monsterTypeHealthModifier = 1f; // %50-%200 arasi
 
@@ -235,11 +246,11 @@ namespace MeteorGame
 
 
         int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823, 32684, 30673, 28784, 27007, 25338, 23770, 22296, 20911, 19610, 18388, 17240, 16161, 15149, 14198, 13304, 12466, 11679, 10940, 10246, 9595, 8984, 8410, 7872, 7367, 6894, 6449, 6033, 5642, 5276, 4932, 4610, 4308, 4025, 3760, 3512, 3279, 3061, 2857, 2665, 2486, 2319, 2162, 2015, 1878, 1749, 1629, 1516, 1411, 1313, 1221, 1135, 1055, 980, 910, 844, 783, 726, 673, 624, 577, 534, 494, 456, 422, 389, 359, 331, 304, 280, 257, 236, 217, 199, 182, 166, 152, 138, 126, 114, 104, 94, 85, 76, 68, 61, 55, 49, 43, 38, 33, 29, 25, 21, 18, 15 };
-
+        List<int> baseLifeList;
 
         void Start()
         {
-
+            
         }
 
 
@@ -312,11 +323,17 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
+            print("IgniteTick " + amount);
             TakeDamage(amount);
         }
 
         private void TakeDamage(int amount)
         {
+            if (amount <= 0)
+            {
+                return;
+            }
+
             var shock = ailmentManager.strongestShock;
 
             if (shock != null)
@@ -360,9 +377,24 @@ namespace MeteorGame
 
         public void TakeHit(SpellSlot from, bool applyAilment = true)
         {
-            float more = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
-            float less = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
-            float final = (1 + more) * (1 - less);
+
+            var increasedProjDamage = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
+            var increasedDmgAgainstIgnited = ModifierHelper.GetTotal("IncreasedDamageAgainstIgnited", from) / 100f;
+
+            var increased = increasedProjDamage + increasedDmgAgainstIgnited;
+
+
+
+            var reducedProjDamage = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
+            var reduced = reducedProjDamage;
+
+
+            var final = 1 + (increased - reduced);
+
+            //float more = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
+
+            //float less = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
+            //float final = (1 + more) * (1 - less);
 
             int fire = (int)(ModifierHelper.GetTotal("DealFireDamage", from) * final);
             int lightning = (int)(ModifierHelper.GetTotal("DealLightningDamage", from) * final);

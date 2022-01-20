@@ -65,7 +65,7 @@ namespace MeteorGame
 
         public int GetModifierValueForCurrentLevel(string s)
         {
-            return GetModifierValueForCurrentLevel(GameManager.Instance.GetModifierSO("ExplosionRadius"));
+            return GetModifierValueForCurrentLevel(GameManager.Instance.GetModifierSO(s));
         }
 
         public int GetModifierValueForCurrentLevel(Modifier m)
@@ -165,31 +165,32 @@ namespace MeteorGame
                     {
                         uiString += "- ";
                         uiString += modifierDesc;
-                        continue;
-                    }
-
-                    uiString += "- ";
-                    uiString += modifierDesc.Substring(0, indexOf); // Skills have 
-
-                    uiString += $"<b><color={statColorBright}>";
-                    uiString += curr;
-                    uiString += percentage; // percentage = "" if no % character exists in this description
-                    uiString += @"</color></b>"; // Skills have 28% 
-
-                    uiString += modifierDesc.Substring(indexOf, modifierDesc.Length - indexOf); 
-                    // Skills have 28% XXX% increased area of effect
-
-                    if (m.max == m.min)
-                    {
-                        uiString = uiString.Replace($"XXX%", "");
-                        uiString = uiString.Replace($"XXX", "");
                     }
                     else
                     {
-                        var replace = $" <color={statColorDark}><size={smallStatSize}%>({m.min}-{m.max})<size=100%></color>";
-                        uiString = uiString.Replace("XXX%", replace);
-                        uiString = uiString.Replace("XXX", replace);
-                        // Skills have 28% (5-52) increased area of effect
+                        uiString += "- ";
+                        uiString += modifierDesc.Substring(0, indexOf); // Skills have 
+
+                        uiString += $"<b><color={statColorBright}>";
+                        uiString += curr;
+                        uiString += percentage; // percentage = "" if no % character exists in this description
+                        uiString += @"</color></b>"; // Skills have 28% 
+
+                        uiString += modifierDesc.Substring(indexOf, modifierDesc.Length - indexOf);
+                        // Skills have 28% XXX% increased area of effect
+
+                        if (m.max == m.min)
+                        {
+                            uiString = uiString.Replace($"XXX%", "");
+                            uiString = uiString.Replace($"XXX", "");
+                        }
+                        else
+                        {
+                            var replace = $" <color={statColorDark}><size={smallStatSize}%>({m.min}-{m.max})<size=100%></color>";
+                            uiString = uiString.Replace("XXX%", replace);
+                            uiString = uiString.Replace("XXX", replace);
+                            // Skills have 28% (5-52) increased area of effect
+                        }
                     }
 
                     uiString += Environment.NewLine;

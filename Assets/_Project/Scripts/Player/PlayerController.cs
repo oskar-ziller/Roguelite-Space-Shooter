@@ -111,8 +111,6 @@ namespace MeteorGame
 
             if (collision.collider.tag == "Ground")
             {
-                print($"-coll- enter isGrounded: {isGrounded} -> true");
-
                 isGrounded = true;
                 coyoteUsable = true;
                 hasBufferedJump = lastJumpPressed + jumpBuffer > Time.time;

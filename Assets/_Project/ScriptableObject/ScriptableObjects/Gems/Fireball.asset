@@ -22,6 +22,9 @@ MonoBehaviour:
   - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
     min: 5
     max: 7
+  - modifier: {fileID: 11400000, guid: 931d8f259a2e1af439a68ee87fac0709, type: 2}
+    min: 80
+    max: 150
   name: Fireball
   gemColor: {r: 0.8018868, g: 0.12655279, b: 0.055980746, a: 1}
   spellSO: {fileID: 11400000, guid: 5c81a95ece82fa24a8a6a535808fcb82, type: 2}

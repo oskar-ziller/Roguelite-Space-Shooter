@@ -664,8 +664,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoText: Click to unequip
-  infoDelay: 0.5
-  gemInfoDelay: 0
+  infoDelay: 0
+  gemInfoDelay: 0.1
   showInfo: 1
   showGemInfo: 1
 --- !u!1 &452167160266465889
