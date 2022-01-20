@@ -11,7 +11,6 @@ namespace MeteorGame
     {
         [Tooltip("The main body group of the projectile")]
         [SerializeField] private GameObject bodyGroup;
-
         [SerializeField] private Rigidbody rigidBody;
 
         [Tooltip("We need to desroy projectile's collider when begin explode etc")]
