@@ -42,11 +42,15 @@ namespace MeteorGame
         [SerializeField] private float boostMultipMaxVel = 2f; // 
 
 
+
+        [SerializeField] private float airMaxSpeed = 10f; // 
+        [SerializeField] private float groundMaxSpeed = 10f;
+
+
         [SerializeField] private CapsuleCollider playerCollider;
 
 
-        [SerializeField]
-        private float maxSpeed = 10f;
+
 
         [SerializeField]
         private float jumpHeight = 2f;
@@ -487,8 +491,10 @@ namespace MeteorGame
 
             if (inputs.inputVector.x != 0)
             {
-                var targetVel = inputs.inputVector.x * maxSpeed * currentBoostMultipMaxVel;
                 var a = acceleration * currentBoostMultipAccel;
+                var s = isGrounded ? groundMaxSpeed : airMaxSpeed;
+
+                var targetVel = inputs.inputVector.x * s * currentBoostMultipMaxVel;
 
                 newX = Mathf.MoveTowards(currentX, targetVel, a * Time.deltaTime);
             }
@@ -501,9 +507,10 @@ namespace MeteorGame
 
             if (inputs.inputVector.y != 0)
             {
-
-                var targetVel = inputs.inputVector.y * maxSpeed * currentBoostMultipMaxVel;
+                var s = isGrounded ? groundMaxSpeed : airMaxSpeed;
                 var a = acceleration * currentBoostMultipAccel;
+
+                var targetVel = inputs.inputVector.y * s * currentBoostMultipMaxVel;
 
                 newZ = Mathf.MoveTowards(currentZ, targetVel, a * Time.deltaTime);
             }
