@@ -11,7 +11,6 @@ namespace MeteorGame
     {
         [Tooltip("The main body group of the projectile")]
         [SerializeField] private GameObject bodyGroup;
-
         [SerializeField] private Rigidbody rigidBody;
 
         [Tooltip("We need to desroy projectile's collider when begin explode etc")]
@@ -99,6 +98,19 @@ namespace MeteorGame
         {
             StartedMovingFrom = rigidBody.position;
             ProjectileMover.Move();
+
+
+            if (isSetup)
+            {
+                DoScaleUp();
+            }
+
+        }
+
+
+        private void DoScaleUp()
+        {
+            transform.DOScale(1, 2f);
         }
 
         /// <summary>
@@ -388,29 +400,39 @@ namespace MeteorGame
             spinner.enabled = true;
         }
 
-        public void MakeDummy()
+        private void DisableTrails()
         {
-            DisableCollider();
-            Rigidbody.isKinematic = true;
-            isDummy = true;
-
             foreach (var tr in trailRenderers)
             {
                 tr.enabled = false;
             }
         }
 
-        public void MakeNormal()
+        private void EnableTrails()
         {
-            EnableCollider();
-            Rigidbody.isKinematic = false;
-            isDummy = false;
-            spinner.enabled = false;
-
             foreach (var tr in trailRenderers)
             {
                 tr.enabled = true;
             }
+        }
+
+        public void MakeDummy()
+        {
+            DisableCollider();
+            DisableTrails();
+
+            Rigidbody.isKinematic = true;
+            isDummy = true;
+        }
+
+        public void MakeNormal()
+        {
+            EnableCollider();
+            EnableTrails();
+
+            Rigidbody.isKinematic = false;
+            isDummy = false;
+            spinner.enabled = false;
         }
     }
 }

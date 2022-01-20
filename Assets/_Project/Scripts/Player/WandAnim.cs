@@ -36,11 +36,12 @@ namespace MeteorGame
         public void Idle()
         {
             idleTween.Kill();
-            idleTween = transform.DOLocalRotate(new Vector3(0, 360, 0), 10, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).OnComplete(Idle);
+            idleTween = transform.DOLocalRotate(new Vector3(0, 360, 0), 15, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).OnComplete(Idle);
         }
 
         public void Shoot(float dur)
         {
+            return;
             idleTween.Kill();
             transform.DOLocalRotate(new Vector3(0, 180, 0), dur, RotateMode.LocalAxisAdd).SetEase(Ease.OutQuint).OnComplete(Idle);
         }

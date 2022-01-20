@@ -90,7 +90,7 @@ namespace MeteorGame
                 var smaller = ex.radi < radi ? ex.radi : radi;
                 var bigger = ex.radi > radi ? ex.radi : radi;
 
-                if (dst < radi / 2 + ex.radi / 2 + (smaller) * spacing + 0.1f)
+                if (dst < radi / 2 + ex.radi / 2 + spacing)
                 {
                     return true;
                 }

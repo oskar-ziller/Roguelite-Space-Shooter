@@ -13,12 +13,6 @@ namespace MeteorGame
         #region Variables
         
 
-        [Tooltip("Projectile spawn point")]
-        [SerializeField] public Transform spawnPoint;
-
-        [Tooltip("Projectile spawn point 2")]
-        [SerializeField] public Transform spawnPoint2;
-
         public Inventory Inv => inventory;
 
         public float currency = 0;

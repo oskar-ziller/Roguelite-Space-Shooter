@@ -101,7 +101,6 @@ namespace MeteorGame
                 var dummy = SpawnProjectile(spellSlot);
                 dummy.MakeDummy();
 
-
                 if (spellSlot.slotNo == 1)
                 {
                     dummy.transform.SetParent(playerProjectileHolder1);
@@ -114,11 +113,7 @@ namespace MeteorGame
 
                 listToUse.Add(dummy);
                 dummy.SetProjectileID(i);
-
-                if (spellSlot.Spell.ProjectileCount > 1)
-                {
-                    dummy.EnableSpinner();
-                }
+                dummy.EnableSpinner();
             }
         }
 
@@ -128,11 +123,11 @@ namespace MeteorGame
 
             if (castBy.slotNo == 1)
             {
-                spawnPos = Player.Instance.spawnPoint.position;
+                spawnPos = playerProjectileHolder1.position;
             }
             else
             {
-                spawnPos = Player.Instance.spawnPoint2.position;
+                spawnPos = playerProjectileHolder2.position;
             }
 
             ProjectileBase spellProjectile = null;
@@ -232,10 +227,18 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
+            var defaultScale = 0.15f;
+            var minScale = 0.01f;
+            var maxCount = 8f;
+            var currCount = listToUse.Count;
+
             foreach (var item in listToUse)
             {
                 item.transform.localScale = Vector3.zero;
-                item.transform.DOScale(Vector3.one / (float)listToUse.Count, dur);
+
+                var scale = defaultScale - (currCount * ((defaultScale - minScale) / maxCount));
+
+                item.transform.DOScale(scale, dur);
             }
         }
 

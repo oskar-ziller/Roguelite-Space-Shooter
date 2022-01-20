@@ -24,7 +24,6 @@ namespace MeteorGame
             speed = new Vector3(x, y, z);
 
             moveRange = Random.Range(minRange, maxRange);
-            moveRange = 0.1f;
         }
 
         private void UpdateRotation()
@@ -33,7 +32,7 @@ namespace MeteorGame
             var y = Mathf.Cos(progression.y);
             var z = Mathf.Cos(progression.z) + Mathf.Sin(progression.z);
 
-            transform.rotation = Quaternion.Euler(x, y, z);
+            transform.localRotation = Quaternion.Euler(x, y, z);
         }
 
         void UpdatePosition()
@@ -49,6 +48,7 @@ namespace MeteorGame
         {
             //UpdateRotation();
             UpdatePosition();
+            UpdateRotation();
             progression += Time.deltaTime * speed;
         }
     }
