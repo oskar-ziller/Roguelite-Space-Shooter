@@ -174,7 +174,7 @@ namespace MeteorGame
             //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
 
             PlaySpawnSound();
-            PlayHoverSound();
+            //PlayHoverSound();
         }
 
 

@@ -24,7 +24,6 @@ namespace MeteorGame
             speed = new Vector3(x, y, z);
 
             moveRange = Random.Range(minRange, maxRange);
-            moveRange = 0.1f;
         }
 
         private void UpdateRotation()
