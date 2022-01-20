@@ -101,7 +101,6 @@ namespace MeteorGame
                 var dummy = SpawnProjectile(spellSlot);
                 dummy.MakeDummy();
 
-
                 if (spellSlot.slotNo == 1)
                 {
                     dummy.transform.SetParent(playerProjectileHolder1);
@@ -114,11 +113,7 @@ namespace MeteorGame
 
                 listToUse.Add(dummy);
                 dummy.SetProjectileID(i);
-
-                if (spellSlot.Spell.ProjectileCount > 1)
-                {
-                    dummy.EnableSpinner();
-                }
+                dummy.EnableSpinner();
             }
         }
 
@@ -232,8 +227,8 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
-            var defaultScale = 0.0125f;
-            var minScale = 0.011f;
+            var defaultScale = 0.15f;
+            var minScale = 0.01f;
             var maxCount = 8f;
             var currCount = listToUse.Count;
 
