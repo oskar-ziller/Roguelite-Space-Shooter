@@ -48,6 +48,58 @@ namespace MeteorGame
             manager = GetComponentInParent<SlotManagerUI>();
         }
 
+
+
+        private void Update()
+        {
+            if (manager.ownerSlot.MaxLinks == linkNo)
+            {
+                Lock();
+                return;
+            }
+            else
+            {
+                Unlock();
+            }
+
+
+            bool isEmpty = manager.ownerSlot.Linked.Count <= linkNo;
+
+            if (isEmpty)
+            {
+                Empty();
+            }
+            else
+            {
+                NotEmpty();
+                SetTextAndColors();
+
+                var linked = manager.ownerSlot.Linked;
+                GemItem g = linked[linkNo];
+                slotTooltipTrigger.SetupGemInfoTooltip(g);
+            }
+
+        }
+
+        public void OnClicked()
+        {
+            if (!locked && !empty)
+            {
+                GemItem g = manager.ownerSlot.Linked[linkNo];
+                manager.ownerSlot.RemoveLinked(g);
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+
+        public void OnUnlockClicked()
+        {
+            manager.OnUnlockClicked();
+        }
+
         private void Lock()
         {
             emptyTmp.enabled = false;
@@ -94,54 +146,6 @@ namespace MeteorGame
             overlay.color = g.Color;
 
             nameTmp.text = g.Name;
-
-            slotTooltipTrigger.SetupGemInfoTooltip(g);
-        }
-
-        private void Update()
-        {
-            if (manager.ownerSlot.MaxLinks == linkNo)
-            {
-                Lock();
-                return;
-            }
-            else
-            {
-                Unlock();
-            }
-
-
-            bool isEmpty = manager.ownerSlot.Linked.Count <= linkNo;
-
-            if (isEmpty)
-            {
-                Empty();
-            }
-            else
-            {
-                NotEmpty();
-                SetTextAndColors();
-            }
-
-        }
-
-        public void OnClicked()
-        {
-            if (!locked && !empty)
-            {
-                GemItem g = manager.ownerSlot.Linked[linkNo];
-                manager.ownerSlot.RemoveLinked(g);
-            }
-        }
-
-        #endregion
-
-        #region Methods
-
-
-        public void OnUnlockClicked()
-        {
-            manager.OnUnlockClicked();
         }
 
         #endregion

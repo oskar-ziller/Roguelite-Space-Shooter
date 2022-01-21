@@ -88,6 +88,7 @@ namespace MeteorGame
         [Tooltip("Spacing between two enemies in a pack")]
         [SerializeField] private float spacingBetweenEnemies;
 
+        private int totalSpawned = 0;
 
         #endregion
 
@@ -432,7 +433,9 @@ namespace MeteorGame
 
             e.ChangeSize(size);
             e.SetRarity(rarity);
-            e.Init(startPos);
+            e.Init(startPos, totalSpawned);
+
+            totalSpawned++;
 
             return e;
         }

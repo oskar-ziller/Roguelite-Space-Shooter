@@ -18,7 +18,7 @@ namespace MeteorGame
         public List<GemItem> Linked => gems;
 
 
-        public Action<SpellSlot, GemItem> GemAddedOrRemoved;
+        public Action<SpellSlot, GemItem> GemLinkedOrRemoved;
         public Action<SpellSlot, SpellItem> SpellChanged;
 
         public int slotNo;
@@ -38,7 +38,7 @@ namespace MeteorGame
 
             gems.Add(gem);
             gem.Equip();
-            GemAddedOrRemoved?.Invoke(this, gem);
+            GemLinkedOrRemoved?.Invoke(this, gem);
         }
 
         private void ChangeSpell(SpellItem spell)
@@ -58,7 +58,7 @@ namespace MeteorGame
         {
             gem.UnEquip();
             gems.Remove(gem);
-            GemAddedOrRemoved?.Invoke(this, gem);
+            GemLinkedOrRemoved?.Invoke(this, gem);
         }
 
         private bool CanLink()

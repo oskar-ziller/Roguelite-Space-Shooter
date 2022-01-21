@@ -12,6 +12,7 @@ namespace MeteorGame
 
         #region Variables
         
+        [SerializeField] private Inventory inventory;
 
         public Inventory Inv => inventory;
 
@@ -21,7 +22,6 @@ namespace MeteorGame
         private SpellSlot spellSlot2 = new SpellSlot(2);
 
         private Tween currencyTween;
-        private Inventory inventory;
         private Camera cameraObj;
 
 
@@ -57,10 +57,10 @@ namespace MeteorGame
             QualitySettings.vSyncCount = 1;
             Application.targetFrameRate = 144;
 
-            spellSlot1.GemAddedOrRemoved += OnGemAddedOrRemoved;
+            spellSlot1.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot1.SpellChanged += OnSpellChanged;
 
-            spellSlot2.GemAddedOrRemoved += OnGemAddedOrRemoved;
+            spellSlot2.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot2.SpellChanged += OnSpellChanged;
         }
 
@@ -75,7 +75,7 @@ namespace MeteorGame
         {
             foreach (GemSO gemSO in GameManager.Instance.AllGems.All)
             {
-                GemItem gem = new GemItem(gemSO, level: 0);
+                GemItem gem = new GemItem(gemSO, level: 20);
                 inventory.AddGem(gem);
             }
         }
@@ -141,15 +141,6 @@ namespace MeteorGame
 
             return destination;
         }
-
-
-        //public bool CanLinkMore()
-        //{
-        //    return linkedGems.Count < maxLinkedGems;
-        //}
-
-
-
 
 
         [ContextMenu("Add currency")]

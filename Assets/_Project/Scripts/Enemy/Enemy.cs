@@ -54,6 +54,7 @@ namespace MeteorGame
 
         private AudioSource spawnAudioSource;
 
+        private int id;
 
         public AnimationCurve spawnAudioCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 1), new Keyframe(1, 0) });
 
@@ -125,8 +126,10 @@ namespace MeteorGame
 
 
 
-        public void Init(Vector3 pos)
+        public void Init(Vector3 pos, int id)
         {
+            this.id = id;
+
             baseLifeList = baseLifeArr.ToList();
             baseLifeList.Reverse();
 
@@ -139,9 +142,7 @@ namespace MeteorGame
 
 
 
-            // TODO: Remove
-            //baseLife = (int)(baseLifeArr[maxLevel - level - 1] * 1.2f);
-            baseLife = (int)(baseLifeList[3] * 1f);
+            baseLife = (int)(baseLifeList[level]);
 
 
 
@@ -245,7 +246,28 @@ namespace MeteorGame
         }
 
 
-        int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823, 32684, 30673, 28784, 27007, 25338, 23770, 22296, 20911, 19610, 18388, 17240, 16161, 15149, 14198, 13304, 12466, 11679, 10940, 10246, 9595, 8984, 8410, 7872, 7367, 6894, 6449, 6033, 5642, 5276, 4932, 4610, 4308, 4025, 3760, 3512, 3279, 3061, 2857, 2665, 2486, 2319, 2162, 2015, 1878, 1749, 1629, 1516, 1411, 1313, 1221, 1135, 1055, 980, 910, 844, 783, 726, 673, 624, 577, 534, 494, 456, 422, 389, 359, 331, 304, 280, 257, 236, 217, 199, 182, 166, 152, 138, 126, 114, 104, 94, 85, 76, 68, 61, 55, 49, 43, 38, 33, 29, 25, 21, 18, 15 };
+        int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
+                              32684, 30673, 28784, 27007, 25338,
+                              23770, 22296, 20911, 19610, 18388,
+                              17240, 16161, 15149, 14198, 13304,
+                              12466, 11679, 10940, 10246, 9595,
+                              8984, 8410, 7872, 7367, 6894,
+                              6449, 6033, 5642, 5276, 4932,
+                              4610, 4308, 4025, 3760, 3512,
+                              3279, 3061, 2857, 2665, 2486,
+                              2319, 2162, 2015, 1878, 1749,
+                              1629, 1516, 1411, 1313, 1221,
+                              1135, 1055, 980, 910, 844,
+                              783, 726, 673, 624, 577,
+                              534, 494, 456, 422, 389,
+                              359, 331, 304, 280, 257,
+                              236, 217, 199, 182, 166,
+                              152, 138, 126, 114, 104,
+                              94, 85, 76, 68, 61,
+                              55, 49, 43, 38, 33,
+                              29, 25, 21, 18, 15 };
+
+
         List<int> baseLifeList;
 
         void Start()
@@ -323,7 +345,7 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
-            print("IgniteTick " + amount);
+            //print("IgniteTick " + amount);
             TakeDamage(amount);
         }
 
@@ -344,6 +366,13 @@ namespace MeteorGame
             }
 
             currentHealth -= amount;
+
+
+            //print($"-ENEMY{id}- Took {amount} damage." +
+            //    $" currentHealth: {currentHealth} -" +
+            //    $" totalHealth: {totalHealth} -" +
+            //    $" baseLife: {baseLife}");
+
 
             if (currentHealth <= 0)
             {

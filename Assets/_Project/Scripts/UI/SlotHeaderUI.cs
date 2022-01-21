@@ -14,7 +14,9 @@ namespace MeteorGame
         private TextMeshProUGUI nameTmp;
         public Image overlay;
 
-        private SlotManagerUI owner;
+        private SlotManagerUI manager;
+        private TooltipTrigger trigger;
+
 
         #endregion
 
@@ -23,26 +25,33 @@ namespace MeteorGame
         private void Awake()
         {
             nameTmp = GetComponentInChildren<TextMeshProUGUI>();
-            owner = GetComponentInParent<SlotManagerUI>();
+            manager = GetComponentInParent<SlotManagerUI>();
+            trigger = GetComponent<TooltipTrigger>();
         }
 
         private void Start()
         {
-        
+            manager.ownerSlot.SpellChanged += SpellChanged;
         }
 
-        private void Update()
+        private void SpellChanged(SpellSlot _, SpellItem spell)
         {
-            if (owner.ownerSlot.Spell == null)
+            if (spell == null)
             {
                 overlay.color = new Color(0, 0, 0, 0);
                 nameTmp.text = "- EMPTY - ";
             }
             else
             {
-                overlay.color = owner.ownerSlot.Spell.Gem.Color;
-                nameTmp.text = owner.ownerSlot.Spell.Gem.Name;
+                overlay.color = spell.Gem.Color;
+                nameTmp.text = spell.Gem.Name;
+                trigger.SetupGemInfoTooltip(spell.Gem);
             }
+        }
+
+        private void Update()
+        {
+            
         }
 
         #endregion

@@ -18,7 +18,7 @@ namespace MeteorGame
 
         public const float normalRarityScale = 3f;
         public const float magicRarityScale = 6f;
-        public const float rareRarityScale = 20f;
+        public const float rareRarityScale = 15f;
         public const float uniqueRarityScale = 25f;
 
         public float enemySpeed = 0.5f;

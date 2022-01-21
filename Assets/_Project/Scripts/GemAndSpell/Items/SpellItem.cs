@@ -8,7 +8,7 @@ namespace MeteorGame
     [Serializable]
     public class SpellItem
     {
-        private GemItem gemItem;
+        [NonSerialized] private GemItem gemItem;
 
         private string prettyName;
         private int msBetweenCasts;

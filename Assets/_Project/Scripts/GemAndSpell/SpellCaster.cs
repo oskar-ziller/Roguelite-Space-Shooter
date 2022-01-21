@@ -35,10 +35,10 @@ namespace MeteorGame
         private void Awake()
         {
             Player.Instance.SpellSlot(1).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(1).GemAddedOrRemoved += OnGemAddedRemoved;
+            Player.Instance.SpellSlot(1).GemLinkedOrRemoved += OnGemAddedRemoved;
 
             Player.Instance.SpellSlot(2).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(2).GemAddedOrRemoved += OnGemAddedRemoved;
+            Player.Instance.SpellSlot(2).GemLinkedOrRemoved += OnGemAddedRemoved;
 
 
             var wandAnims = Player.Instance.GetComponentsInChildren<WandAnim>().ToList();

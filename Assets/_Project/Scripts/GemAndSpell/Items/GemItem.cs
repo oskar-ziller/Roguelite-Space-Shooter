@@ -13,20 +13,22 @@ namespace MeteorGame
 
         #region Variables
 
-        private SpellItem spellItem;
-        private int level;
-        private int maxLevel = 20;
+        [SerializeField] private SpellItem spellItem;
+
+        [SerializeField] private string name;
+        [SerializeField] private int level = 1;
+        [SerializeField] private bool isEquipped = false;
+        private string description;
         private Color gemColor;
 
-        private string description;
-        private List<ModifierWithValue> modifiers;
+        [SerializeField] private List<ModifierWithValue> modifiers;
 
-        public bool IsEquipped { get; private set; }
+        public bool IsEquipped => isEquipped;
+        public string Name => name;
+        public Color Color => gemColor;
 
-        public string Name { get; private set; }
         public bool HasSpell => spellItem != null;
         public SpellItem Spell => spellItem;
-        public Color Color => gemColor;
         public string Description => description;
 
 
@@ -50,7 +52,7 @@ namespace MeteorGame
         public GemItem(GemSO gemSO, int level = 0)
         {
             modifiers = gemSO.modifiers;
-            Name = gemSO.name;
+            name = gemSO.name;
             description = gemSO.description;
             gemColor = gemSO.gemColor;
 
@@ -95,12 +97,12 @@ namespace MeteorGame
 
         public void Equip()
         {
-            IsEquipped = true;
+            isEquipped = true;
         }
 
         public void UnEquip()
         {
-            IsEquipped = false;
+            isEquipped = false;
         }
 
 
