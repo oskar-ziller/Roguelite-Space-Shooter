@@ -11,6 +11,7 @@ namespace MeteorGame
         #region Variables
 
         public SpellSlot ownerSlot { get; private set; }
+        private SlotHeaderUI header;
         private List<SlotLinkUI> links = new List<SlotLinkUI>();
         private TabMenuManager tabMenuManager;
         private RectTransform rectTransform;
@@ -63,6 +64,11 @@ namespace MeteorGame
         {
             var max = ownerSlot.MaxLinks;
 
+            if (!ownerSlot.IsUnlocked)
+            {
+                max = -1;
+            }
+
             foreach (SlotLinkUI link in links)
             {
                 if (link.linkNo <= max)
@@ -76,22 +82,54 @@ namespace MeteorGame
             }
         }
 
-
-        // Called when a SlotLinkUI is clicked when it's in locked state
-        public void OnUnlockClicked()
+        private bool TryBuy(int cost)
         {
-            var cost = links[ownerSlot.MaxLinks].unlockCost;
-
             if (Player.Instance.CanAfford(cost))
             {
                 Player.Instance.ChangeCurrency(-cost);
-                ownerSlot.IncreaseMaxLinks();
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
-                //LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
+                return true;
             }
             else
             {
                 tabMenuManager.DisplayError(UIError.CantAfford);
+                return false;
+            }
+        }
+
+        public void OnUnlockClickedSlotHeader(SlotHeaderUI slotHeaderUI)
+        {
+            bool res = TryBuy(slotHeaderUI.UnlockCost);
+
+            if (res)
+            {
+                ownerSlot.UnlockSpellSlot();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            }
+        }
+
+        // Called when a SlotLinkUI is clicked when it's in locked state
+        public void OnUnlockClickedLink(SlotLinkUI slotLinkUI)
+        {
+            //var cost = slotLinkUI.UnlockCost;
+
+            //if (Player.Instance.CanAfford(cost))
+            //{
+            //    Player.Instance.ChangeCurrency(-cost);
+            //    ownerSlot.IncreaseMaxLinks();
+            //    LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            //}
+            //else
+            //{
+            //    tabMenuManager.DisplayError(UIError.CantAfford);
+            //}
+
+
+            bool res = TryBuy(slotLinkUI.UnlockCost);
+
+            if (res)
+            {
+                ownerSlot.IncreaseMaxLinks();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
             }
         }
 

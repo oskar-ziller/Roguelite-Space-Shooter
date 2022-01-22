@@ -187,6 +187,7 @@ namespace MeteorGame
 
             PlaySpawnSound();
             //PlayHoverSound();
+            StartCoroutine(UpdateAilmentsCoroutine());
         }
 
 
@@ -331,9 +332,17 @@ namespace MeteorGame
             //}
         }
 
+        IEnumerator UpdateAilmentsCoroutine()
+        {
+            while (true)
+            {
+                ailmentManager.UpdateAilments();
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+
         private void FixedUpdate()
         {
-            ailmentManager.UpdateAilments();
             StopIfFrozen();
             SlowDownIfChilled();
         }
@@ -385,20 +394,14 @@ namespace MeteorGame
 
         public void TakeDoT(SpellSlot from, float scale, bool applyAilment = true)
         {
-            float more = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("IncreasedProjectileDamage"), from) / 100f;
-            float less = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ReducedProjectileDamage"), from) / 100f;
+            print($"Taking {from.DamageOverTime} damage per second." +
+                $" Current hit: {(int)(from.DamageOverTime / scale)}");
 
-            int fire = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("FireDamagePerSecond"), from) * (1 + more) * (1 - less));
-            int lightning = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("LightningDamagePerSecond"), from) * (1 + more) * (1 - less));
-            int cold = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ColdDamagePerSecond"), from) * (1 + more) * (1 - less));
-
-            int combined = fire + lightning + cold;
-
-            TakeDamage((int)(combined * scale));
+            TakeDamage((int)(from.DamageOverTime / scale));
 
             if (applyAilment)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, fire, cold, lightning);
+                ailmentManager.CheckIfDamageAppliesAilment(from, from.FireDoT, from.ColdDoT, from.LightDoT);
             }
         }
 
@@ -406,36 +409,38 @@ namespace MeteorGame
 
         public void TakeHit(SpellSlot from, bool applyAilment = true)
         {
+            var inc = 0f;
+            var red = 0f;
 
-            var increasedProjDamage = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
-            var increasedDmgAgainstIgnited = ModifierHelper.GetTotal("IncreasedDamageAgainstIgnited", from) / 100f;
+            if (ailmentManager.strongestIgnite != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstIgnited") / 100f;
+            }
 
-            var increased = increasedProjDamage + increasedDmgAgainstIgnited;
+            if (ailmentManager.strongestChill != null || ailmentManager.strongestFreeze != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstChilledOrFrozen") / 100f;
+            }
+
+            if (ailmentManager.strongestShock != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstShocked") / 100f;
+            }
+
+            float fireFinal = from.FireEffectiveDamage * (1 + inc) * (1 - red);
+            float coldFinal = from.ColdEffectiveDamage * (1 + inc) * (1 - red);
+            float lightFinal = from.LightningEffectiveDamage * (1 + inc) * (1 - red);
+
+            int final = (int)(fireFinal + coldFinal + lightFinal);
 
 
+            //print("Taking a hit of " + final);
 
-            var reducedProjDamage = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
-            var reduced = reducedProjDamage;
-
-
-            var final = 1 + (increased - reduced);
-
-            //float more = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
-
-            //float less = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
-            //float final = (1 + more) * (1 - less);
-
-            int fire = (int)(ModifierHelper.GetTotal("DealFireDamage", from) * final);
-            int lightning = (int)(ModifierHelper.GetTotal("DealLightningDamage", from) * final);
-            int cold = (int)(ModifierHelper.GetTotal("DealColdDamage", from) * final);
-
-            int combined = fire + lightning + cold;
-
-            TakeDamage(combined);
+            TakeDamage(final);
 
             if (applyAilment)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, fire, cold, lightning);
+                ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)lightFinal);
             }
         }
 

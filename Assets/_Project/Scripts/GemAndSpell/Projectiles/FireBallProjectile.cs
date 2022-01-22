@@ -36,7 +36,7 @@ namespace MeteorGame
             HideBody();
             DisableCollider();
 
-            var totalRadi = CastBy.Spell.ExplosionRadius;
+            var totalRadi = CastBy.ExpRadi;
 
             foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, totalRadi, fromShell: true))
             {

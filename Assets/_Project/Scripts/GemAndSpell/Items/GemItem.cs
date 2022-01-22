@@ -23,6 +23,8 @@ namespace MeteorGame
 
         [SerializeField] private List<ModifierWithValue> modifiers;
 
+
+        public List<ModifierWithValue> Modifiers => modifiers;
         public bool IsEquipped => isEquipped;
         public string Name => name;
         public Color Color => gemColor;
@@ -38,6 +40,7 @@ namespace MeteorGame
         private string statColorCold = "#58c4f4";
         private string statColorFire = "#ff4d07";
         private string statColorLightning = "#85fa46";
+        private string statColorDoT = "#85fa46";
 
         private int smallStatSize = 80;
 
@@ -63,6 +66,7 @@ namespace MeteorGame
                 spellItem = new SpellItem(gemSO.spellSO, this);
             }
         }
+
 
 
         public int GetModifierValueForCurrentLevel(string s)
@@ -134,6 +138,9 @@ namespace MeteorGame
 
             input = input.Replace("lightning", $"<b><color={statColorLightning}>lightning</color></b>");
             input = input.Replace("shock", $"<b><color={statColorLightning}>shock</color></b>");
+
+            input = input.Replace("damage over time", $"<b><color={statColorDoT}>damage over time</color></b>");
+
 
             return input;
         }

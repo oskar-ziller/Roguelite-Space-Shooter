@@ -18,8 +18,8 @@ namespace MeteorGame
 
         public float currency = 0;
 
-        private SpellSlot spellSlot1 = new SpellSlot(1);
-        private SpellSlot spellSlot2 = new SpellSlot(2);
+        [SerializeField] private SpellSlot spellSlot1 = new SpellSlot(1);
+        [SerializeField] private SpellSlot spellSlot2 = new SpellSlot(2);
 
         private Tween currencyTween;
         private Camera cameraObj;
@@ -48,6 +48,9 @@ namespace MeteorGame
 
         private void Awake()
         {
+            spellSlot1.UnlockSpellSlot();
+            spellSlot1.IncreaseMaxLinks();
+
             inventory = new Inventory();
             //inventory.GemAdded += OnGemAddedToInventory;
             Instance = this;

@@ -130,6 +130,12 @@ namespace MeteorGame
         {
             var s = Player.Instance.SpellSlot(slot);
 
+            if (!s.IsUnlocked)
+            {
+                tabMenuManager.DisplayError(UIError.SpellSlotNeedsUnlock);
+                return;
+            }
+
             if (!gem.HasSpell)
             {
                 if (s.CanLinkMore)

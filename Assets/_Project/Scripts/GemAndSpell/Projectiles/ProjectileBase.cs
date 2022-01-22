@@ -57,8 +57,8 @@ namespace MeteorGame
         {
             var spell = castBySlot.Spell;
 
-            StartingSpeed = spell.ProjectileSpeed;
-            TotalProjectiles = spell.ProjectileCount;
+            StartingSpeed = castBySlot.ProjectileSpeed;
+            TotalProjectiles = castBySlot.ProjectileCount;
             CastBy = castBySlot;
             MovingTowards = aimingAt;
             AimingAtEnemy = hitEnemy;
@@ -85,10 +85,7 @@ namespace MeteorGame
         {
             spawnTime = Time.time;
             var baseLifetime = CastBy.Spell.LifeTime;
-            var inceasedBy = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("IncreasedSkillEffectDuration"), CastBy) / 100f;
-
-            inceasedBy *= 1.5f;
-
+            var inceasedBy = CastBy.GetTotal("IncreasedSkillEffectDuration") / 100f;
             var final = baseLifetime * (1 + inceasedBy);
 
             expireTime = spawnTime + final;
@@ -246,14 +243,14 @@ namespace MeteorGame
 
         public bool ShouldPierce()
         {
-            bool always = ModifierHelper.ModifierExists(GameManager.Instance.GetModifierSO("AlwaysPierce"), CastBy);
+            bool always = CastBy.GetTotal("AlwaysPierce") > 0;
 
             if (always)
             {
                 return true;
             }
 
-            int count = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("PierceAdditionalTimes"), CastBy);
+            int count = (int)CastBy.GetTotal("PierceAdditionalTimes");
 
             if (count == 0)
             {
@@ -276,7 +273,7 @@ namespace MeteorGame
 
         public bool ShouldChain()
         {
-            int shouldChainCount = ModifierHelper.GetTotal("ChainAdditionalTimes", CastBy);
+            int shouldChainCount = (int)CastBy.GetTotal("ChainAdditionalTimes");
 
             if (ChainedFrom.Count >= shouldChainCount)
             {
@@ -305,7 +302,7 @@ namespace MeteorGame
 
         public bool ShouldFork()
         {
-            int count = ModifierHelper.GetTotal("ForkAdditionalTimes", CastBy);
+            int count = (int)CastBy.GetTotal("ForkAdditionalTimes");
 
             if (count == 0)
             {

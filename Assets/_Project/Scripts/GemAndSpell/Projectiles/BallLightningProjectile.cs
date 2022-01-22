@@ -29,7 +29,7 @@ namespace MeteorGame
 
         private void Begin()
         {
-            float increasedBy = ModifierHelper.GetTotal("IncreasedAoe", CastBy) / 100f;
+            float increasedBy = CastBy.GetTotal("IncreasedAoe");
             var totalRadi = defaultRadius * (1 + increasedBy * 2);
 
             ballMesh.localScale *= totalRadi;

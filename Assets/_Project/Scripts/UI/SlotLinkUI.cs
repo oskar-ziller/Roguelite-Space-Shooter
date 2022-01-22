@@ -15,39 +15,45 @@ namespace MeteorGame
 
         public int linkNo;
 
-        public Image overlay;
-        public Image circleIcon;
+        [Header("Images")]
+        [SerializeField] private Image overlay;
+        [SerializeField] private Image circleIcon;
+        [SerializeField] private Image squareIcon;
 
-        public TextMeshProUGUI nameTmp;
-        public TextMeshProUGUI emptyTmp;
-        public int unlockCost;
+        [Header("Texts")]
+        [SerializeField] private TextMeshProUGUI nameTmp;
+        [SerializeField] private TextMeshProUGUI emptyTmp;
+
+
+        [SerializeField] private int unlockCost;
 
         [Tooltip("Object to display when slot is not yet unlocked")]
-        public GameObject lockedObj;
+        [SerializeField] private GameObject lockedObj;
+
+        public int UnlockCost => unlockCost;
 
         private TooltipTrigger slotTooltipTrigger;
-
         private SlotManagerUI manager;
 
         private bool empty = false;
         private bool locked = false;
+        private bool isSpell = false;
 
         #endregion
 
         #region Unity Methods
 
-        private void Awake()
-        {
-            
-        }
 
         private void Start()
         {
             slotTooltipTrigger = GetComponent<TooltipTrigger>();
-            lockedObj.GetComponent<TooltipTrigger>().infoText += unlockCost.ToString();
             manager = GetComponentInParent<SlotManagerUI>();
-        }
 
+            if (lockedObj != null) // sadece slot2 lockedObj sahip
+            {
+                lockedObj.GetComponent<TooltipTrigger>().infoText += unlockCost.ToString();
+            }
+        }
 
 
         private void Update()
@@ -94,10 +100,9 @@ namespace MeteorGame
 
         #region Methods
 
-
         public void OnUnlockClicked()
         {
-            manager.OnUnlockClicked();
+            manager.OnUnlockClickedLink(this);
         }
 
         private void Lock()
@@ -114,7 +119,6 @@ namespace MeteorGame
             locked = false;
         }
 
-
         private void Empty()
         {
             circleIcon.enabled = false;
@@ -122,8 +126,8 @@ namespace MeteorGame
             nameTmp.enabled = false;
             emptyTmp.enabled = true;
             empty = true;
+            slotTooltipTrigger.enabled = false;
         }
-
 
         private void NotEmpty()
         {
@@ -131,7 +135,6 @@ namespace MeteorGame
             emptyTmp.enabled = false;
             slotTooltipTrigger.enabled = true;
         }
-
 
         private void SetTextAndColors()
         {

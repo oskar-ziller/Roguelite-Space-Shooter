@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0925a33ff1883294c80f221a6e09177a, type: 3}
-  m_Name: ReducedProjectileDamage
+  m_Name: IncreasedChanceToIgnite
   m_EditorClassIdentifier: 
-  internalName: ReducedDamage
+  internalName: IncreasedChanceToIgnite
   hasValues: 1
-  description: Deal XXX% reduced damage
+  description: Spells that can ignite have XXX% increased chance to ignite enemies

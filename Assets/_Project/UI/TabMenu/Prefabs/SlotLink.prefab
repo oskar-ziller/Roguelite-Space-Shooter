@@ -647,6 +647,7 @@ MonoBehaviour:
   linkNo: 1
   overlay: {fileID: 452167158692773657}
   circleIcon: {fileID: 452167160266465903}
+  squareIcon: {fileID: 0}
   nameTmp: {fileID: 452167158976255979}
   emptyTmp: {fileID: 452167158383898887}
   unlockCost: 200

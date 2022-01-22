@@ -10,7 +10,8 @@ namespace MeteorGame
     public enum UIError
     {
         CantAfford,
-        CantLink
+        CantLink,
+        SpellSlotNeedsUnlock,
     }
 
     public class ErrorDisplayer : MonoBehaviour
@@ -21,13 +22,21 @@ namespace MeteorGame
         public float fadeDelaySeconds;
         public float fadeDuration;
 
+        public float bgFadeDelaySeconds;
+        public float bgFadeDuration;
+
+
         public TextMeshProUGUI currencyTMP;
         public Image currencyIcon;
+        public Image darkOverlay;
 
         private TextMeshProUGUI errorTMP;
         private CanvasGroup errorCanvasGrp;
 
-        private Sequence mySequence;
+        private Sequence bgSequence, fadeSequence;
+
+        private Color darkBgColor = new Color(0, 0, 0, 0.5f);
+
 
         #endregion
 
@@ -57,6 +66,14 @@ namespace MeteorGame
         {
             ShowErrorBar(error);
             FadeOutErrorBar();
+
+            ShowDarkBG();
+            FadeOutBG();
+        }
+
+        private void ShowDarkBG()
+        {
+            darkOverlay.color = darkBgColor;
         }
 
 
@@ -77,20 +94,43 @@ namespace MeteorGame
                 errorText = "Can't link more. Buy more link slots or replace existing ones.";
             }
 
+            if (e == UIError.SpellSlotNeedsUnlock)
+            {
+                errorText = "You need to unlock SLOT 2 to equip";
+            }
+
             errorTMP.text = errorText;
+        }
+
+        private void FadeOutBG()
+        {
+            darkOverlay.DOKill();
+            ;
+
+            if (bgSequence != null)
+            {
+                bgSequence.Kill();
+            }
+
+            bgSequence = DOTween.Sequence();
+            bgSequence.AppendInterval(bgFadeDelaySeconds);
+            bgSequence.Append(darkOverlay.DOFade(0, bgFadeDuration));
+            bgSequence.SetUpdate(true);
+            bgSequence.Play();
         }
 
         private void FadeOutErrorBar()
         {
-            if (mySequence != null)
+            if (fadeSequence != null)
             {
-                mySequence.Kill();
+                fadeSequence.Kill();
             }
 
-            mySequence = DOTween.Sequence();
-            mySequence.AppendInterval(fadeDelaySeconds);
-            mySequence.Append(errorCanvasGrp.DOFade(0, fadeDuration));
-            mySequence.Play();
+            fadeSequence = DOTween.Sequence();
+            fadeSequence.AppendInterval(fadeDelaySeconds);
+            fadeSequence.Append(errorCanvasGrp.DOFade(0, fadeDuration));
+            fadeSequence.SetUpdate(true);
+            fadeSequence.Play();
         }
 
         private IEnumerator BlinkCurrency()

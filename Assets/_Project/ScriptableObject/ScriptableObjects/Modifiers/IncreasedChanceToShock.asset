@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0925a33ff1883294c80f221a6e09177a, type: 3}
-  m_Name: IncreasedProjectileDamage
+  m_Name: IncreasedChanceToShock
   m_EditorClassIdentifier: 
-  internalName: IncreasedProjectileDamage
-  description: Projectiles deal XXX% increased damage
+  internalName: IncreasedChanceToShock
+  hasValues: 1
+  description: Spells that can shock have XXX% increased chance to shock enemies

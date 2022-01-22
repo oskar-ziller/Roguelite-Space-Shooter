@@ -78,7 +78,11 @@ namespace MeteorGame
                 listToUse.Clear();
             }
 
-            SpawnDummiesWithEffect(slot);
+            if (spell != null) // spell is set to null when unequipped
+            {
+                SpawnDummiesWithEffect(slot);
+            }
+
         }
 
         private void SpawnDummies(SpellSlot spellSlot)
