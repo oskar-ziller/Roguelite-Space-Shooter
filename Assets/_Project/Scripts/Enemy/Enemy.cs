@@ -142,7 +142,7 @@ namespace MeteorGame
 
 
 
-            baseLife = (int)(baseLifeList[level]);
+            baseLife = baseLifeList[level] * 10;
 
 
 
@@ -354,7 +354,7 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
-            //print("IgniteTick " + amount);
+            print("IgniteTick " + amount);
             TakeDamage(amount);
         }
 

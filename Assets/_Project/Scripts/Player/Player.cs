@@ -78,7 +78,7 @@ namespace MeteorGame
         {
             foreach (GemSO gemSO in GameManager.Instance.AllGems.All)
             {
-                GemItem gem = new GemItem(gemSO, level: 20);
+                GemItem gem = new GemItem(gemSO, level: 0);
                 inventory.AddGem(gem);
             }
         }

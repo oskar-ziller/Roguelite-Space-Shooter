@@ -431,7 +431,7 @@ namespace MeteorGame
 
             EnemyManager.Instance.AddEnemy(e);
 
-            e.ChangeSize(size);
+            //e.ChangeSize(size);
             e.SetRarity(rarity);
             e.Init(startPos, totalSpawned);
 

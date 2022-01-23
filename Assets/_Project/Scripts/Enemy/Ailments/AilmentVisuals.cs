@@ -31,10 +31,20 @@ namespace MeteorGame
 
         private void Start()
         {
-        
+            StartCoroutine(CheckAilmentsCoroutine());
         }
 
-        private void Update()
+        IEnumerator CheckAilmentsCoroutine()
+        {
+            while (true)
+            {
+                yield return new WaitForSeconds(0.15f);
+                CheckAilmentsAndUpdateVisuals();
+            }
+        }
+
+
+        private void CheckAilmentsAndUpdateVisuals()
         {
             if (owner.IsFrozenOrChilled())
             {
@@ -62,6 +72,11 @@ namespace MeteorGame
             {
                 shockVisuals.SetActive(false);
             }
+        }
+
+        private void Update()
+        {
+            
         }
 
         #endregion
