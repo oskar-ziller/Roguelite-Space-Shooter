@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+
 namespace MeteorGame
 {
     public class EnemySpawner : MonoBehaviour
@@ -523,10 +524,15 @@ namespace MeteorGame
 
         public WeightedRandomEnemy()
         {
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, 0.9f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, 0.08f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 12, 0.0195f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 50, 0.0005f));
+            float normalOccurence = 9000f / 10000f;
+            float magicOccurence = 400f / 10000f;
+            float rareOccurence = 100f / 10000f;
+            float uniqueOccurence = 5f / 10000f;
+
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, normalOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, magicOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 30, rareOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 150, uniqueOccurence));
         }
 
         public List<EnemyRarity> CreateSpawnList()
@@ -554,6 +560,40 @@ namespace MeteorGame
             }
 
             return toReturn;
+        }
+
+
+        public void Test()
+        {
+            var toReturn = new List<EnemyRarity>();
+
+            float totalWeight = entries.Sum(e => e.weight);
+            int count = 1000000;
+
+            while (count > 0)
+            {
+                float randomWeight = Random.Range(0, totalWeight);
+                float currentWeight = 0f;
+
+                foreach (var e in entries)
+                {
+                    currentWeight += e.weight;
+
+                    if (randomWeight <= currentWeight)
+                    {
+                        toReturn.Add(e.Rarity); // selected one
+                        count--;
+                        break;
+                    }
+                }
+            }
+
+            int normal = toReturn.Count(r => r == EnemyRarity.Normal) / 100;
+            int magic = toReturn.Count(r => r == EnemyRarity.Magic) / 100;
+            int rare = toReturn.Count(r => r == EnemyRarity.Rare) / 100;
+            int unique = toReturn.Count(r => r == EnemyRarity.Unique) / 100;
+
+            UnityEngine.Debug.Log($"TEST - normal: {normal} - magic: {magic} - rare: {rare} - unique: {unique}");
         }
 
 
