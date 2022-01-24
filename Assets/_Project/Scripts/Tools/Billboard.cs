@@ -25,17 +25,27 @@ namespace MeteorGame
         {
             enemyTransform = GetComponentInParent<Enemy>().transform;
             startingY = transform.localPosition.y;
+            StartCoroutine(UpdateLoop());
         }
 
 
         private void LateUpdate()
         {
-            var isPlayerAboveEnemy = Player.Instance.transform.position.y > enemyTransform.position.y;
+            
+        }
 
+        
+        private IEnumerator UpdateLoop()
+        {
+            while (true)
+            {
+                var isPlayerAboveEnemy = Player.Instance.transform.position.y > enemyTransform.position.y;
 
-            var location = isPlayerAboveEnemy ? -startingY : startingY;
-            transform.localPosition = location * Vector3.up;
-            transform.LookAt(Player.Instance.transform.position);
+                var location = isPlayerAboveEnemy ? -startingY : startingY;
+                transform.localPosition = location * Vector3.up;
+                transform.LookAt(Player.Instance.transform.position);
+                yield return new WaitForSeconds(0.1f);
+            }
         }
 
         #endregion

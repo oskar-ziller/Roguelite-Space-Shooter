@@ -117,7 +117,7 @@ namespace MeteorGame
             }
 
 
-            
+
         }
 
         private void OnCollisionStay(Collision collision)
@@ -133,8 +133,6 @@ namespace MeteorGame
 
             if (collision.collider.tag == "Ground")
             {
-                print($"-coll- enter isGrounded: {isGrounded} -> false");
-
                 isGrounded = false;
                 timeLeftGrounded = Time.time;
                 //CreateObjectAtCollision(collision, false);
@@ -206,8 +204,8 @@ namespace MeteorGame
             transform.Rotate(Vector3.up, amount);
         }
 
-       
-       
+
+
 
 
 

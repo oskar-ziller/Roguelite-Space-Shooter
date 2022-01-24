@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9104619409605924948}
   - component: {fileID: 869254480224921543}
   - component: {fileID: 1086865106567661824}
-  - component: {fileID: 6815309464040363219}
   - component: {fileID: 2883415570443773270}
   m_Layer: 0
   m_Name: PackTestSphere
@@ -83,19 +82,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &6815309464040363219
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 403825671683726345}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2883415570443773270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,4 +94,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 739ca523eaff04a41bc55ff8060177d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeDur: 3
+  fadeDur: 7

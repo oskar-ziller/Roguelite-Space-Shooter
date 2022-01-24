@@ -155,11 +155,13 @@ namespace MeteorGame
 
         private void Start()
         {
+            debugGameLevel = 5;
+            gameLevel = 5;
             gameStartSW.Restart();
-
-            enemySpawner.BeginSpawning();
             Cursor.lockState = CursorLockMode.Locked;
             TabMenuManager.RebuildInventoryUI();
+
+            enemySpawner.BeginSpawning();
         }
 
 
@@ -183,7 +185,13 @@ namespace MeteorGame
 
             if (Input.GetKeyDown(KeyCode.KeypadMinus))
             {
-                debugElapsed += TimeSpan.FromSeconds(120);
+                //debugElapsed += TimeSpan.FromSeconds(120);
+                StartCoroutine(enemySpawner.PackSpawnStart());
+            }
+
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                EnemyManager.Instance.DestroyAllEnemies();
             }
 
             var secondsToMax = minutesToHitMaxGameLevel * 60;
@@ -196,7 +204,7 @@ namespace MeteorGame
             //var minutePercentage = (float)(HowFarIntoDifficulty().TotalSeconds / (minutesToHitMaxGameLevel * 60));
             //var eval = difficultyCurve.Evaluate(minutePercentage);
             gameLevel = res + debugGameLevel;
-
+            gameLevel = 90;
 
             bool laterThanLastChallenge = gameLevel > lastChallengeLevelCompleted;
             bool atChallengeLevel = ((gameLevel - 1) % checkpointLevelInterval == 0);

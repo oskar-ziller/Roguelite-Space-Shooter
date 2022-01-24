@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -186,7 +187,7 @@ namespace MeteorGame
 
         private void DoAimAssist()
         {
-            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 2, true).FirstOrDefault();
+            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 5, true).FirstOrDefault();
 
             if (closest != null)
             {
@@ -213,8 +214,14 @@ namespace MeteorGame
 
             if (ShouldAimAssist())
             {
-                DoAimAssist();
+                StartCoroutine(AimAssistLoop());
             }
+        }
+
+        private IEnumerator AimAssistLoop()
+        {
+            DoAimAssist();
+            yield return new WaitForSeconds(0.1f);
         }
 
         public virtual void OnTriggerEnter(Collider colliderObj)
