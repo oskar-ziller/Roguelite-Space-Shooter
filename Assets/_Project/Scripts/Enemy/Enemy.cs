@@ -142,10 +142,7 @@ namespace MeteorGame
 
 
 
-            baseLife = baseLifeList[level] * 10;
-
-
-
+            baseLife = baseLifeList[level];
 
             var monsterTypeHealthModifier = 1f; // %50-%200 arasi
 

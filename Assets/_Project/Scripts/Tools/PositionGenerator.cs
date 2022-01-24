@@ -11,7 +11,7 @@ namespace MeteorGame
     public class PositionGenerator
     {
         public int regionExtends;
-        public int maxRegionSize = 1170;
+        public float maxRegionSize;
         public List<SpawnPos> spawnPositions;
         List<EnemyRarity> spawnList;
 
@@ -29,14 +29,15 @@ namespace MeteorGame
             spawnPositions = new List<SpawnPos>();
         }
 
-        public PositionGenerator(PackShape shape, float spacing, List<EnemyRarity> spawnList)
+        public PositionGenerator(PackShape shape, float spacing, List<EnemyRarity> spawnList, float maxExtends)
         {
             regionExtends = 0;
             spawnPositions = new List<SpawnPos>();
 
             this.spacing = spacing;
             this.spawnList = new List<EnemyRarity>(spawnList);
-            this.regionShape = shape;
+            regionShape = shape;
+            maxRegionSize = maxExtends;
         }
 
 
@@ -73,14 +74,12 @@ namespace MeteorGame
 
                         if (regionExtends > maxRegionSize)
                         {
-                            UnityEngine.Debug.Log("regionExtends > maxRegionSize");
-                            break;
+                            throw new System.Exception("regionExtends > maxRegionSize");
                         }
                     }
                 }
 
                 spawnPositions.Add(pos);
-                UnityEngine.Debug.Log("adding " + e + " at: " + pos.center + " total: " + spawnPositions.Count);
                 yield return null;
             }
 
@@ -100,14 +99,12 @@ namespace MeteorGame
 
                         if (regionExtends > maxRegionSize)
                         {
-                            UnityEngine.Debug.Log("regionExtends > maxRegionSize");
-                            break;
+                            throw new System.Exception("regionExtends > maxRegionSize");
                         }
                     }
                 }
 
                 spawnPositions.Add(pos);
-                UnityEngine.Debug.Log("adding " + e + " at: " + pos.center + " total: " + spawnPositions.Count);
                 yield return null;
             }
 
@@ -127,14 +124,12 @@ namespace MeteorGame
 
                         if (regionExtends > maxRegionSize)
                         {
-                            UnityEngine.Debug.Log("regionExtends > maxRegionSize");
-                            break;
+                            throw new System.Exception("regionExtends > maxRegionSize");
                         }
                     }
                 }
 
                 spawnPositions.Add(pos);
-                UnityEngine.Debug.Log("adding " + e + " at: " + pos.center + " total: " + spawnPositions.Count);
                 yield return null;
             }
 
@@ -149,19 +144,16 @@ namespace MeteorGame
                     if (pos == null)
                     {
                         regionExtends++;
-                        UnityEngine.Debug.Log("regionExtends++");
                         yield return new WaitForSeconds(0.02f);
 
                         if (regionExtends > maxRegionSize)
                         {
-                            UnityEngine.Debug.Log("regionExtends > maxRegionSize");
-                            break;
+                            throw new System.Exception("regionExtends > maxRegionSize");
                         }
                     }
                 }
 
                 spawnPositions.Add(pos);
-                UnityEngine.Debug.Log("adding " + e + " at: " + pos.center + " total: " + spawnPositions.Count);
                 yield return null;
             }
         }
@@ -240,7 +232,7 @@ namespace MeteorGame
 
                 if (regionShape == PackShape.Sphere)
                 {
-                    return randomPos.sqrMagnitude < regionExtends * regionExtends;
+                    return randomPos.sqrMagnitude + toSpawn.r * toSpawn.r < regionExtends * regionExtends;
                 }
 
 

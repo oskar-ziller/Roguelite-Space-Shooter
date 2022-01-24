@@ -27,7 +27,7 @@ namespace MeteorGame
 
 
         [Tooltip("How far enemy pack can spawn from Arena center")]
-        [SerializeField] private int spawnAreaSize;
+        [SerializeField] private int spawnAreaExtends;
 
         [Tooltip("Starting height for enemies at level 0")]
         [SerializeField] private int startPosMinHeight;
@@ -63,17 +63,7 @@ namespace MeteorGame
         [Tooltip("Pack spawner money curve")]
         [SerializeField] private AnimationCurve packSpawnerMoneyCurve;
 
-        //[Tooltip("Break duration in seconds")]
-        //[SerializeField] private int breakDuration;
-
-        //[Tooltip("Break interval in seconds")]
-        //[SerializeField] private int breakInterval;
-
-        [Tooltip("Interval between two consequtive enemy spawns in seconds")]
-        [SerializeField] private float spawnInterval;
-
         private Coroutine spawnLoop_Co;
-        //private float packSizeFactor = 1f;
 
 
         private Stopwatch timeSinceBreak = Stopwatch.StartNew();
@@ -157,7 +147,7 @@ namespace MeteorGame
             float level = GameManager.Instance.GameLevel;
             float maxLevel = GameManager.Instance.MaxGameLevel;
 
-            var curveVal = packSpawnerMoneyCurve.Evaluate(level / maxLevel);
+            var curveVal = packSpawnPosHeightCurve.Evaluate(level / maxLevel);
             return startPosMinHeight + curveVal * startPosMaxHeight;
         }
 
@@ -192,14 +182,19 @@ namespace MeteorGame
                 randShape = PackShape.Cube;
             }
 
-            var generator = new PositionGenerator(shape: randShape, spacing: spacingBetweenEnemies, spawnList: enemiesToSpawn);
+            var generator = new PositionGenerator(shape: randShape,
+                                                  spacing: spacingBetweenEnemies,
+                                                  spawnList: enemiesToSpawn,
+                                                  maxExtends: spawnAreaExtends);
+
+
             yield return generator.Generate();
 
-            //var randx = random.Next(-spawnAreaSize / 2 + generator.regionExtends / 2, spawnAreaSize / 2 - generator.regionExtends / 2);
-            //var randz = random.Next(-spawnAreaSize / 2 + generator.regionExtends / 2, spawnAreaSize / 2 - generator.regionExtends / 2);
+            var randx = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends);
+            var randz = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends );
 
             var height = CalculatePackHeightForCurrentGameLevel();
-            var pos = new Vector3(0, 40, 0);
+            var pos = new Vector3(randx, height, randz);
 
             var holder = new GameObject("Pack");
             holder.transform.parent = parentGroup;
@@ -360,7 +355,6 @@ namespace MeteorGame
                 startPos = point + c.center;
 
                 Enemy e = SpawnEnemy(normalEnemyPrefab, parent, EnemyRarity.Normal, startPos);
-                print("spawning enemy");
                 yield return new WaitForSeconds(0.02f);
             }
         

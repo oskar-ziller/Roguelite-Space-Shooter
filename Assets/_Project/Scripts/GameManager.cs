@@ -155,8 +155,6 @@ namespace MeteorGame
 
         private void Start()
         {
-            debugGameLevel = 5;
-            gameLevel = 5;
             gameStartSW.Restart();
             Cursor.lockState = CursorLockMode.Locked;
             TabMenuManager.RebuildInventoryUI();
@@ -204,7 +202,6 @@ namespace MeteorGame
             //var minutePercentage = (float)(HowFarIntoDifficulty().TotalSeconds / (minutesToHitMaxGameLevel * 60));
             //var eval = difficultyCurve.Evaluate(minutePercentage);
             gameLevel = res + debugGameLevel;
-            gameLevel = 90;
 
             bool laterThanLastChallenge = gameLevel > lastChallengeLevelCompleted;
             bool atChallengeLevel = ((gameLevel - 1) % checkpointLevelInterval == 0);
