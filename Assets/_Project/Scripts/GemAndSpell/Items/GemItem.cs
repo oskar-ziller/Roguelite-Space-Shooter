@@ -13,7 +13,7 @@ namespace MeteorGame
 
         #region Variables
 
-        [SerializeField] private SpellItem spellItem;
+        [SerializeField] private SpellItem spellItem = null;
 
         [SerializeField] private string name;
         [SerializeField] private int level = 1;
@@ -29,7 +29,7 @@ namespace MeteorGame
         public string Name => name;
         public Color Color => gemColor;
 
-        public bool HasSpell => spellItem != null;
+        public bool HasSpell => spellItem != null && spellItem.Name != null;
         public SpellItem Spell => spellItem;
         public string Description => description;
 
@@ -40,7 +40,7 @@ namespace MeteorGame
         private string statColorCold = "#58c4f4";
         private string statColorFire = "#ff4d07";
         private string statColorLightning = "#85fa46";
-        private string statColorDoT = "#85fa46";
+        private string statColorDoT = "#00ff9c";
 
         private int smallStatSize = 80;
 
@@ -65,13 +65,10 @@ namespace MeteorGame
             {
                 spellItem = new SpellItem(gemSO.spellSO, this);
             }
-        }
-
-
-
-        public int GetModifierValueForCurrentLevel(string s)
-        {
-            return GetModifierValueForCurrentLevel(GameManager.Instance.GetModifierSO(s));
+            else
+            {
+                spellItem = null;
+            }
         }
 
         public int GetModifierValueForCurrentLevel(Modifier m)
@@ -86,18 +83,6 @@ namespace MeteorGame
             return gemMod.ValueAtLevel(level);
         }
 
-        internal bool ModifierExists(Modifier modifier)
-        {
-            foreach (ModifierWithValue item in modifiers)
-            {
-                if (item.modifier == modifier)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         public void Equip()
         {
@@ -108,7 +93,6 @@ namespace MeteorGame
         {
             isEquipped = false;
         }
-
 
         public void LevelUp()
         {
@@ -139,7 +123,7 @@ namespace MeteorGame
             input = input.Replace("lightning", $"<b><color={statColorLightning}>lightning</color></b>");
             input = input.Replace("shock", $"<b><color={statColorLightning}>shock</color></b>");
 
-            input = input.Replace("damage over time", $"<b><color={statColorDoT}>damage over time</color></b>");
+            input = input.Replace("damage per second", $"<b><color={statColorDoT}>damage per second</color></b>");
 
 
             return input;

@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modifiers:
   - modifier: {fileID: 11400000, guid: 485888f690f0943498ea02e8ec223e89, type: 2}
-    min: 35
-    max: 2415
+    min: 16
+    max: 570
   - modifier: {fileID: 11400000, guid: f287a39cac42b7345836095102541341, type: 2}
     min: 4
     max: 12
   - modifier: {fileID: 11400000, guid: 9e346463b3f01314290dc665be30b9a7, type: 2}
-    min: 21
-    max: 1491
+    min: 20
+    max: 1490
   - modifier: {fileID: 11400000, guid: 6f610086f72adba44834d7b702207634, type: 2}
     min: 4
     max: 12

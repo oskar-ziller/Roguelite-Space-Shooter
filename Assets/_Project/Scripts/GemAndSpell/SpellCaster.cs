@@ -24,13 +24,10 @@ namespace MeteorGame
         private List<ChillingArea> creepingFrostChillingAreas = new List<ChillingArea>();
         private int castID = 0;
 
-
         private List<ProjectileBase> dummyProjectiles = new List<ProjectileBase>();
         private List<ProjectileBase> dummyProjectiles2 = new List<ProjectileBase>();
 
-
         WandAnim wandAnim1, wandAnim2;
-
 
         private void Awake()
         {
@@ -51,7 +48,7 @@ namespace MeteorGame
 
         private void OnGemAddedRemoved(SpellSlot slot, GemItem gem)
         {
-            OnSpellChanged(slot, gem.Spell);
+            OnSpellChanged(slot, null);
         }
 
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
@@ -78,7 +75,7 @@ namespace MeteorGame
                 listToUse.Clear();
             }
 
-            if (spell != null) // spell is set to null when unequipped
+            if (slot.Spell != null) // spell is set to null when unequipped
             {
                 SpawnDummiesWithEffect(slot);
             }
@@ -87,7 +84,6 @@ namespace MeteorGame
 
         private void SpawnDummies(SpellSlot spellSlot)
         {
-
             List<ProjectileBase> listToUse;
 
             if (spellSlot.slotNo == 1)
@@ -99,8 +95,7 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
-
-            for (int i = 0; i < spellSlot.Spell.ProjectileCount; i++)
+            for (int i = 0; i < spellSlot.ProjectileCount; i++)
             {
                 var dummy = SpawnProjectile(spellSlot);
                 dummy.MakeDummy();

@@ -17,8 +17,8 @@ MonoBehaviour:
     min: 4
     max: 4
   - modifier: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
-    min: 50
-    max: 50
+    min: 45
+    max: 20
   name: Greater Multiple Projectiles
   gemColor: {r: 0.5754717, g: 0.03474543, b: 0.38277876, a: 1}
   spellSO: {fileID: 0}

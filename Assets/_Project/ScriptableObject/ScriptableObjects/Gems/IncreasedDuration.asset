@@ -14,11 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modifiers:
   - modifier: {fileID: 11400000, guid: 8a838a74b5d772241bf42b3f9d5185f9, type: 2}
-    min: 45
-    max: 70
-  - modifier: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
-    min: 20
-    max: 20
+    min: 30
+    max: 100
   name: Increased Duration
   gemColor: {r: 0.37687448, g: 0.20163757, b: 0.6037736, a: 1}
   spellSO: {fileID: 0}

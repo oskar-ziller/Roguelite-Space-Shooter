@@ -69,7 +69,6 @@ namespace MeteorGame
                     if (pos == null)
                     {
                         regionExtends++;
-                        UnityEngine.Debug.Log("regionExtends++");
                         yield return new WaitForSeconds(0.02f);
 
                         if (regionExtends > maxRegionSize)
@@ -94,7 +93,6 @@ namespace MeteorGame
                     if (pos == null)
                     {
                         regionExtends++;
-                        UnityEngine.Debug.Log("regionExtends++");
                         yield return new WaitForSeconds(0.02f);
 
                         if (regionExtends > maxRegionSize)
@@ -119,7 +117,6 @@ namespace MeteorGame
                     if (pos == null)
                     {
                         regionExtends++;
-                        UnityEngine.Debug.Log("regionExtends++");
                         yield return new WaitForSeconds(0.02f);
 
                         if (regionExtends > maxRegionSize)

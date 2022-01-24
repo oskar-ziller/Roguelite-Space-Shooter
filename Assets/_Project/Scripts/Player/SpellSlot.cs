@@ -322,7 +322,7 @@ namespace MeteorGame
             if (Spell != null)
             {
                 Spell.UnEquip();
-                RemoveFromModifierDict(spellToEquip.Gem);
+                RemoveFromModifierDict(Spell.Gem);
             }
 
             Spell = spellToEquip;
