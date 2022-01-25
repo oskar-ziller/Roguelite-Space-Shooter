@@ -279,7 +279,7 @@ namespace MeteorGame
             e.gameObject.layer = LayerMask.NameToLayer("Enemies");
             e.transform.parent = parent;
 
-            e.OnDeath += EnemyManager.Instance.HandleEnemyDeath;
+            e.OnDeath += EnemyManager.Instance.OnEnemyDeath;
 
             EnemyManager.Instance.AddEnemy(e);
 

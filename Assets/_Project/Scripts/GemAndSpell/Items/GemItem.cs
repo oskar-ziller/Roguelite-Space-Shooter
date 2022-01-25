@@ -8,7 +8,7 @@ namespace MeteorGame
 
 
     [Serializable]
-    public class GemItem : IGameItem
+    public class GemItem
     {
 
         #region Variables

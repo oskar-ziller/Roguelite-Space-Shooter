@@ -27,6 +27,8 @@ namespace MeteorGame
 
         public Animator shootTest;
 
+
+
         #endregion
 
         #region Unity Methods
@@ -119,6 +121,11 @@ namespace MeteorGame
 
         #region Methods
 
+        internal void CollidedWithDroppedGold(GoldCoinDrop goldCoinDrop)
+        {
+            ChangeCurrency(goldCoinDrop.amount);
+        }
+
         public Vector3 AimingAt(out Enemy hitEnemy)
         {
             hitEnemy = null;
@@ -146,11 +153,9 @@ namespace MeteorGame
         }
 
 
-        [ContextMenu("Add currency")]
-        void AddCurrencyDebug()
+        private void PlayGoldPickup()
         {
-            Debug.Log("Perform operation");
-            ChangeCurrency(200);
+
         }
 
         internal void ChangeCurrency(int amount)

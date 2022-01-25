@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8665850091193355159}
   - component: {fileID: 2450289867596143613}
   - component: {fileID: 6929392356597648195}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor (2)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -296,7 +296,7 @@ GameObject:
   - component: {fileID: 3535426234405391904}
   - component: {fileID: 7129735921914441085}
   - component: {fileID: 8896170718212597986}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor (1)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -575,7 +575,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7172789022255949158}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Platform
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -613,7 +613,7 @@ GameObject:
   - component: {fileID: 2712799342170805428}
   - component: {fileID: 7860350684896721130}
   - component: {fileID: 4153919900025862818}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -895,7 +895,7 @@ GameObject:
   - component: {fileID: 2111231143593860659}
   - component: {fileID: 9019597180921308504}
   - component: {fileID: 6382911457128358849}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Glow
   m_TagString: Ground
   m_Icon: {fileID: 0}

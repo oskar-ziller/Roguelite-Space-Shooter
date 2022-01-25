@@ -14,6 +14,8 @@ namespace MeteorGame
 
         public Transform enemiesHolder;
 
+        public GameObject coinDrop;
+
         #region Variables
 
         public float enemySpeed = 0.5f;
@@ -56,8 +58,27 @@ namespace MeteorGame
 
         #region Methods
 
-        internal void HandleEnemyDeath(Enemy e)
+
+        private int CalculateDropAmount()
         {
+            return 100;
+        }
+
+
+        private void DropGold(Enemy dropFrom)
+        {
+            var amount = CalculateDropAmount();
+
+            for (int i = 0; i < 5; i++)
+            {
+                Instantiate(coinDrop, dropFrom.transform.position, Quaternion.identity);
+            }
+
+        }
+
+        internal void OnEnemyDeath(Enemy e)
+        {
+            DropGold(e);
             aliveEnemies.Remove(e);
         }
 
