@@ -12,8 +12,14 @@ namespace MeteorGame
         [Tooltip("Non-kinematic body we use to move the whole object")]
         [SerializeField] private Rigidbody rb;
 
+
+        [Tooltip("Object parent to use in Destroy method")]
         public GameObject parent;
-        public float gravity = 3f;
+
+        [Tooltip("Objects get Random(-randomAngleRange, randomAngleRange) angle at start")]
+        public float randomAngleRange = 20f;
+
+        public float gravity = 30f;
         public float explosionSpeedMin = 3f;
         public float explosionSpeedMax = 16f;
         public int amount = 30;
@@ -24,10 +30,10 @@ namespace MeteorGame
 
         private void Start()
         {
-            var rand = Random.Range(-20, 20);
+            var rand = Random.Range(-randomAngleRange, randomAngleRange);
             Vector3 customAxis = Quaternion.AngleAxis(rand, transform.forward) * transform.up;
 
-            rand = Random.Range(-20, 20);
+            rand = Random.Range(-randomAngleRange, randomAngleRange);
             Vector3 customAxis2 = Quaternion.AngleAxis(rand, transform.right) * customAxis;
             
             var randSpeed = Random.Range(explosionSpeedMin, explosionSpeedMax);

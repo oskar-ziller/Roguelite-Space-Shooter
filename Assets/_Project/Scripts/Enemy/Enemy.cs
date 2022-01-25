@@ -37,22 +37,7 @@ namespace MeteorGame
         [Tooltip("Rarity of this enemy")]
         public EnemyRarity rarity;
 
-
-
-        [Tooltip("Audio to play on spawn")]
-        [SerializeField] private AudioClip spawnSound;
-
-
-        [Tooltip("Looping hover/engine sound")]
-        [SerializeField] private AudioClip engineLoop;
-
-        [Tooltip("Audio source that plays hover sounds")]
-        [SerializeField] private AudioSource hoverAudioSource;
-
-
         public Action<Enemy> DamageTaken;
-
-        private AudioSource spawnAudioSource;
 
         private int id;
 
@@ -182,8 +167,6 @@ namespace MeteorGame
 
             //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
 
-            PlaySpawnSound();
-            //PlayHoverSound();
             StartCoroutine(UpdateAilmentsCoroutine());
         }
 
@@ -219,18 +202,6 @@ namespace MeteorGame
         }
 
 
-        private void PlaySpawnSound()
-        {
-            var s = gameObject.AddComponent<AudioSource>();
-            s = EditSourceSettings(s);
-            s.clip = spawnSound;
-            s.Play();
-        }
-
-        private void PlayHoverSound()
-        {
-            hoverAudioSource.Play();
-        }
 
         public void SetLevel(int level)
         {
@@ -240,7 +211,6 @@ namespace MeteorGame
         private void Awake()
         {
             ailmentManager = new AilmentManager(this);
-            spawnAudioSource = gameObject.GetComponent<AudioSource>();
         }
 
 
