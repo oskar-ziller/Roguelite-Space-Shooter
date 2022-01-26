@@ -9,24 +9,37 @@ namespace MeteorGame
 
         #region Variables
 
-        [Tooltip("Non-kinematic body we use to move the whole object")]
-        [SerializeField] private Rigidbody rb;
+        [Tooltip("Amount to give to player once picked up")]
+        public int goldAmount = 30;
 
-
-        [Tooltip("Object parent to use in Destroy method")]
-        public GameObject parent;
-
+        [Header("Explosion")]
         [Tooltip("Objects get Random(-randomAngleRange, randomAngleRange) angle at start")]
         public float randomAngleRange = 20f;
-
         public float gravity = 30f;
         public float explosionSpeedMin = 3f;
         public float explosionSpeedMax = 16f;
-        public int amount = 30;
+
+
+        private SphereCollider triggerCollider;
+        private AudioSource audioSource;
+        private CapsuleCollider worldCollider;
+        private MeshRenderer meshRenderer;
+        private Light lightObj;
+        private Rigidbody parentRB;
 
         #endregion
 
         #region Unity Methods
+
+        private void Awake()
+        {
+            audioSource = GetComponent<AudioSource>();
+            triggerCollider = GetComponent<SphereCollider>();
+            worldCollider = GetComponentInChildren<CapsuleCollider>();
+            meshRenderer = GetComponentInChildren<MeshRenderer>();
+            lightObj = GetComponent<Light>();
+            parentRB = GetComponent<Rigidbody>();
+        }
 
         private void Start()
         {
@@ -37,7 +50,7 @@ namespace MeteorGame
             Vector3 customAxis2 = Quaternion.AngleAxis(rand, transform.right) * customAxis;
             
             var randSpeed = Random.Range(explosionSpeedMin, explosionSpeedMax);
-            rb.AddRelativeForce(customAxis2 * randSpeed, ForceMode.Impulse);
+            parentRB.AddRelativeForce(customAxis2 * randSpeed, ForceMode.Impulse);
         }
 
         private void Update()
@@ -47,7 +60,7 @@ namespace MeteorGame
 
         private void FixedUpdate()
         {
-            rb.velocity += Vector3.down * Time.deltaTime * gravity;
+            parentRB.velocity += Vector3.down * Time.deltaTime * gravity;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -61,10 +74,25 @@ namespace MeteorGame
 
         }
 
+        private void HideBody()
+        {
+            triggerCollider.enabled = false;
+            worldCollider.enabled = false;
+            meshRenderer.enabled = false;
+            lightObj.enabled = false;
+        }
+
         private void CollidedWithPlayer()
         {
             Player.Instance.CollidedWithDroppedGold(this);
-            Destroy(parent);
+            HideBody();
+        }
+
+        public void PlayAuidoWithPitch(float pitch)
+        {
+            audioSource.pitch = pitch;
+            audioSource.Play();
+            Destroy(gameObject, audioSource.clip.length);
         }
 
 

@@ -68,7 +68,11 @@ namespace MeteorGame
         private void DropGold(Enemy dropFrom)
         {
             var amount = CalculateDropAmount();
-            Instantiate(coinDrop, dropFrom.transform.position, Quaternion.identity);
+
+            for (int i = 0; i < 5; i++)
+            {
+                Instantiate(coinDrop, dropFrom.transform.position, Quaternion.identity);
+            }
 
         }
 

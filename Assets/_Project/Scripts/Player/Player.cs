@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -121,9 +122,28 @@ namespace MeteorGame
 
         #region Methods
 
+        private float pitch = 1f;
+        Coroutine pitchResetCoroutine;
+        private float pitchResetDurInSeconds = 1.5f;
+
+        IEnumerator PitchResetCoroutine()
+        {
+            yield return new WaitForSeconds(pitchResetDurInSeconds);
+            pitch = 1f;
+        }
+
         internal void CollidedWithDroppedGold(GoldCoinDrop goldCoinDrop)
         {
-            ChangeCurrency(goldCoinDrop.amount);
+            ChangeCurrency(goldCoinDrop.goldAmount);
+            goldCoinDrop.PlayAuidoWithPitch(pitch);
+            pitch += 0.05f;
+
+            if (pitchResetCoroutine != null)
+            {
+                StopCoroutine(pitchResetCoroutine);
+            }
+
+            pitchResetCoroutine = StartCoroutine(PitchResetCoroutine());
         }
 
         public Vector3 AimingAt(out Enemy hitEnemy)
