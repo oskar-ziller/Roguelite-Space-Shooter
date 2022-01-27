@@ -374,6 +374,20 @@ namespace MeteorGame
 
     public class WeightedRandomEnemy
     {
+        public class EnemySpawnEntry
+        {
+            public EnemyRarity Rarity;
+            public float weight;
+            public float cost;
+
+            public EnemySpawnEntry(EnemyRarity r, float cost, float weight)
+            {
+                Rarity = r;
+                this.cost = cost;
+                this.weight = weight;
+            }
+        }
+
         public List<EnemySpawnEntry> entries = new List<EnemySpawnEntry>();
         public float totalMoney;
 
@@ -417,37 +431,10 @@ namespace MeteorGame
             return toReturn;
         }
 
-
-        
-
-
     }
 
 
-    public class EnemySpawnEntry
-    {
-        public EnemyRarity Rarity;
-        public float weight;
-        public float cost;
 
-        public EnemySpawnEntry(EnemyRarity r, float cost, float weight)
-        {
-            Rarity = r;
-            this.cost = cost;
-            this.weight = weight;
-        }
-
-
-
-
-
-
-
-
-
-
-
-    }
 
 
 

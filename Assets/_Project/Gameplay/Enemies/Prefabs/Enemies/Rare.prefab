@@ -133,9 +133,6 @@ MonoBehaviour:
   level: 0
   maxLevel: 100
   rarity: 2
-  spawnSound: {fileID: 8300000, guid: dc6614beca09347ec9b258f12d154bdd, type: 3}
-  engineLoop: {fileID: 8300000, guid: 316224186e8ae6543990a05f4dc13981, type: 3}
-  hoverAudioSource: {fileID: 0}
   spawnAudioCurve:
     serializedVersion: 2
     m_Curve:
@@ -195,7 +192,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1442109895853519253}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 21, y: 9, z: 21}

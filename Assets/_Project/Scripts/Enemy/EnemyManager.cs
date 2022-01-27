@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace MeteorGame
 {
+
+
     public class EnemyManager : MonoBehaviour
     {
         public static EnemyManager Instance { get; private set; }
@@ -14,7 +16,12 @@ namespace MeteorGame
 
         public Transform enemiesHolder;
 
-        public GameObject coinDrop;
+        public GoldCoinDrop coinDropBig, coinDropMedium, coinDropSmall;
+
+        public Transform goldDropHolder;
+
+
+        private DropManager dropManager = new DropManager();
 
         #region Variables
 
@@ -36,9 +43,11 @@ namespace MeteorGame
             Instance = this;
         }
 
+       
+
         private void Start()
         {
-        
+            
         }
 
         private void Update()
@@ -58,22 +67,33 @@ namespace MeteorGame
 
         #region Methods
 
-
-        private int CalculateDropAmount()
+        private void SpawnGoldDrop(CoinSize whichCoin, Vector3 pos)
         {
-            return 100;
+            GoldCoinDrop prefab = coinDropSmall;
+
+            if (whichCoin == CoinSize.Medium)
+            {
+                prefab = coinDropMedium;
+            }
+
+            if (whichCoin == CoinSize.Big)
+            {
+                prefab = coinDropBig;
+            }
+
+            Instantiate(prefab, pos, Quaternion.identity, goldDropHolder);
         }
 
 
         private void DropGold(Enemy dropFrom)
         {
-            var amount = CalculateDropAmount();
+            var howMany = dropManager.PickRandomNumber(dropFrom);
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < howMany; i++)
             {
-                Instantiate(coinDrop, dropFrom.transform.position, Quaternion.identity);
+                var whichCoin = dropManager.PickRandomCoinSize(dropFrom);
+                SpawnGoldDrop(whichCoin, dropFrom.transform.position);
             }
-
         }
 
         internal void OnEnemyDeath(Enemy e)

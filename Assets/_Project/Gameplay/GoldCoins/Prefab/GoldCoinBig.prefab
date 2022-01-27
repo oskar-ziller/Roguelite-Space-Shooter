@@ -52,7 +52,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!135 &900626739208488654
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2205c5b62ea90184b83595667fd25fa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goldAmount: 30
+  goldAmount: 5000
   randomAngleRange: 25
   gravity: 50
   explosionSpeedMin: 5
@@ -267,7 +267,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1667978803413412}
-  m_LocalRotation: {x: -0.6434764, y: -0.6434764, z: 0.293152, w: 0.293152}
+  m_LocalRotation: {x: 0.6790553, y: 0.6790553, z: 0.19719005, w: 0.19719005}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 400, y: 300, z: 400}
   m_Children: []
