@@ -14,13 +14,9 @@ namespace MeteorGame
         #region Variables
 
         [SerializeField] private SpellItem spellItem = null;
-
         [SerializeField] private string name;
         [SerializeField] private int level = 1;
         [SerializeField] private bool isEquipped = false;
-        private string description;
-        private Color gemColor;
-
         [SerializeField] private List<ModifierWithValue> modifiers;
 
 
@@ -32,11 +28,16 @@ namespace MeteorGame
         public bool HasSpell => spellItem != null && spellItem.Name != null;
         public SpellItem Spell => spellItem;
         public string Description => description;
+        public int Level => level;
+        public int LevelUpCost => (level + 1) * 1000;
 
+        public const int MaxGemLevel = 20;
+
+        private string description;
+        private Color gemColor;
 
         private string statColorBright = "#edf508";
         private string statColorDark = "#969494";
-
         private string statColorCold = "#58c4f4";
         private string statColorFire = "#ff4d07";
         private string statColorLightning = "#85fa46";
@@ -106,10 +107,7 @@ namespace MeteorGame
             uiString = "";
         }
 
-        public int LevelUpCost()
-        {
-            return (level + 1) * 1000;
-        }
+
 
         public string ColorizeDamageTypes(string input)
         {

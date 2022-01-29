@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 namespace MeteorGame
 {
-    [RequireComponent(typeof(TooltipTrigger))]
     public class SlotHeaderUI : MonoBehaviour
     {
 
@@ -29,16 +28,25 @@ namespace MeteorGame
 
         [Space(50)]
 
-        [Tooltip("Object to display when slot is not yet unlocked")]
-        [SerializeField] private GameObject lockedObj;
+        [Tooltip("Object to display when slot is not yet unlocked. " +
+            "Only SLOT2 has this since SLOT1 is unlocked from start.")]
+        [SerializeField] private GameObject lockedObj;  
+
+        [SerializeField] private Button levelUpButton;
+
+        [Tooltip("TooltipTrigger for showing gem info.")]
+        [SerializeField] private TooltipTrigger headerTooltipTrigger;
 
         public int UnlockCost => unlockCost;
 
 
-        private TooltipTrigger slotTooltipTrigger;
+        private TabMenuManager tabMenuManager;
         private SlotManagerUI manager;
 
         private bool empty = false;
+        private GemItem gem; // gem slotted at header (spell)
+
+        private bool isSetup = false;
 
         #endregion
 
@@ -46,22 +54,21 @@ namespace MeteorGame
         #region Unity Methods
 
 
-        private void Start()
+        private void Setup()
         {
-            slotTooltipTrigger = GetComponent<TooltipTrigger>();
-
-            if (lockedObj != null)
+            if (lockedObj != null) // Only SLOT2 has lockedObj since SLOT1 is unlocked from start
             {
                 lockedObj.GetComponent<TooltipTrigger>().infoText += unlockCost.ToString();
             }
 
             manager = GetComponentInParent<SlotManagerUI>();
+            tabMenuManager = GetComponentInParent<TabMenuManager>();
 
             if (locked)
             {
                 lockedObj.SetActive(true);
 
-                slotTooltipTrigger.enabled = false;
+                headerTooltipTrigger.enabled = false;
 
                 nameTmp.enabled = false;
                 emptyTmp.enabled = false;
@@ -69,37 +76,43 @@ namespace MeteorGame
                 squareIcon.enabled = false;
                 overlay.enabled = true;
             }
+
+            isSetup = true;
         }
 
 
 
-
-
-        private void Update()
+        public void UpdateUI()
         {
+            if (!isSetup)
+            {
+                Setup();
+            }
+
             if (locked)
             {
                 if (manager.ownerSlot.IsUnlocked)
                 {
                     Unlock();
                 }
-
-                return;
             }
 
-            bool isEmpty = manager.ownerSlot.Spell == null;
-
-            if (isEmpty)
+            if (!locked)
             {
-                Empty();
-            }
-            else
-            {
-                NotEmpty();
-                SetTextAndColors();
+                bool isEmpty = manager.ownerSlot.Spell == null;
 
-                GemItem g = manager.ownerSlot.Spell.Gem;
-                slotTooltipTrigger.SetupGemInfoTooltip(g);
+                if (isEmpty)
+                {
+                    Empty();
+                }
+                else
+                {
+                    NotEmpty();
+                    SetTextAndColors();
+
+                    GemItem g = manager.ownerSlot.Spell.Gem;
+                    headerTooltipTrigger.SetupGemInfoTooltip(g);
+                }
             }
         }
 
@@ -120,11 +133,10 @@ namespace MeteorGame
             manager.OnUnlockClickedSlotHeader(this);
         }
 
-
         private void Unlock()
         {
             lockedObj.SetActive(false);
-            slotTooltipTrigger.enabled = true;
+            headerTooltipTrigger.enabled = true;
             nameTmp.enabled = true;
             emptyTmp.enabled = true;
             squareIcon.enabled = true;
@@ -134,44 +146,77 @@ namespace MeteorGame
 
         private void Empty()
         {
+            levelUpButton.gameObject.SetActive(false);
+
             squareIcon.enabled = false;
             overlay.enabled = false;
 
             nameTmp.enabled = false;
             emptyTmp.enabled = true;
 
-            slotTooltipTrigger.enabled = false;
+            headerTooltipTrigger.enabled = false;
 
             slotBG.color = new Color(0, 0, 0, 0.023f);
 
             empty = true;
+            gem = null;
+
         }
 
         private void NotEmpty()
         {
+            levelUpButton.gameObject.SetActive(true);
+
             overlay.enabled = true;
             nameTmp.enabled = true;
             emptyTmp.enabled = false;
-            slotTooltipTrigger.enabled = true;
+            headerTooltipTrigger.enabled = true;
             squareIcon.enabled = true;
             empty = false;
+
+
+            GemItem g = manager.ownerSlot.Spell.Gem;
+            gem = g;
+
+            UpdateLevelUpButtonTooltip();
+        }
+
+
+        private void UpdateLevelUpButtonTooltip()
+        {
+            TooltipTrigger tooltipTrigger = levelUpButton.gameObject.GetComponent<TooltipTrigger>();
+            tooltipTrigger.infoText = "Level up for " + gem.LevelUpCost;
         }
 
         private void SetTextAndColors()
         {
             nameTmp.enabled = true;
-            GemItem g = manager.ownerSlot.Spell.Gem;
 
             squareIcon.enabled = true;
             overlay.enabled = true;
 
-            overlay.color = new Color(g.Color.r, g.Color.g, g.Color.b, overlayOpacity);
-            slotBG.color = new Color(g.Color.r, g.Color.g, g.Color.b, 0.023f);
+            overlay.color = new Color(gem.Color.r, gem.Color.g, gem.Color.b, overlayOpacity);
+            slotBG.color = new Color(gem.Color.r, gem.Color.g, gem.Color.b, 0.023f);
 
-            squareIcon.color = g.Color;
-            //overlay.color = g.Color;
+            squareIcon.color = gem.Color;
 
-            nameTmp.text = g.Name;
+            nameTmp.text = gem.Name + $" ({gem.Level})";
+        }
+
+        public void TryLevelup()
+        {
+            if (gem.Level >= GemItem.MaxGemLevel)
+            {
+                tabMenuManager.DisplayError(UIError.GemAlreadyMaxLevel);
+                return;
+            }
+
+            bool res = manager.TryBuy(gem.LevelUpCost);
+
+            if (res)
+            {
+                manager.ownerSlot.Levelup(gem);
+            }
         }
 
         #endregion

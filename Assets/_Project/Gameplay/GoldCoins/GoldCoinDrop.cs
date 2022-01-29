@@ -19,13 +19,14 @@ namespace MeteorGame
         public float explosionSpeedMin = 3f;
         public float explosionSpeedMax = 16f;
 
-
         private SphereCollider triggerCollider;
         private AudioSource audioSource;
         private CapsuleCollider worldCollider;
         private MeshRenderer meshRenderer;
         private Light lightObj;
         private Rigidbody parentRB;
+        private bool inMagnet = false;
+
 
         #endregion
 
@@ -53,26 +54,56 @@ namespace MeteorGame
             parentRB.AddRelativeForce(customAxis2 * randSpeed, ForceMode.Impulse);
         }
 
-        private void Update()
-        {
-
-        }
 
         private void FixedUpdate()
         {
             parentRB.velocity += Vector3.down * Time.deltaTime * gravity;
-        }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            var p = other.gameObject.GetComponentInParent<Player>();
-
-            if (p != null)
+            if (inMagnet)
             {
-                CollidedWithPlayer();
+                var dir = (Player.Instance.transform.position - parentRB.position).normalized;
+                parentRB.velocity += dir * Time.deltaTime * 250f;
             }
 
         }
+
+
+        private void OnTriggerEnter(Collider other)
+        {
+            var magnet = other.gameObject.GetComponent<GoldMagnet>();
+
+            if (magnet == null)
+            {
+                var p = other.gameObject.GetComponentInParent<Player>();
+
+                if (p != null)
+                {
+                    CollidedWithPlayer();
+                }
+            }
+            else
+            {
+                inMagnet = true;
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            var magnet = other.gameObject.GetComponent<GoldMagnet>();
+
+            if (magnet != null)
+            {
+                inMagnet = false;
+            }
+        }
+
+
+        private void MoveTowardsPlayer()
+        {
+
+        }
+
+
 
         private void HideBody()
         {

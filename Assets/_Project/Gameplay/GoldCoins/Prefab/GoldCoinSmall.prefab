@@ -97,7 +97,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8009043870403366881, guid: fa2c57d3f28a5e6419393e8bc3eeb32a, type: 3}
       propertyPath: goldAmount
-      value: 10
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8805051133605093626, guid: fa2c57d3f28a5e6419393e8bc3eeb32a, type: 3}
       propertyPath: m_LocalPosition.y

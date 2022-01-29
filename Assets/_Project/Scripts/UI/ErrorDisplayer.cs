@@ -12,6 +12,8 @@ namespace MeteorGame
         CantAfford,
         CantLink,
         SpellSlotNeedsUnlock,
+        GemAlreadyMaxLevel,
+
     }
 
     public class ErrorDisplayer : MonoBehaviour
@@ -36,6 +38,8 @@ namespace MeteorGame
         private Sequence bgSequence, fadeSequence;
 
         private Color darkBgColor = new Color(0, 0, 0, 0.5f);
+
+        private Coroutine currencyBlinkCoroutine;
 
 
         #endregion
@@ -86,7 +90,13 @@ namespace MeteorGame
             if (e == UIError.CantAfford)
             {
                 errorText = "Can't afford.";
-                StartCoroutine(BlinkCurrency());
+
+                if (currencyBlinkCoroutine != null)
+                {
+                    StopCoroutine(currencyBlinkCoroutine);
+                    currencyBlinkCoroutine = StartCoroutine(BlinkCurrency());
+                }
+
             }
 
             if (e == UIError.CantLink)
@@ -141,27 +151,27 @@ namespace MeteorGame
             currencyIcon.color = Color.red;
             currencyTMP.color = Color.red;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             currencyIcon.color = currencyIconOrigColor;
             currencyTMP.color = currencyOrigColor;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             currencyIcon.color = Color.red;
             currencyTMP.color = Color.red;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             currencyIcon.color = currencyIconOrigColor;
             currencyTMP.color = currencyOrigColor;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             currencyIcon.color = Color.red;
             currencyTMP.color = Color.red;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             currencyIcon.color = currencyIconOrigColor;
             currencyTMP.color = currencyOrigColor;

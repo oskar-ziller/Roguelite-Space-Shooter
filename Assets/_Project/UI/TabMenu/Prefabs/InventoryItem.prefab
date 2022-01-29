@@ -597,8 +597,8 @@ MonoBehaviour:
   rectShape: {fileID: 3250502022276111847}
   circleIcon: {fileID: 3250502023036283847}
   rectIcon: {fileID: 3250502022273192074}
-  defaultTextColor: {r: 0.9254902, g: 0.85882354, b: 0.7294118, a: 1}
-  enterTextColor: {r: 0.5852448, g: 1, b: 0.53207546, a: 1}
+  defaultTextColor: {r: 1, g: 1, b: 1, a: 1}
+  enterTextColor: {r: 0.47394967, g: 1, b: 0.40943396, a: 1}
 --- !u!114 &4787523885683639069
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2205c5b62ea90184b83595667fd25fa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goldAmount: 5000
+  goldAmount: 800
   randomAngleRange: 25
   gravity: 50
   explosionSpeedMin: 5
@@ -267,7 +267,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1667978803413412}
-  m_LocalRotation: {x: 0.6790553, y: 0.6790553, z: 0.19719005, w: 0.19719005}
+  m_LocalRotation: {x: -0.46793082, y: -0.46793082, z: 0.5301328, w: 0.5301328}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 400, y: 300, z: 400}
   m_Children: []

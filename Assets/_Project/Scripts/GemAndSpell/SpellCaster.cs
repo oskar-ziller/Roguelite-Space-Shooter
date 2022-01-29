@@ -64,7 +64,6 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
-
             if (listToUse.Count > 0)
             {
                 foreach (var item in listToUse)

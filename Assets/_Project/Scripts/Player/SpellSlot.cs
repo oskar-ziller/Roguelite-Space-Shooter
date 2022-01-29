@@ -31,7 +31,7 @@ namespace MeteorGame
 
         private List<GemItem> gems = new List<GemItem>();
 
-        public int MaxLinks { get; private set; }
+        public int MaxLinksUnlocked { get; private set; }
 
         public bool CanLinkMore => CanLink();
 
@@ -78,13 +78,6 @@ namespace MeteorGame
         public int ColdBaseDamage => coldDamage;
         public int TotalIncreasedDamage => totalIncreased;
         public int TotalReducedDamage => totalReduced;
-
-
-
-
-
-
-
 
 
 
@@ -154,8 +147,8 @@ namespace MeteorGame
             float coldBase = GetTotal("ColdDamagePerSecond");
             float lightningBase = GetTotal("LightningDamagePerSecond");
 
-            inc += TotalIncreasedDamage;
-            red += TotalReducedDamage;
+            inc += TotalIncreasedDamage / 100f;
+            red += TotalReducedDamage / 100f;
 
             fireDoT = (int)(fireBase * (1 + inc) * (1 - red));
             coldDoT = (int)(coldBase * (1 + inc) * (1 - red));
@@ -186,7 +179,7 @@ namespace MeteorGame
 
         public SpellSlot(int slotNr)
         {
-            MaxLinks = 0;
+            MaxLinksUnlocked = 0;
             slotNo = slotNr;
         }
 
@@ -304,6 +297,7 @@ namespace MeteorGame
             }
 
             gems.Add(gem);
+            gems = gems.OrderBy(g => g.Name).ToList();
             gem.Equip();
             SaveToModifierDict(gem);
             GemLinkedOrRemoved?.Invoke(this, gem);
@@ -313,8 +307,17 @@ namespace MeteorGame
         {
             gem.UnEquip();
             gems.Remove(gem);
+            gems = gems.OrderBy(g => g.Name).ToList();
             RemoveFromModifierDict(gem);
             GemLinkedOrRemoved?.Invoke(this, gem);
+        }
+
+        public void Levelup(GemItem gem)
+        {
+            UnEquip(gem);
+            gem.LevelUp();
+            Equip(gem);
+            //GameManager.Instance.TabMenuManager.RebuildInventoryUI();
         }
 
         private void ChangeSpell(SpellItem spellToEquip)
@@ -346,7 +349,7 @@ namespace MeteorGame
 
         private bool CanLink()
         {
-           return gems.Count < MaxLinks;
+           return gems.Count < MaxLinksUnlocked;
         }
 
         public void Cast()
@@ -361,7 +364,7 @@ namespace MeteorGame
 
         public void IncreaseMaxLinks()
         {
-            MaxLinks++;
+            MaxLinksUnlocked++;
         }
 
         internal void Equip(GemItem gem)
@@ -373,6 +376,18 @@ namespace MeteorGame
             else
             {
                 ChangeSpell(gem.Spell);
+            }
+        }
+
+        internal void UnEquip(GemItem gem)
+        {
+            if (gem.HasSpell)
+            {
+                RemoveSpell();
+            }
+            else
+            {
+                RemoveLinked(gem);
             }
         }
 

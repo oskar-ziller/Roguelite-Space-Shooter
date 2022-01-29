@@ -42,7 +42,7 @@ namespace MeteorGame
         public float chainRange = 10f;
 
         [Tooltip("Max links allowed per spell slot")]
-        public int MaxLinks = 7;
+        public int MaxLinksAllowed = 7;
 
 
 
@@ -157,7 +157,7 @@ namespace MeteorGame
         {
             gameStartSW.Restart();
             Cursor.lockState = CursorLockMode.Locked;
-            TabMenuManager.RebuildInventoryUI();
+            //TabMenuManager.RebuildTabMenu();
 
             enemySpawner.BeginSpawning();
         }

@@ -362,9 +362,9 @@ namespace MeteorGame
         public void TakeDoT(SpellSlot from, float scale, bool applyAilment = true)
         {
             print($"Taking {from.DamageOverTime} damage per second." +
-                $" Current hit: {(int)(from.DamageOverTime / scale)}");
+                $" Current hit: {(int)(from.DamageOverTime * scale)}");
 
-            TakeDamage((int)(from.DamageOverTime / scale));
+            TakeDamage((int)(from.DamageOverTime * scale));
 
             if (applyAilment)
             {

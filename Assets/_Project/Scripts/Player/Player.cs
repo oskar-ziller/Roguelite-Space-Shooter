@@ -25,10 +25,7 @@ namespace MeteorGame
         private Tween currencyTween;
         private Camera cameraObj;
 
-
-        public Animator shootTest;
-
-
+        private bool isSetup = false;
 
         #endregion
 
@@ -51,72 +48,66 @@ namespace MeteorGame
 
         private void Awake()
         {
-            spellSlot1.UnlockSpellSlot();
-            spellSlot1.IncreaseMaxLinks();
-
-            inventory = new Inventory();
-            //inventory.GemAdded += OnGemAddedToInventory;
-            Instance = this;
-
-            cameraObj = GetComponentInChildren<Camera>();
-
             QualitySettings.vSyncCount = 1;
             Application.targetFrameRate = 144;
+
+            Instance = this;
+        }
+
+
+        private void Start()
+        {
+            if (!isSetup)
+            {
+                Setup();
+            }
+        }
+
+        private void Setup()
+        {
+            inventory = new Inventory();
+            cameraObj = GetComponentInChildren<Camera>();
 
             spellSlot1.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot1.SpellChanged += OnSpellChanged;
 
             spellSlot2.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot2.SpellChanged += OnSpellChanged;
+
+            DebugAddAllGemsToInv();
+            spellSlot1.UnlockSpellSlot();
+            spellSlot1.IncreaseMaxLinks();
+            spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
+
+            GameManager.Instance.TabMenuManager.RebuildTabMenu();
+
+            isSetup = true;
         }
-
-        private void OnEnable()
-        {
-            Instance = this;
-        }
-
-
 
         private void DebugAddAllGemsToInv()
         {
             foreach (GemSO gemSO in GameManager.Instance.AllGems.All)
             {
-                GemItem gem = new GemItem(gemSO, level: 20);
+                GemItem gem = new GemItem(gemSO, level: 0);
                 inventory.AddGem(gem);
             }
         }
 
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
         {
-            GameManager.Instance.TabMenuManager.RebuildInventoryUI();
+            if (isSetup)
+            {
+                GameManager.Instance.TabMenuManager.RebuildTabMenu();
+            }
         }
 
         private void OnGemAddedOrRemoved(SpellSlot slot, GemItem gem)
         {
-            GameManager.Instance.TabMenuManager.RebuildInventoryUI();
+            if (isSetup)
+            {
+                GameManager.Instance.TabMenuManager.RebuildTabMenu();
+            }
         }
-
-        private void Start()
-        {
-            DebugAddAllGemsToInv();
-
-            //GameManager.Instance.test();
-
-            //AddLinked(inventory.gems.First());
-            //AddLinked(inventory.gems.Last());
-
-            //SetActiveSpell(inventory.Spells.First(s => s.Name == "Fireball"));
-            //AddLinked(inventory.gems.First(g => g.gemSO.name == "Greater Multiple Projectiles"));
-
-            spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
-        }
-
-        private void Update()
-        {
-
-
-        }
-
 
         #endregion
 
@@ -185,6 +176,8 @@ namespace MeteorGame
                 currencyTween.Complete();
                 currencyTween.Kill();
             }
+
+            currencyTween.Complete();
 
             var curr = currency;
             var target = curr + amount;
