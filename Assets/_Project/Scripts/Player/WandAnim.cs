@@ -41,7 +41,6 @@ namespace MeteorGame
 
         public void Shoot(float dur)
         {
-            return;
             idleTween.Kill();
             transform.DOLocalRotate(new Vector3(0, 180, 0), dur, RotateMode.LocalAxisAdd).SetEase(Ease.OutQuint).OnComplete(Idle);
         }

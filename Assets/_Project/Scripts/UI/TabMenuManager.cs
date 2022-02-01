@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,13 +14,13 @@ namespace MeteorGame
         private ErrorDisplayer errorDisplayer;
         private UIInventoryManager invManager;
 
-        private bool isShowing = false;
+        private List<SlotManagerUI> slotManagers;
 
         private void Awake()
         {
             errorDisplayer = GetComponentInChildren<ErrorDisplayer>();
             invManager = GetComponentInChildren<UIInventoryManager>();
-            RebuildInventoryUI();
+            slotManagers = GetComponentsInChildren<SlotManagerUI>().ToList();
         }
 
         public void DisplayError(UIError error)
@@ -27,12 +28,15 @@ namespace MeteorGame
             errorDisplayer.DisplayError(error);
         }
 
-        public void RebuildInventoryUI()
+        public void RebuildTabMenu()
         {
-            if (invManager != null)
+            invManager.Rebuild();
+
+            foreach (SlotManagerUI sm in slotManagers)
             {
-                invManager.Rebuild();
+                sm.UpdateUI();
             }
+
         }
     }
 }

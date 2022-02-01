@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8816278980266226949}
   - component: {fileID: 7456777133461518516}
   - component: {fileID: 2768821008911181596}
-  - component: {fileID: 1392316648084039003}
   - component: {fileID: 7331660345850047418}
   m_Layer: 0
   m_Name: PackTestCube
@@ -83,19 +82,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1392316648084039003
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5820225315832662232}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7331660345850047418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,4 +94,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 739ca523eaff04a41bc55ff8060177d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeDur: 3
+  fadeDur: 1

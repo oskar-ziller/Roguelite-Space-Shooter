@@ -51,13 +51,21 @@ namespace MeteorGame
         private IEnumerator ShowInfoWithDelay()
         {
             yield return new WaitForSecondsRealtime(infoDelay);
-            TooltipSystem.ShowInfo(infoText);
+
+            if (enabled)
+            {
+                TooltipSystem.ShowInfo(infoText);
+            }
         }
 
         private IEnumerator ShowGemInfoWithDelay()
         {
             yield return new WaitForSecondsRealtime(gemInfoDelay);
-            TooltipSystem.ShowGemInfo(gem);
+
+            if (enabled)
+            {
+                TooltipSystem.ShowGemInfo(gem);
+            }
         }
 
 
@@ -72,5 +80,9 @@ namespace MeteorGame
             TooltipSystem.HideGemInfo();
             TooltipSystem.HideInfo();
         }
+
+
+
+
     }
 }

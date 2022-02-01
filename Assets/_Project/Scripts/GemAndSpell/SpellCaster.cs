@@ -24,21 +24,18 @@ namespace MeteorGame
         private List<ChillingArea> creepingFrostChillingAreas = new List<ChillingArea>();
         private int castID = 0;
 
-
         private List<ProjectileBase> dummyProjectiles = new List<ProjectileBase>();
         private List<ProjectileBase> dummyProjectiles2 = new List<ProjectileBase>();
 
-
         WandAnim wandAnim1, wandAnim2;
-
 
         private void Awake()
         {
             Player.Instance.SpellSlot(1).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(1).GemAddedOrRemoved += OnGemAddedRemoved;
+            Player.Instance.SpellSlot(1).GemLinkedOrRemoved += OnGemAddedRemoved;
 
             Player.Instance.SpellSlot(2).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(2).GemAddedOrRemoved += OnGemAddedRemoved;
+            Player.Instance.SpellSlot(2).GemLinkedOrRemoved += OnGemAddedRemoved;
 
 
             var wandAnims = Player.Instance.GetComponentsInChildren<WandAnim>().ToList();
@@ -51,7 +48,7 @@ namespace MeteorGame
 
         private void OnGemAddedRemoved(SpellSlot slot, GemItem gem)
         {
-            OnSpellChanged(slot, gem.Spell);
+            OnSpellChanged(slot, null);
         }
 
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
@@ -67,7 +64,6 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
-
             if (listToUse.Count > 0)
             {
                 foreach (var item in listToUse)
@@ -78,12 +74,15 @@ namespace MeteorGame
                 listToUse.Clear();
             }
 
-            SpawnDummiesWithEffect(slot);
+            if (slot.Spell != null) // spell is set to null when unequipped
+            {
+                SpawnDummiesWithEffect(slot);
+            }
+
         }
 
         private void SpawnDummies(SpellSlot spellSlot)
         {
-
             List<ProjectileBase> listToUse;
 
             if (spellSlot.slotNo == 1)
@@ -95,8 +94,7 @@ namespace MeteorGame
                 listToUse = dummyProjectiles2;
             }
 
-
-            for (int i = 0; i < spellSlot.Spell.ProjectileCount; i++)
+            for (int i = 0; i < spellSlot.ProjectileCount; i++)
             {
                 var dummy = SpawnProjectile(spellSlot);
                 dummy.MakeDummy();

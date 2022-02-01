@@ -9,6 +9,7 @@ namespace MeteorGame
     public class Modifier : ScriptableObject
     {
         public string internalName;
+        public bool hasValues = true;
 
         [TextArea]
         public string description;

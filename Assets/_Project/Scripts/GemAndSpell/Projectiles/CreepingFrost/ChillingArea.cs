@@ -55,18 +55,14 @@ namespace MeteorGame
             transform.parent = null;
             gameObject.SetActive(true);
             SpellCaster.AddCreepingFrostChillingArea(this);
-            transform.DOScale(castBy.Spell.ExplosionRadius * 2, expandDur).SetEase(easingExpand);
+            transform.DOScale(castBy.ExpRadi * 2, expandDur).SetEase(easingExpand);
 
             // setup destruction
-            float baseDur = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("BaseDuration"), castBy);
-            float increasedBy = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("IncreasedSkillEffectDuration"), castBy) / 100f;
-            float reducedBy = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ReducedSkillEffectDuration"), castBy) / 100f;
-            float totalDur = baseDur * (1 + increasedBy) * (1 - reducedBy);
-
-            StartCoroutine(DestroyWithDelay(totalDur));
+            
+            StartCoroutine(DestroyWithDelay(castBy.ProjLifetime));
 
             // if have too many, destroy oldest
-            var countLimit = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ChillingAreaLimit"), castBy);
+            var countLimit = castBy.ChillingAreaLimit;
 
             if (SpellCaster.CreepingFrostChillingAreaCount() > countLimit)
             {
@@ -81,7 +77,7 @@ namespace MeteorGame
 
         private void DealDamage()
         {
-            float totalRadi = transform.localScale.x / 2f;
+            float totalRadi = castBy.ExpRadi;
 
             foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, totalRadi, fromShell: true))
             {

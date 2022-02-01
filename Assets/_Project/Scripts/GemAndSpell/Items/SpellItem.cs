@@ -8,7 +8,7 @@ namespace MeteorGame
     [Serializable]
     public class SpellItem
     {
-        private GemItem gemItem;
+        [NonSerialized] private GemItem gemItem;
 
         private string prettyName;
         private int msBetweenCasts;
@@ -25,13 +25,13 @@ namespace MeteorGame
 
         public string Name { get; private set; }
         public float CastTimeMs => castTimeMs;
-        public int MsBetweenCasts => CalculateCastSpeed();
-        public float ProjectileSpeed => CalculateProjectileSpeed();
-        public int ProjectileCount => CalculateProjectileCount();
+        public int MsBetweenCasts => msBetweenCasts;
+        public float ProjectileSpeed => projectileSpeed;
+        public int ProjectileCount => projectileCount;
         public float LifeTime => projectileLifetimeSeconds;
 
 
-        public float ExplosionRadius => CalculateExplosionRadius();
+        //public float ExplosionRadius => CalculateExplosionRadius();
 
 
         #region Methods
@@ -54,36 +54,36 @@ namespace MeteorGame
             lastCastTime = spellSO.lastCastTime;
         }
 
-        private int CalculateProjectileCount()
-        {
-            int increasedBy = (int)ModifierHelper.GetTotal("AdditionalProjectiles", slottedAt);
-            return projectileCount + increasedBy;
-        }
+        //private int CalculateProjectileCount()
+        //{
+        //    int increasedBy = (int)ModifierHelper.GetTotal("AdditionalProjectiles", slottedAt);
+        //    return projectileCount + increasedBy;
+        //}
 
-        private int CalculateCastSpeed()
-        {
-            float increasedBy = ModifierHelper.GetTotal("IncreasedCastSpeed", slottedAt) / 100f;
-            return (int)(msBetweenCasts * (1 - increasedBy));
-        }
+        //private int CalculateCastSpeed()
+        //{
+        //    float increasedBy = ModifierHelper.GetTotal("IncreasedCastSpeed", slottedAt) / 100f;
+        //    return (int)(msBetweenCasts * (1 - increasedBy));
+        //}
 
-        public float CalculateProjectileSpeed()
-        {
-            float increasedBy = ModifierHelper.GetTotal("IncreasedProjectileSpeed", slottedAt) / 100f;
-            float reducedBy = ModifierHelper.GetTotal("ReducedProjectileSpeed", slottedAt) / 100f;
+        //public float CalculateProjectileSpeed()
+        //{
+        //    float increasedBy = ModifierHelper.GetTotal("IncreasedProjectileSpeed", slottedAt) / 100f;
+        //    float reducedBy = ModifierHelper.GetTotal("ReducedProjectileSpeed", slottedAt) / 100f;
 
-            return projectileSpeed * (1 + increasedBy) * (1 - reducedBy);
-        }
+        //    return projectileSpeed * (1 + increasedBy) * (1 - reducedBy);
+        //}
 
 
-        public int GetModifierValueForCurrentLevel(Modifier modifier)
-        {
-            return gemItem.GetModifierValueForCurrentLevel(modifier);
-        }
+        //public int GetModifierValueForCurrentLevel(Modifier modifier)
+        //{
+        //    return gemItem.GetModifierValueForCurrentLevel(modifier);
+        //}
 
-        internal bool ModifierExists(Modifier modifier)
-        {
-            return gemItem.ModifierExists(modifier);
-        }
+        //internal bool ModifierExists(Modifier modifier)
+        //{
+        //    return gemItem.ModifierExists(modifier);
+        //}
 
 
         public bool CanCast()
@@ -91,14 +91,14 @@ namespace MeteorGame
             return Time.time - lastCastTime >= msBetweenCasts / 1000f;
         }
 
-        public int CalculateExplosionRadius()
-        {
-            float radi = gemItem.GetModifierValueForCurrentLevel("ExplosionRadius");
-            float increasedBy = ModifierHelper.GetTotal("IncreasedAoe", slottedAt) / 100f;
-            float totalRadi = radi * (1 + increasedBy);
+        //public int CalculateExplosionRadius()
+        //{
+        //    float radi = gemItem.GetModifierValueForCurrentLevel("ExplosionRadius");
+        //    float increasedBy = ModifierHelper.GetTotal("IncreasedAoe", slottedAt) / 100f;
+        //    float totalRadi = radi * (1 + increasedBy);
 
-            return (int)totalRadi;
-        }
+        //    return (int)totalRadi;
+        //}
 
         public void Cast()
         {

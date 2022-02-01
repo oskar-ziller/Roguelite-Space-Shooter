@@ -17,7 +17,7 @@ namespace MeteorGame
         public RectTransform infoRT;
         public RectTransform gemInfoRT;
 
-        public TextMeshProUGUI infoTMP, statsTMP, nameTMP, descTMP;
+        public TextMeshProUGUI infoTMP, statsTMP, nameTMP, descTMP, levelTMP;
 
         [Tooltip("Offset of the tooltip from mouse position")]
         public Vector2 infoPadding;
@@ -153,6 +153,7 @@ namespace MeteorGame
             Instance.nameTMP.text = gem.Name;
             Instance.statsTMP.text = gem.GetStatsStringForUI();
             Instance.descTMP.text = "    " + gem.Description;
+            Instance.levelTMP.text = "Level: " + gem.Level;
         }
 
         public static void HideGemInfo()

@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,17 +12,13 @@ namespace MeteorGame
     {
         [Tooltip("The main body group of the projectile")]
         [SerializeField] private GameObject bodyGroup;
-        [SerializeField] private Rigidbody rigidBody;
-
-        [Tooltip("We need to desroy projectile's collider when begin explode etc")]
-        [SerializeField] private SphereCollider projectileCollider;
 
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-        public Vector3 Position { get { return rigidBody.position; } set { rigidBody.position = value; } }
+        public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
-        public Rigidbody Rigidbody { get { return rigidBody; } }
+        public Rigidbody Rigidbody { get { return rigidbody; } }
 
         public Enemy AimingAtEnemy { get; protected set; }
         public int CastID { get; protected set; }
@@ -53,12 +50,15 @@ namespace MeteorGame
 
         private SpinAround spinner;
 
+        private Rigidbody rigidbody;
+        private SphereCollider projectileCollider;
+
         public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID)
         {
             var spell = castBySlot.Spell;
 
-            StartingSpeed = spell.ProjectileSpeed;
-            TotalProjectiles = spell.ProjectileCount;
+            StartingSpeed = castBySlot.ProjectileSpeed;
+            TotalProjectiles = castBySlot.ProjectileCount;
             CastBy = castBySlot;
             MovingTowards = aimingAt;
             AimingAtEnemy = hitEnemy;
@@ -85,10 +85,7 @@ namespace MeteorGame
         {
             spawnTime = Time.time;
             var baseLifetime = CastBy.Spell.LifeTime;
-            var inceasedBy = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("IncreasedSkillEffectDuration"), CastBy) / 100f;
-
-            inceasedBy *= 1.5f;
-
+            var inceasedBy = CastBy.GetTotal("IncreasedSkillEffectDuration") / 100f;
             var final = baseLifetime * (1 + inceasedBy);
 
             expireTime = spawnTime + final;
@@ -96,7 +93,7 @@ namespace MeteorGame
 
         public virtual void Move()
         {
-            StartedMovingFrom = rigidBody.position;
+            StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
 
 
@@ -160,6 +157,9 @@ namespace MeteorGame
             maxTrailDur = trailRenderers.Max(t => t.time);
 
             spinner = GetComponent<SpinAround>();
+
+            rigidbody = GetComponent<Rigidbody>();
+            projectileCollider = GetComponent<SphereCollider>();
         }
 
 
@@ -172,7 +172,7 @@ namespace MeteorGame
 
         internal virtual void Expire()
         {
-            rigidBody.DOKill();
+            Rigidbody.DOKill();
             DestroySelfSoft();
         }
 
@@ -189,16 +189,16 @@ namespace MeteorGame
 
         private void DoAimAssist()
         {
-            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 2, true).FirstOrDefault();
+            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 5, true).FirstOrDefault();
 
             if (closest != null)
             {
                 var dir = closest.transform.position - transform.position;
 
-                rigidBody.DOKill();
-                rigidBody.isKinematic = false;
+                Rigidbody.DOKill();
+                Rigidbody.isKinematic = false;
 
-                rigidBody.velocity = dir.normalized * StartingSpeed;
+                Rigidbody.velocity = dir.normalized * StartingSpeed;
             }
         }
 
@@ -216,8 +216,14 @@ namespace MeteorGame
 
             if (ShouldAimAssist())
             {
-                DoAimAssist();
+                StartCoroutine(AimAssistLoop());
             }
+        }
+
+        private IEnumerator AimAssistLoop()
+        {
+            DoAimAssist();
+            yield return new WaitForSeconds(0.1f);
         }
 
         public virtual void OnTriggerEnter(Collider colliderObj)
@@ -239,21 +245,21 @@ namespace MeteorGame
                 collided = true;
                 collidingWith = collidedEnemy;
 
-                rigidBody.DOKill();
+                Rigidbody.DOKill();
                 HandleEnemyCollision();
             }
         }
 
         public bool ShouldPierce()
         {
-            bool always = ModifierHelper.ModifierExists(GameManager.Instance.GetModifierSO("AlwaysPierce"), CastBy);
+            bool always = CastBy.GetTotal("AlwaysPierce") > 0;
 
             if (always)
             {
                 return true;
             }
 
-            int count = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("PierceAdditionalTimes"), CastBy);
+            int count = (int)CastBy.GetTotal("PierceAdditionalTimes");
 
             if (count == 0)
             {
@@ -276,7 +282,7 @@ namespace MeteorGame
 
         public bool ShouldChain()
         {
-            int shouldChainCount = ModifierHelper.GetTotal("ChainAdditionalTimes", CastBy);
+            int shouldChainCount = (int)CastBy.GetTotal("ChainAdditionalTimes");
 
             if (ChainedFrom.Count >= shouldChainCount)
             {
@@ -305,7 +311,7 @@ namespace MeteorGame
 
         public bool ShouldFork()
         {
-            int count = ModifierHelper.GetTotal("ForkAdditionalTimes", CastBy);
+            int count = (int)CastBy.GetTotal("ForkAdditionalTimes");
 
             if (count == 0)
             {
@@ -355,12 +361,12 @@ namespace MeteorGame
 
         private void SetVelocityTowards(Vector3 position, float speed)
         {
-            rigidBody.isKinematic = false;
+            Rigidbody.isKinematic = false;
             transform.LookAt(position);
 
             var dir = (position - transform.position).normalized;
-            rigidBody.velocity = Vector3.zero;
-            rigidBody.AddForce(dir * speed, ForceMode.VelocityChange);
+            Rigidbody.velocity = Vector3.zero;
+            Rigidbody.AddForce(dir * speed, ForceMode.VelocityChange);
         }
 
         private void CopyFrom(ProjectileBase p)
