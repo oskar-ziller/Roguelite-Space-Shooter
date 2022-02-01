@@ -16,9 +16,11 @@ namespace MeteorGame
         [SerializeField] private Inventory inventory;
 
         public Inventory Inv => inventory;
+        public float TweeningCurrency => currencyTweening;
 
-        public float currency = 0;
+        private float currencyTweening = 0; // used to tween and display currency
 
+        [SerializeField] private float currency = 0;
         [SerializeField] private SpellSlot spellSlot1 = new SpellSlot(1);
         [SerializeField] private SpellSlot spellSlot2 = new SpellSlot(2);
 
@@ -48,8 +50,8 @@ namespace MeteorGame
 
         private void Awake()
         {
-            QualitySettings.vSyncCount = 1;
-            Application.targetFrameRate = 144;
+            //QualitySettings.vSyncCount = 1;
+            //Application.targetFrameRate = 144;
 
             Instance = this;
         }
@@ -80,6 +82,8 @@ namespace MeteorGame
             spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
 
             GameManager.Instance.TabMenuManager.RebuildTabMenu();
+
+            currencyTweening = currency;
 
             isSetup = true;
         }
@@ -177,17 +181,18 @@ namespace MeteorGame
                 currencyTween.Kill();
             }
 
-            currencyTween.Complete();
-
             var curr = currency;
             var target = curr + amount;
-            currencyTween = DOTween.To(() => currency, x => currency = x, target, 0.5f).SetUpdate(true);
+            currency = target;
+            currencyTween = DOTween.To(() => currencyTweening, x => currencyTweening = x, target, 0.5f).SetUpdate(true);
         }
 
         public bool CanAfford(int amount)
         {
             return currency >= amount;
         }
+
+
 
         #endregion
     }

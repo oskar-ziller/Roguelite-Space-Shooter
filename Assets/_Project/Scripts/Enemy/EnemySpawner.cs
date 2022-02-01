@@ -362,12 +362,6 @@ namespace MeteorGame
         }
 
 
-        private List<PDiscSampler.Obj> Sampler(float regionSize, List<float> spawnSizeList, float padding = 0f)
-        {
-            PDiscSampler sampler = new PDiscSampler(300, spawnSizeList, Vector3.one * regionSize, padding);
-            return sampler.FindPoints();
-        }
-
         #endregion
 
     }

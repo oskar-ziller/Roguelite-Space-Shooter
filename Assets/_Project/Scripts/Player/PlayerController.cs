@@ -69,8 +69,7 @@ namespace MeteorGame
         [SerializeField] private float jumpForce = 30;
 
 
-
-        [Header("GRAVITY")]
+        [Header("FALL")]
         [Tooltip("Downwards speed clamp when falling with jump key pressed")]
         [SerializeField] private float fallLimitMin = -30f;
         [Tooltip("Downwards speed clamp when falling with jump key NOT pressed")]
@@ -87,10 +86,8 @@ namespace MeteorGame
         private float timeLeftGrounded;
         private float currentBoostMultipAccel = 1f;
         private float currentBoostMultipMaxVel = 1f;
-        private float _jumpApexThreshold = 10;
         private Vector3 targetJumpVel = Vector3.zero;
         private bool endedJumpEarly = true;
-
 
         #endregion
 
@@ -116,8 +113,6 @@ namespace MeteorGame
                 hasBufferedJump = lastJumpPressed + jumpBuffer > Time.time;
             }
 
-
-
         }
 
         private void OnCollisionStay(Collision collision)
@@ -135,10 +130,8 @@ namespace MeteorGame
             {
                 isGrounded = false;
                 timeLeftGrounded = Time.time;
-                //CreateObjectAtCollision(collision, false);
             }
         }
-
 
         void Update()
         {
@@ -174,8 +167,6 @@ namespace MeteorGame
 
 
 
-
-
         private void GatherInput()
         {
             inputs = new FrameInput
@@ -204,11 +195,6 @@ namespace MeteorGame
             transform.Rotate(Vector3.up, amount);
         }
 
-
-
-
-
-
         private Vector3 CalculateJump()
         {
             Vector3 toReturn = Vector3.zero;
@@ -229,7 +215,6 @@ namespace MeteorGame
             if (!isGrounded && inputs.jumpReleased && !endedJumpEarly
                 && rb.velocity.y > targetJumpVel.y * 0.75f)
             {
-                // _currentVerticalSpeed = 0;
                 endedJumpEarly = true;
             }
 
@@ -251,18 +236,6 @@ namespace MeteorGame
                 gravity = minGravity;
             }
 
-
-            float clamp = fallLimitMax;
-
-            if (inputs.jumpDown)
-            {
-                clamp = fallLimitMin;
-            }
-
-            //var fallSpeed = !isGrounded && !inputs.jumpDown ? _fallSpeed * _jumpEndEarlyGravityModifier : _fallSpeed;
-            //var gravityVel = !inputs.jumpDown ? maxGravityDecel : minGravityDecel;
-            //var clamp = gravityVel == maxGravityDecel ? fallVelLimitFast : fallVelLimitSlow;
-
             var magnitude = gravity * Time.deltaTime;
 
             // if pressing jump but falling too fast for slow jump speed
@@ -270,19 +243,6 @@ namespace MeteorGame
             {
                 magnitude = -maxGravity * Time.deltaTime;
             }
-
-
-            //var targetVel = rb.velocity.y + vel;
-            //// Clamp
-            //if (targetVel < clamp)
-            //{
-            //    vel = 0;
-
-            //    //if (inputs.jumpDown)
-            //    //{
-            //    //    vel = airDecel;
-            //    //}
-            //}
 
             return Vector3.up * magnitude;
         }
@@ -297,6 +257,8 @@ namespace MeteorGame
 
             float acceleration = isGrounded ? groundAccel : airAccel;
             float deceleration = isGrounded ? groundDecel : airDecel;
+
+            
 
             float newX, newZ;
 

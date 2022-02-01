@@ -12,17 +12,13 @@ namespace MeteorGame
     {
         [Tooltip("The main body group of the projectile")]
         [SerializeField] private GameObject bodyGroup;
-        [SerializeField] private Rigidbody rigidBody;
-
-        [Tooltip("We need to desroy projectile's collider when begin explode etc")]
-        [SerializeField] private SphereCollider projectileCollider;
 
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-        public Vector3 Position { get { return rigidBody.position; } set { rigidBody.position = value; } }
+        public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
-        public Rigidbody Rigidbody { get { return rigidBody; } }
+        public Rigidbody Rigidbody { get { return rigidbody; } }
 
         public Enemy AimingAtEnemy { get; protected set; }
         public int CastID { get; protected set; }
@@ -53,6 +49,9 @@ namespace MeteorGame
         private float maxTrailDur = 0f;
 
         private SpinAround spinner;
+
+        private Rigidbody rigidbody;
+        private SphereCollider projectileCollider;
 
         public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID)
         {
@@ -94,7 +93,7 @@ namespace MeteorGame
 
         public virtual void Move()
         {
-            StartedMovingFrom = rigidBody.position;
+            StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
 
 
@@ -158,6 +157,9 @@ namespace MeteorGame
             maxTrailDur = trailRenderers.Max(t => t.time);
 
             spinner = GetComponent<SpinAround>();
+
+            rigidbody = GetComponent<Rigidbody>();
+            projectileCollider = GetComponent<SphereCollider>();
         }
 
 
@@ -170,7 +172,7 @@ namespace MeteorGame
 
         internal virtual void Expire()
         {
-            rigidBody.DOKill();
+            Rigidbody.DOKill();
             DestroySelfSoft();
         }
 
@@ -193,10 +195,10 @@ namespace MeteorGame
             {
                 var dir = closest.transform.position - transform.position;
 
-                rigidBody.DOKill();
-                rigidBody.isKinematic = false;
+                Rigidbody.DOKill();
+                Rigidbody.isKinematic = false;
 
-                rigidBody.velocity = dir.normalized * StartingSpeed;
+                Rigidbody.velocity = dir.normalized * StartingSpeed;
             }
         }
 
@@ -243,7 +245,7 @@ namespace MeteorGame
                 collided = true;
                 collidingWith = collidedEnemy;
 
-                rigidBody.DOKill();
+                Rigidbody.DOKill();
                 HandleEnemyCollision();
             }
         }
@@ -359,12 +361,12 @@ namespace MeteorGame
 
         private void SetVelocityTowards(Vector3 position, float speed)
         {
-            rigidBody.isKinematic = false;
+            Rigidbody.isKinematic = false;
             transform.LookAt(position);
 
             var dir = (position - transform.position).normalized;
-            rigidBody.velocity = Vector3.zero;
-            rigidBody.AddForce(dir * speed, ForceMode.VelocityChange);
+            Rigidbody.velocity = Vector3.zero;
+            Rigidbody.AddForce(dir * speed, ForceMode.VelocityChange);
         }
 
         private void CopyFrom(ProjectileBase p)

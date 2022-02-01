@@ -65,7 +65,7 @@ namespace MeteorGame
         private TimeSpan debugElapsed;
         private float debugGameLevel = 0;
         private float gameLevel = 0; // derived from minutes since start and difficultyCurve
-        private bool tabMenuShowing = false;
+        private bool tabMenuShowing = true;
 
         #endregion
 
@@ -120,21 +120,15 @@ namespace MeteorGame
 
         /*
 
-
-
         timeFactor = 0.0506 * difficultyValue * 1^0.2
         stageFactor = 1.15^{stagesCompleted}}
         coeff = (1 + timeInMinutes * timeFactor) * stageFactor
 
         difficultyValue is equal to 1 for Drizzle, 2 for Rainstorm, and 3 for Monsoon.
 
-
         enemyLevel = 1 + (coeff-1) / 0.33
 
         moneyCost = baseCost * coeff^1.25
-
-
-
 
         Whenever a monster spawns, its reward is directly multiplied by coeff :
 
@@ -142,9 +136,7 @@ namespace MeteorGame
 
         enemyGoldReward = 2 * coeff * monsterValue * rewardMultiplier
 
-
         Credits per second = 0.75 * (1 + 0.4 * coeff) * 1 / 2
-
         */
 
 
@@ -160,6 +152,7 @@ namespace MeteorGame
             //TabMenuManager.RebuildTabMenu();
 
             enemySpawner.BeginSpawning();
+            HideTabMenu();
         }
 
 
@@ -199,8 +192,6 @@ namespace MeteorGame
             var eval = difficultyCurve.Evaluate(secondsPercentage);
             var res = Mathf.Floor(eval * maxGameLevel);
 
-            //var minutePercentage = (float)(HowFarIntoDifficulty().TotalSeconds / (minutesToHitMaxGameLevel * 60));
-            //var eval = difficultyCurve.Evaluate(minutePercentage);
             gameLevel = res + debugGameLevel;
 
             bool laterThanLastChallenge = gameLevel > lastChallengeLevelCompleted;
@@ -278,7 +269,6 @@ namespace MeteorGame
             tabMenuCanvas.gameObject.SetActive(false);
             tabMenuShowing = false;
         }
-
 
 
         #endregion
