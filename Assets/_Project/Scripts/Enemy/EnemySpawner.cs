@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+
 namespace MeteorGame
 {
     public class EnemySpawner : MonoBehaviour
@@ -26,7 +27,7 @@ namespace MeteorGame
 
 
         [Tooltip("How far enemy pack can spawn from Arena center")]
-        [SerializeField] private int spawnAreaSize;
+        [SerializeField] private int spawnAreaExtends;
 
         [Tooltip("Starting height for enemies at level 0")]
         [SerializeField] private int startPosMinHeight;
@@ -34,7 +35,7 @@ namespace MeteorGame
         [Tooltip("Starting height for enemies at Max Level")]
         [SerializeField] private int startPosMaxHeight;
 
-        private WeightedRandomEnemy spawnDirector =  new WeightedRandomEnemy();
+        private WeightedRandomEnemy spawnDirector = new WeightedRandomEnemy();
 
         //[Tooltip("Delay between each pack in seconds")]
         //[SerializeField] private int delayBetweenPacks;
@@ -62,17 +63,7 @@ namespace MeteorGame
         [Tooltip("Pack spawner money curve")]
         [SerializeField] private AnimationCurve packSpawnerMoneyCurve;
 
-        //[Tooltip("Break duration in seconds")]
-        //[SerializeField] private int breakDuration;
-
-        //[Tooltip("Break interval in seconds")]
-        //[SerializeField] private int breakInterval;
-
-        [Tooltip("Interval between two consequtive enemy spawns in seconds")]
-        [SerializeField] private float spawnInterval;
-
         private Coroutine spawnLoop_Co;
-        //private float packSizeFactor = 1f;
 
 
         private Stopwatch timeSinceBreak = Stopwatch.StartNew();
@@ -84,10 +75,11 @@ namespace MeteorGame
 
 
 
-        
+
         [Tooltip("Spacing between two enemies in a pack")]
         [SerializeField] private float spacingBetweenEnemies;
 
+        private int totalSpawned = 0;
 
         #endregion
 
@@ -100,7 +92,7 @@ namespace MeteorGame
 
         private void Start()
         {
-            
+
         }
 
         private void BreakStart()
@@ -113,51 +105,60 @@ namespace MeteorGame
             print("BreakEnd");
         }
 
+
+        private float CalculateNextWaveDelay()
+        {
+            float level = GameManager.Instance.GameLevel;
+            float maxLevel = GameManager.Instance.MaxGameLevel;
+
+            var val = delayBetweenPacksCurve.Evaluate(level / maxLevel);
+            var delay = minDelayBeteenPacks + val * maxDelayBeteenPacks;
+            return delay;
+        }
+
+
         private IEnumerator SpawnLoop()
         {
-            while(true)
+            while (true)
             {
                 if (!GameManager.Instance.waitingForChallenge)
                 {
                     yield return PackSpawnStart();
-
-                    float level = GameManager.Instance.GameLevel;
-                    float maxLevel = GameManager.Instance.MaxGameLevel;
-
-                    var val = delayBetweenPacksCurve.Evaluate(level / maxLevel);
-                    var delay = minDelayBeteenPacks + val * maxDelayBeteenPacks;
-
-                    yield return new WaitForSeconds(delay);
+                    yield return new WaitForSeconds(CalculateNextWaveDelay());
                 }
 
-                yield return null;
+                yield return new WaitForSeconds(1);
             }
         }
 
 
+        private float CalculatePackMoneyForCurrentGameLevel()
+        {
+            float level = GameManager.Instance.GameLevel;
+            float maxLevel = GameManager.Instance.MaxGameLevel;
+
+            var curveVal = packSpawnerMoneyCurve.Evaluate(level / maxLevel);
+            return minMoney + curveVal * maxMoney;
+        }
 
 
-        private IEnumerator PackSpawnStart()
+        private float CalculatePackHeightForCurrentGameLevel()
+        {
+            float level = GameManager.Instance.GameLevel;
+            float maxLevel = GameManager.Instance.MaxGameLevel;
+
+            var curveVal = packSpawnPosHeightCurve.Evaluate(level / maxLevel);
+            return startPosMinHeight + curveVal * startPosMaxHeight;
+        }
+
+        public IEnumerator PackSpawnStart()
         {
             print("PackSpawnStart");
 
             var random = new System.Random();
 
-
-            //packSizeFactor = (1 + GameManager.Instance.gameLevel) * 0.04f;
-
-            float level = GameManager.Instance.GameLevel;
-            float maxLevel = GameManager.Instance.MaxGameLevel;
-
-            var val1 = packSpawnerMoneyCurve.Evaluate(level / maxLevel);
-            var target1 = minMoney + val1 * maxMoney;
-
-            spawnDirector.totalMoney = target1;
-            print($"totalMoney: {spawnDirector.totalMoney}");
-
+            spawnDirector.totalMoney = CalculatePackMoneyForCurrentGameLevel();
             List<EnemyRarity> enemiesToSpawn = spawnDirector.CreateSpawnList();
-
-            print($"total enemies to spawn {enemiesToSpawn.Count}");
 
 
             var normals = enemiesToSpawn.Where(e => e == EnemyRarity.Normal).ToList();
@@ -165,15 +166,15 @@ namespace MeteorGame
             var rares = enemiesToSpawn.Where(e => e == EnemyRarity.Rare).ToList();
             var uniques = enemiesToSpawn.Where(e => e == EnemyRarity.Unique).ToList();
 
+            print($"totalMoney: {spawnDirector.totalMoney}");
+            print($"total enemies to spawn {enemiesToSpawn.Count}");
             print($"normals: {normals.Count}");
             print($"magics: {magics.Count}");
             print($"rares: {rares.Count}");
             print($"uniques: {uniques.Count}");
 
-            var spawnList = RarityToRadius(enemiesToSpawn);
-            spawnList.Sort();
-
-            bool cointoss = UnityEngine.Random.value < 0.5f;
+            
+            bool cointoss = Random.value < 0.5f;
             PackShape randShape = PackShape.Sphere;
 
             if (cointoss)
@@ -181,22 +182,24 @@ namespace MeteorGame
                 randShape = PackShape.Cube;
             }
 
-            var generator = new PositionGenerator(shape: randShape, maxRegionSize: spawnAreaSize - 1, spacing: spacingBetweenEnemies, spawnList: spawnList, iterationsBeforeWait: 50);
-            generator.Generate();
+            var generator = new PositionGenerator(shape: randShape,
+                                                  spacing: spacingBetweenEnemies,
+                                                  spawnList: enemiesToSpawn,
+                                                  maxExtends: spawnAreaExtends);
 
 
-            var val = packSpawnPosHeightCurve.Evaluate(level / maxLevel);
-            var target = startPosMinHeight + val * startPosMaxHeight;
+            yield return generator.Generate();
 
-            var randx = random.Next(-spawnAreaSize/2 + generator.regionSize / 2, spawnAreaSize/2 - generator.regionSize / 2);
-            var randz = random.Next(-spawnAreaSize/2 + generator.regionSize / 2, spawnAreaSize/2 - generator.regionSize / 2);
-            var pos = new Vector3(randx, target, randz);
+            var randx = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends);
+            var randz = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends );
+
+            var height = CalculatePackHeightForCurrentGameLevel();
+            var pos = new Vector3(randx, height, randz);
 
             var holder = new GameObject("Pack");
             holder.transform.parent = parentGroup;
 
             Transform packTest;
-
 
             if (randShape == PackShape.Cube)
             {
@@ -207,19 +210,12 @@ namespace MeteorGame
                 packTest = Instantiate(packTestSphere);
             }
 
-            if (generator.regionSize > 1)
-            {
-                packTest.localScale = Vector3.one * generator.regionSize;
-            }
-            else
-            {
-                packTest.localScale = Vector3.one * 1;
-            }
+            packTest.localScale = Vector3.one * generator.regionExtends * 2;
 
             packTest.SetParent(holder.transform);
             packTest.position = pos;
 
-            yield return SpawnCandidatesAroundPoint(pos, generator.spheres, holder.transform);
+            yield return SpawnCandidatesAroundPoint(pos, generator.spawnPositions, holder.transform);
         }
 
         public void BeginSpawning()
@@ -232,155 +228,12 @@ namespace MeteorGame
             spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
 
-
-
-        /// <summary>
-        /// Converts List<EnemyRarity> to List<float> based on EnemyManager.normalRarityScale etc.
-        /// </summary>
-        /// <param name="enemiesToSpawn"></param>
-        /// <returns></returns>
-        private List<float> RarityToRadius(List<EnemyRarity> enemiesToSpawn)
-        {
-            List<float> spawnListForSampler = new List<float>();
-
-            foreach (var item in enemiesToSpawn)
-            {
-                if (item == EnemyRarity.Normal)
-                {
-                    spawnListForSampler.Add(EnemyManager.normalRarityScale);
-                }
-
-                if (item == EnemyRarity.Magic)
-                {
-                    spawnListForSampler.Add(EnemyManager.magicRarityScale);
-                }
-
-                if (item == EnemyRarity.Rare)
-                {
-                    spawnListForSampler.Add(EnemyManager.rareRarityScale);
-                }
-
-                if (item == EnemyRarity.Unique)
-                {
-                    spawnListForSampler.Add(EnemyManager.uniqueRarityScale);
-                }
-            }
-
-            return spawnListForSampler;
-        }
-
-
-
-        private List<float> CreateDebugSpawnList()
-        {
-            print("CreateDebugSpawnList");
-
-            spawnDirector.totalMoney = 1;
-            List<EnemyRarity> enemiesToSpawn = spawnDirector.CreateSpawnList();
-
-            print($"total enemies to spawn {enemiesToSpawn.Count}");
-            print($"normal: {enemiesToSpawn.Count(e => e == EnemyRarity.Normal)}");
-            print($"magic: {enemiesToSpawn.Count(e => e == EnemyRarity.Magic)}");
-            print($"rare: {enemiesToSpawn.Count(e => e == EnemyRarity.Rare)}");
-            print($"unique: {enemiesToSpawn.Count(e => e == EnemyRarity.Unique)}");
-
-
-            List<float> spawnListForSampler = new List<float>();
-
-            foreach (var item in enemiesToSpawn)
-            {
-                if (item == EnemyRarity.Normal)
-                {
-                    spawnListForSampler.Add(EnemyManager.normalRarityScale);
-                }
-
-                if (item == EnemyRarity.Magic)
-                {
-                    spawnListForSampler.Add(EnemyManager.magicRarityScale);
-                }
-
-                if (item == EnemyRarity.Rare)
-                {
-                    spawnListForSampler.Add(EnemyManager.rareRarityScale);
-                }
-
-                if (item == EnemyRarity.Unique)
-                {
-                    spawnListForSampler.Add(EnemyManager.uniqueRarityScale);
-                }
-            }
-
-            return spawnListForSampler;
-        }
-
         void Update()
         {
 
             if (Input.GetKeyDown(KeyCode.Backspace))
             {
-                var spawnlist = CreateDebugSpawnList();
-                var toSpawnCount = spawnlist.Count;
 
-                var regionSize = 30f;
-                var padding = 0f;
-
-                List<PDiscSampler.Obj> samplerPoints = Sampler(regionSize, new List<float>(spawnlist), padding);
-
-                int tries = 0;
-                int limit = 4;
-
-                if (samplerPoints.Count < toSpawnCount)
-                {
-                    while (samplerPoints.Count < toSpawnCount)
-                    {
-                        tries++;
-                        print("points.count: " + samplerPoints.Count + " increase region size: " + regionSize + " tries: " + tries);
-
-                        regionSize++;
-                        samplerPoints = Sampler(regionSize, new List<float>(spawnlist), padding);
-
-                        if (tries > 20)
-                        {
-                            throw new System.Exception("something wrong with enemy spawn");
-                        }
-                    }
-                }
-
-
-
-
-                if (samplerPoints.Count < toSpawnCount)
-                {
-                    print("failed spawning enemies");
-                }
-
-
-
-                var l = GameManager.Instance.GameLevel;
-                var target = Helper.Map(l, 0, 100, startPosMinHeight, startPosMaxHeight);
-
-                var randx = UnityEngine.Random.Range(-spawnAreaSize, spawnAreaSize);
-                var randz = UnityEngine.Random.Range(-spawnAreaSize, spawnAreaSize);
-
-                var pos = new Vector3(randx, target, randz);
-
-                print("debug enemies start pos: " + pos);
-
-
-                //StartCoroutine(SpawnCandidatesAroundPoint(pos, samplerPoints));
-                //SpawnCandidatesAroundPoint(pos, samplerPoints);
-
-
-
-                //Vector3 p = Vector3.zero;
-
-                //p.x = debugKeySpawnPos.x + regionSize / 2;
-                //p.y = debugKeySpawnPos.y + regionSize / 2;
-                //p.z = debugKeySpawnPos.z + regionSize / 2;
-
-                //enemySpawnerTest.position = p;
-
-                //enemySpawnerTest.localScale = Vector3.one * regionSize;
             }
 
             if (Input.GetKeyDown(KeyCode.Insert))
@@ -420,31 +273,32 @@ namespace MeteorGame
         }
 
 
-        private Enemy SpawnEnemy(Enemy prefab, Transform parent, float size, EnemyRarity rarity, Vector3 startPos)
+        private Enemy SpawnEnemy(Enemy prefab, Transform parent, EnemyRarity rarity, Vector3 startPos)
         {
             Enemy e = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             e.gameObject.layer = LayerMask.NameToLayer("Enemies");
             e.transform.parent = parent;
 
-            e.OnDeath += EnemyManager.Instance.HandleEnemyDeath;
+            e.OnDeath += EnemyManager.Instance.OnEnemyDeath;
 
             EnemyManager.Instance.AddEnemy(e);
 
-            e.ChangeSize(size);
+            //e.ChangeSize(size);
             e.SetRarity(rarity);
-            e.Init(startPos);
+            e.Init(startPos, totalSpawned);
+
+            totalSpawned++;
 
             return e;
         }
 
-
-        private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<MySphere> candidates, Transform parent)
+        private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<SpawnPos> candidates, Transform parent)
         {
             print("SpawnCandidatesAroundPoint");
-            var uniques = candidates.Where(c => c.radi == EnemyManager.uniqueRarityScale).ToList();
-            var rares = candidates.Where(c => c.radi == EnemyManager.rareRarityScale).ToList();
-            var magics = candidates.Where(c => c.radi == EnemyManager.magicRarityScale).ToList();
-            var normals = candidates.Where(c => c.radi == EnemyManager.normalRarityScale).ToList();
+            var uniques = candidates.Where(c => c.rarity == EnemyRarity.Unique).ToList();
+            var rares = candidates.Where(c => c.rarity == EnemyRarity.Rare).ToList();
+            var magics = candidates.Where(c => c.rarity == EnemyRarity.Magic).ToList();
+            var normals = candidates.Where(c => c.rarity == EnemyRarity.Normal).ToList();
 
             Vector3 startPos;
 
@@ -458,8 +312,9 @@ namespace MeteorGame
 
                 startPos = point + c.center;
 
-                Enemy e = SpawnEnemy(uniqueEnemyPrefab, parent, size: c.radi, EnemyRarity.Unique, startPos);
-                yield return null;
+                Enemy e = SpawnEnemy(uniqueEnemyPrefab, parent, EnemyRarity.Unique, startPos);
+                print("spawning enemy");
+                yield return new WaitForSeconds(0.02f);
             }
 
             foreach (var c in rares)
@@ -471,8 +326,9 @@ namespace MeteorGame
 
                 startPos = point + c.center;
 
-                Enemy e = SpawnEnemy(rareEnemyPrefab, parent, size: c.radi, EnemyRarity.Rare, startPos);
-                yield return null;
+                Enemy e = SpawnEnemy(rareEnemyPrefab, parent, EnemyRarity.Rare, startPos);
+                print("spawning enemy");
+                yield return new WaitForSeconds(0.02f);
             }
 
             foreach (var c in magics)
@@ -484,8 +340,9 @@ namespace MeteorGame
 
                 startPos = point + c.center;
 
-                Enemy e = SpawnEnemy(magicEnemyPrefab, parent, size: c.radi, EnemyRarity.Magic, startPos);
-                yield return null;
+                Enemy e = SpawnEnemy(magicEnemyPrefab, parent, EnemyRarity.Magic, startPos);
+                print("spawning enemy");
+                yield return new WaitForSeconds(0.02f);
             }
 
             foreach (var c in normals)
@@ -497,17 +354,13 @@ namespace MeteorGame
 
                 startPos = point + c.center;
 
-                Enemy e = SpawnEnemy(normalEnemyPrefab, parent, size: c.radi, EnemyRarity.Normal, startPos);
-                yield return null;
+                Enemy e = SpawnEnemy(normalEnemyPrefab, parent, EnemyRarity.Normal, startPos);
+                yield return new WaitForSeconds(0.02f);
             }
+        
+            yield return null;
         }
 
-
-        private List<PDiscSampler.Obj> Sampler(float regionSize, List<float> spawnSizeList, float padding = 0f)
-        {
-            PDiscSampler sampler = new PDiscSampler(300, spawnSizeList, Vector3.one * regionSize, padding);
-            return sampler.FindPoints();
-        }
 
         #endregion
 
@@ -515,15 +368,34 @@ namespace MeteorGame
 
     public class WeightedRandomEnemy
     {
+        public class EnemySpawnEntry
+        {
+            public EnemyRarity Rarity;
+            public float weight;
+            public float cost;
+
+            public EnemySpawnEntry(EnemyRarity r, float cost, float weight)
+            {
+                Rarity = r;
+                this.cost = cost;
+                this.weight = weight;
+            }
+        }
+
         public List<EnemySpawnEntry> entries = new List<EnemySpawnEntry>();
         public float totalMoney;
 
         public WeightedRandomEnemy()
         {
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, 0.9f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, 0.08f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 12, 0.0195f));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 50, 0.0005f));
+            float normalOccurence = 9400f / 10000f;
+            float magicOccurence = 550f / 10000f;
+            float rareOccurence = 50f / 10000f;
+            float uniqueOccurence = 5f / 10000f;
+
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, normalOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, magicOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 30, rareOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 150, uniqueOccurence));
         }
 
         public List<EnemyRarity> CreateSpawnList()
@@ -553,59 +425,10 @@ namespace MeteorGame
             return toReturn;
         }
 
-
     }
 
 
-    public class EnemySpawnEntry
-    {
-        public EnemyRarity Rarity;
-        public float weight;
-        public float cost;
 
-        public EnemySpawnEntry(EnemyRarity r, float cost, float weight)
-        {
-            Rarity = r;
-            this.cost = cost;
-            this.weight = weight;
-        }
-
-
-
-
-
-
-
-
-
-
-        /*
-
-
-
-
-
-
-
-        function [ c r ] = randomSphere( dims )
-        % creating one sphere at random inside [0..dims(1)]x[0..dims(2)]x...
-        % radius and center coordinates are sampled from a uniform distribution 
-        % over the relevant domain.
-        %
-        % output: c - center of sphere (vector cx, cy,... )
-        %         r - radius of sphere (scalar)
-        r = rand(1); % you might want to scale this w.r.t dims or other consideration
-        c = r + rand( size(dims) )./( dims - 2*r ); % make sure sphere does not exceed boundaries
-
-
-
-
-
-
-        */
-
-
-    }
 
 
 

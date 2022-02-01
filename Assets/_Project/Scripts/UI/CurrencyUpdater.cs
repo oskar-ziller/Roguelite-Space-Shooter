@@ -9,6 +9,7 @@ namespace MeteorGame
     {
 
         #region Variables
+
         private TextMeshProUGUI currencyTMP;
 
         #endregion
@@ -20,14 +21,9 @@ namespace MeteorGame
             currencyTMP = GetComponentInChildren<TextMeshProUGUI>();
         }
 
-        private void Start()
-        {
-        
-        }
-
         private void Update()
         {
-            currencyTMP.text = Player.Instance.currency.ToString("N0");
+            currencyTMP.text = Player.Instance.TweeningCurrency.ToString("N0");
         }
 
         #endregion

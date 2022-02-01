@@ -26,7 +26,6 @@ namespace MeteorGame
         private void Awake()
         {
             player = FindObjectOfType<PlayerController>();
-
         }
 
         void Start()
@@ -45,13 +44,6 @@ namespace MeteorGame
 
             float mouseX = xAxis * sens * Time.deltaTime;
             float mouseY = yAxis * sens * Time.deltaTime;
-
-            //var angle = Quaternion.FromToRotation(transform.forward, Vector3.up);
-
-            //print("angle: " + angle);
-            //print("angle.eulerAngles.y: " + angle.eulerAngles.y);
-
-
 
             transform.Rotate(Vector3.right, -mouseY);
             player.TurnHorizontal(mouseX); // rotate player body

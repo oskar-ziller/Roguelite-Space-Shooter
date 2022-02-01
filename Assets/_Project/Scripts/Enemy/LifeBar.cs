@@ -10,19 +10,10 @@ namespace MeteorGame
 
         #region Variables
 
-        [Tooltip("The lifebar belongs to")]
-        [SerializeField] Enemy owner;
-
-        //[Tooltip("Health Canvas")]
-        //[SerializeField] private Canvas lifeBarCanvas;
-
-        [Tooltip("Health Slider from UI Canvas")]
-        [SerializeField] private Slider healthSlider;
-
-        //[Tooltip("billboard script of canvas (to set offset)")]
-        //[SerializeField] private Billboard billboard;
-
+        private Enemy owner;
         private Coroutine hideLifeBar_Co;
+        private MeshRenderer mesh;
+        private Material mat;
 
 
         #endregion
@@ -31,12 +22,16 @@ namespace MeteorGame
 
         private void Awake()
         {
+            owner = GetComponentInParent<Enemy>();
+            mesh = GetComponent<MeshRenderer>();
+            mat = mesh.material;
         }
 
         private void Start()
         {
             owner.DamageTaken += UpdateHealthBar;
-            SetSliderValToOwnerHealth();
+
+            mat.SetFloat("_percentage", 1);
 
             // if not always on, start off
             if (owner.hideLifebarAfterSeconds != 0)
@@ -54,15 +49,16 @@ namespace MeteorGame
 
         #region Methods
 
-        private void SetSliderValToOwnerHealth()
+        private void SetBarPercent()
         {
-            healthSlider.value = (float)owner.currentHealth / owner.totalHealth;
+            var percentage = (float)owner.currentHealth / owner.totalHealth;
+            mat.SetFloat("_percentage", percentage);
         }
 
         private void UpdateHealthBar(Enemy _)
         {
             gameObject.SetActive(true);
-            SetSliderValToOwnerHealth();
+            SetBarPercent();
 
             if (hideLifeBar_Co != null)
             {

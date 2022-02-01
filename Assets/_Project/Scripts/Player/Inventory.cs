@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MeteorGame
 {
@@ -7,7 +8,7 @@ namespace MeteorGame
     [System.Serializable]
     public class Inventory
     {
-        private List<GemItem> gems = new List<GemItem>();
+        [SerializeField] private List<GemItem> gems = new List<GemItem>();
 
         public List<GemItem> Gems => gems;
 

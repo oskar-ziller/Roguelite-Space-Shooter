@@ -39,7 +39,7 @@ namespace MeteorGame
             HideBody();
             DisableCollider();
 
-            foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, CastBy.Spell.ExplosionRadius, fromShell: true))
+            foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, CastBy.ExpRadi, fromShell: true))
             {
                 if (e == collidingWith)
                 {

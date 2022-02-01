@@ -72,7 +72,7 @@ namespace MeteorGame
 
         private void UpdateTexts()
         {
-            nameTMP.text = gem.Name;
+            nameTMP.text = gem.Name + $" ({gem.Level})";
             trigger.SetupGemInfoTooltip(gem);
         }
 
@@ -128,13 +128,19 @@ namespace MeteorGame
 
         private void TryEquip(int slot)
         {
-            var s = Player.Instance.SpellSlot(slot);
+            var spellSlot = Player.Instance.SpellSlot(slot);
+
+            if (!spellSlot.IsUnlocked)
+            {
+                tabMenuManager.DisplayError(UIError.SpellSlotNeedsUnlock);
+                return;
+            }
 
             if (!gem.HasSpell)
             {
-                if (s.CanLinkMore)
+                if (spellSlot.CanLinkMore)
                 {
-                    s.Equip(gem);
+                    spellSlot.Equip(gem);
                 }
                 else
                 {
@@ -143,7 +149,7 @@ namespace MeteorGame
             }
             else
             {
-                s.Equip(gem);
+                spellSlot.Equip(gem);
             }
         }
     }

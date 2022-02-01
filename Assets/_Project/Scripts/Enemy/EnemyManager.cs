@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace MeteorGame
 {
+
+
     public class EnemyManager : MonoBehaviour
     {
         public static EnemyManager Instance { get; private set; }
@@ -14,14 +16,17 @@ namespace MeteorGame
 
         public Transform enemiesHolder;
 
+        public GoldCoinDrop coinDropBig, coinDropMedium, coinDropSmall;
+
+        public Transform goldDropHolder;
+
+
+        private DropManager dropManager = new DropManager();
+
         #region Variables
 
-        public const float normalRarityScale = 3f;
-        public const float magicRarityScale = 6f;
-        public const float rareRarityScale = 20f;
-        public const float uniqueRarityScale = 25f;
+        public float enemySpeed = 0.5f;
 
-        public float enemySpeed = 1f;
 
         #endregion
 
@@ -38,9 +43,11 @@ namespace MeteorGame
             Instance = this;
         }
 
+       
+
         private void Start()
         {
-        
+            
         }
 
         private void Update()
@@ -60,8 +67,38 @@ namespace MeteorGame
 
         #region Methods
 
-        internal void HandleEnemyDeath(Enemy e)
+        private void SpawnGoldDrop(CoinSize whichCoin, Vector3 pos)
         {
+            GoldCoinDrop prefab = coinDropSmall;
+
+            if (whichCoin == CoinSize.Medium)
+            {
+                prefab = coinDropMedium;
+            }
+
+            if (whichCoin == CoinSize.Big)
+            {
+                prefab = coinDropBig;
+            }
+
+            Instantiate(prefab, pos, Quaternion.identity, goldDropHolder);
+        }
+
+
+        private void DropGold(Enemy dropFrom)
+        {
+            var howMany = dropManager.PickRandomNumber(dropFrom);
+
+            for (int i = 0; i < howMany; i++)
+            {
+                var whichCoin = dropManager.PickRandomCoinSize(dropFrom);
+                SpawnGoldDrop(whichCoin, dropFrom.transform.position);
+            }
+        }
+
+        internal void OnEnemyDeath(Enemy e)
+        {
+            DropGold(e);
             aliveEnemies.Remove(e);
         }
 
@@ -107,14 +144,33 @@ namespace MeteorGame
             {
                 Enemy e = aliveEnemies[i];
 
-                float dist = Vector3.Distance(e.transform.position, pos);
+                var vec = (e.transform.position - pos);
+                float dist = vec.sqrMagnitude;
 
                 if (fromShell)
                 {
-                    dist -= e.transform.localScale.x / 2;
+                    if (e.rarity == EnemyRarity.Normal)
+                    {
+                        dist -= normalSpawnInfo.r * normalSpawnInfo.r;
+                    }
+
+                    if (e.rarity == EnemyRarity.Magic)
+                    {
+                        dist -= magicSpawnInfo.r * magicSpawnInfo.r;
+                    }
+
+                    if (e.rarity == EnemyRarity.Unique)
+                    {
+                        dist -= uniqueSpawnInfo.r * uniqueSpawnInfo.r;
+                    }
+
+                    if (e.rarity == EnemyRarity.Rare)
+                    {
+                        dist -= rareSpawnInfo.extends.sqrMagnitude;
+                    }
                 }
 
-                if (dist <= range)
+                if (dist <= range * range)
                 {
                     toreturn.Add(e);
                 }
@@ -156,6 +212,46 @@ namespace MeteorGame
             }
 
             return refined.ElementAt(UnityEngine.Random.Range(0, refined.Count()));
+        }
+
+
+
+
+        private SpawnInfo uniqueSpawnInfo, rareSpawnInfo, magicSpawnInfo, normalSpawnInfo;
+
+
+
+        internal SpawnInfo GetSpawnInfo(EnemyRarity e)
+        {
+            if (uniqueSpawnInfo == null)
+            {
+                uniqueSpawnInfo = new SpawnInfo(13.2f);
+                rareSpawnInfo = new SpawnInfo(new Vector3(21f, 9f, 21f)/2f);
+                magicSpawnInfo = new SpawnInfo(5.2f);
+                normalSpawnInfo = new SpawnInfo(2.6f);
+            }
+
+            if (e == EnemyRarity.Unique)
+            {
+                return uniqueSpawnInfo;
+            }
+
+            if (e == EnemyRarity.Rare)
+            {
+                return rareSpawnInfo;
+            }
+
+            if (e == EnemyRarity.Magic)
+            {
+                return magicSpawnInfo;
+            }
+
+            if (e == EnemyRarity.Normal)
+            {
+                return normalSpawnInfo;
+            }
+
+            return null;
         }
 
         #endregion

@@ -248,7 +248,7 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.744
+    m_Value: 0.799
     min: 0
     max: 1
   response:
@@ -519,7 +519,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   intensity:
     m_OverrideState: 1
-    m_Value: -0.11
+    m_Value: -0.239
     min: -1
     max: 1
   xMultiplier:
@@ -617,7 +617,7 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.372
+    m_Value: 0.471
     min: 0
     max: 1
   smoothness:
@@ -644,7 +644,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   temperature:
     m_OverrideState: 1
-    m_Value: 7.4
+    m_Value: 36.2
     min: -100
     max: 100
   tint:

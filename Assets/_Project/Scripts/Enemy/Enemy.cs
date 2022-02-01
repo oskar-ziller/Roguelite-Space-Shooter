@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,23 +37,9 @@ namespace MeteorGame
         [Tooltip("Rarity of this enemy")]
         public EnemyRarity rarity;
 
-
-
-        [Tooltip("Audio to play on spawn")]
-        [SerializeField] private AudioClip spawnSound;
-
-
-        [Tooltip("Looping hover/engine sound")]
-        [SerializeField] private AudioClip engineLoop;
-
-        [Tooltip("Audio source that plays hover sounds")]
-        [SerializeField] private AudioSource hoverAudioSource;
-
-
         public Action<Enemy> DamageTaken;
 
-        private AudioSource spawnAudioSource;
-
+        private int id;
 
         public AnimationCurve spawnAudioCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 1), new Keyframe(1, 0) });
 
@@ -124,8 +111,13 @@ namespace MeteorGame
 
 
 
-        public void Init(Vector3 pos)
+        public void Init(Vector3 pos, int id)
         {
+            this.id = id;
+
+            baseLifeList = baseLifeArr.ToList();
+            baseLifeList.Reverse();
+
             spawnPos = pos;
 
             RepositionToSpawn();
@@ -133,7 +125,9 @@ namespace MeteorGame
             SetLevel(Mathf.RoundToInt(GameManager.Instance.GameLevel));
             //SetRandomRotation();
 
-            baseLife = (int)(baseLifeArr[maxLevel - level - 1] * 1.2f);
+
+
+            baseLife = baseLifeList[level];
 
             var monsterTypeHealthModifier = 1f; // %50-%200 arasi
 
@@ -173,8 +167,7 @@ namespace MeteorGame
 
             //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
 
-            PlaySpawnSound();
-            //PlayHoverSound();
+            StartCoroutine(UpdateAilmentsCoroutine());
         }
 
 
@@ -209,18 +202,6 @@ namespace MeteorGame
         }
 
 
-        private void PlaySpawnSound()
-        {
-            var s = gameObject.AddComponent<AudioSource>();
-            s = EditSourceSettings(s);
-            s.clip = spawnSound;
-            s.Play();
-        }
-
-        private void PlayHoverSound()
-        {
-            hoverAudioSource.Play();
-        }
 
         public void SetLevel(int level)
         {
@@ -230,16 +211,36 @@ namespace MeteorGame
         private void Awake()
         {
             ailmentManager = new AilmentManager(this);
-            spawnAudioSource = gameObject.GetComponent<AudioSource>();
         }
 
 
-        int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823, 32684, 30673, 28784, 27007, 25338, 23770, 22296, 20911, 19610, 18388, 17240, 16161, 15149, 14198, 13304, 12466, 11679, 10940, 10246, 9595, 8984, 8410, 7872, 7367, 6894, 6449, 6033, 5642, 5276, 4932, 4610, 4308, 4025, 3760, 3512, 3279, 3061, 2857, 2665, 2486, 2319, 2162, 2015, 1878, 1749, 1629, 1516, 1411, 1313, 1221, 1135, 1055, 980, 910, 844, 783, 726, 673, 624, 577, 534, 494, 456, 422, 389, 359, 331, 304, 280, 257, 236, 217, 199, 182, 166, 152, 138, 126, 114, 104, 94, 85, 76, 68, 61, 55, 49, 43, 38, 33, 29, 25, 21, 18, 15 };
+        int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
+                              32684, 30673, 28784, 27007, 25338,
+                              23770, 22296, 20911, 19610, 18388,
+                              17240, 16161, 15149, 14198, 13304,
+                              12466, 11679, 10940, 10246, 9595,
+                              8984, 8410, 7872, 7367, 6894,
+                              6449, 6033, 5642, 5276, 4932,
+                              4610, 4308, 4025, 3760, 3512,
+                              3279, 3061, 2857, 2665, 2486,
+                              2319, 2162, 2015, 1878, 1749,
+                              1629, 1516, 1411, 1313, 1221,
+                              1135, 1055, 980, 910, 844,
+                              783, 726, 673, 624, 577,
+                              534, 494, 456, 422, 389,
+                              359, 331, 304, 280, 257,
+                              236, 217, 199, 182, 166,
+                              152, 138, 126, 114, 104,
+                              94, 85, 76, 68, 61,
+                              55, 49, 43, 38, 33,
+                              29, 25, 21, 18, 15 };
 
+
+        List<int> baseLifeList;
 
         void Start()
         {
-
+            
         }
 
 
@@ -298,9 +299,17 @@ namespace MeteorGame
             //}
         }
 
+        IEnumerator UpdateAilmentsCoroutine()
+        {
+            while (true)
+            {
+                ailmentManager.UpdateAilments();
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+
         private void FixedUpdate()
         {
-            ailmentManager.UpdateAilments();
             StopIfFrozen();
             SlowDownIfChilled();
         }
@@ -312,11 +321,17 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
+            print("IgniteTick " + amount);
             TakeDamage(amount);
         }
 
         private void TakeDamage(int amount)
         {
+            if (amount <= 0)
+            {
+                return;
+            }
+
             var shock = ailmentManager.strongestShock;
 
             if (shock != null)
@@ -327,6 +342,13 @@ namespace MeteorGame
             }
 
             currentHealth -= amount;
+
+
+            //print($"-ENEMY{id}- Took {amount} damage." +
+            //    $" currentHealth: {currentHealth} -" +
+            //    $" totalHealth: {totalHealth} -" +
+            //    $" baseLife: {baseLife}");
+
 
             if (currentHealth <= 0)
             {
@@ -339,20 +361,14 @@ namespace MeteorGame
 
         public void TakeDoT(SpellSlot from, float scale, bool applyAilment = true)
         {
-            float more = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("IncreasedProjectileDamage"), from) / 100f;
-            float less = ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ReducedProjectileDamage"), from) / 100f;
+            print($"Taking {from.DamageOverTime} damage per second." +
+                $" Current hit: {(int)(from.DamageOverTime * scale)}");
 
-            int fire = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("FireDamagePerSecond"), from) * (1 + more) * (1 - less));
-            int lightning = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("LightningDamagePerSecond"), from) * (1 + more) * (1 - less));
-            int cold = (int)(ModifierHelper.GetTotal(GameManager.Instance.GetModifierSO("ColdDamagePerSecond"), from) * (1 + more) * (1 - less));
-
-            int combined = fire + lightning + cold;
-
-            TakeDamage((int)(combined * scale));
+            TakeDamage((int)(from.DamageOverTime * scale));
 
             if (applyAilment)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, fire, cold, lightning);
+                ailmentManager.CheckIfDamageAppliesAilment(from, from.FireDoT, from.ColdDoT, from.LightDoT);
             }
         }
 
@@ -360,21 +376,38 @@ namespace MeteorGame
 
         public void TakeHit(SpellSlot from, bool applyAilment = true)
         {
-            float more = ModifierHelper.GetTotal("IncreasedProjectileDamage", from) / 100f;
-            float less = ModifierHelper.GetTotal("ReducedProjectileDamage", from) / 100f;
-            float final = (1 + more) * (1 - less);
+            var inc = 0f;
+            var red = 0f;
 
-            int fire = (int)(ModifierHelper.GetTotal("DealFireDamage", from) * final);
-            int lightning = (int)(ModifierHelper.GetTotal("DealLightningDamage", from) * final);
-            int cold = (int)(ModifierHelper.GetTotal("DealColdDamage", from) * final);
+            if (ailmentManager.strongestIgnite != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstIgnited") / 100f;
+            }
 
-            int combined = fire + lightning + cold;
+            if (ailmentManager.strongestChill != null || ailmentManager.strongestFreeze != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstChilledOrFrozen") / 100f;
+            }
 
-            TakeDamage(combined);
+            if (ailmentManager.strongestShock != null)
+            {
+                inc += from.GetTotal("IncreasedDamageAgainstShocked") / 100f;
+            }
+
+            float fireFinal = from.FireEffectiveDamage * (1 + inc) * (1 - red);
+            float coldFinal = from.ColdEffectiveDamage * (1 + inc) * (1 - red);
+            float lightFinal = from.LightningEffectiveDamage * (1 + inc) * (1 - red);
+
+            int final = (int)(fireFinal + coldFinal + lightFinal);
+
+
+            //print("Taking a hit of " + final);
+
+            TakeDamage(final);
 
             if (applyAilment)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, fire, cold, lightning);
+                ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)lightFinal);
             }
         }
 

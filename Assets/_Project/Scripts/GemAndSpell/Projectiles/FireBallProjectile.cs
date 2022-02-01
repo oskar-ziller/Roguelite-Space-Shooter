@@ -6,8 +6,8 @@ namespace MeteorGame
 {
     public class FireBallProjectile : ProjectileBase
     {
-        [Tooltip("Mesh to scale to size of AoE")]
-        [SerializeField] private Transform explosionMesh;
+
+        [SerializeField] private ParticleSystem explosionPS;
 
         public override void Awake()
         {
@@ -36,7 +36,14 @@ namespace MeteorGame
             HideBody();
             DisableCollider();
 
-            var totalRadi = CastBy.Spell.ExplosionRadius;
+            var totalRadi = CastBy.ExpRadi;
+
+            var sizeVariation = Random.Range(0.9f, 1.1f);
+
+            var main = explosionPS.main;
+            main.startSize = totalRadi * 2 * sizeVariation;
+
+            explosionPS.Play();
 
             foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, totalRadi, fromShell: true))
             {
@@ -47,53 +54,6 @@ namespace MeteorGame
 
                 e.TakeHit(CastBy, applyAilment: false);
             }
-
-            float dur = 0.25f;
-            Transform mesh = SpawnExplosionMesh();
-
-            float fadetime = 0.1f;
-
-            var rend = mesh.GetComponent<MeshRenderer>();
-            //var startAlpha = rend.material.GetFloat("_maxalpha");
-
-            mesh.DOScale(totalRadi * 2, dur).SetEase(Ease.OutExpo).OnComplete(() =>
-            {
-                Destroy(mesh.gameObject, dur);
-                DestroySelfSoft();
-            });
-
-            StartCoroutine(FadeOut(rend, dur/2, dur/2));
-        }
-
-        private IEnumerator FadeOut(MeshRenderer rend, float delay, float duration)
-        {
-            yield return new WaitForSeconds(delay);
-
-            float time = 0;
-            float startValue = rend.material.GetFloat("_maxalpha");
-
-            while (time < duration)
-            {
-                float val = Mathf.Lerp(startValue, 0, time / duration);
-
-                if (val < 0.03f)
-                {
-                    rend.material.SetFloat("_maxalpha", 0);
-                    yield break;
-                }
-
-                rend.material.SetFloat("_maxalpha", val);
-                time += Time.deltaTime;
-                yield return null;
-            }
-
-        }
-
-        private Transform SpawnExplosionMesh()
-        {
-            explosionMesh.parent = null;
-            explosionMesh.gameObject.SetActive(true);
-            return explosionMesh;
         }
     }
 }

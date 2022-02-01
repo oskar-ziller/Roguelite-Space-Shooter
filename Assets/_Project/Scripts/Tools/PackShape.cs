@@ -5,4 +5,10 @@
         Sphere,
         Cube
     }
+
+    public enum ColliderShape
+    {
+        Sphere,
+        Cube
+    }
 }

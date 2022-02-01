@@ -9,18 +9,10 @@ namespace MeteorGame
 
     public class Billboard : MonoBehaviour
     {
-        [SerializeField] private Transform parentObj;
+        private Transform enemyTransform;
 
-        private Transform cam;
-        private RectTransform canvas;
+        private float startingY;
 
-
-        [SerializeField] private Vector3 above;
-        [SerializeField] private Vector3 below;
-
-        private float height;
-
-        private bool isSetup = false;
 
         #region Unity Methods
 
@@ -31,33 +23,29 @@ namespace MeteorGame
 
         private void Start()
         {
-            cam = Camera.main.transform;
-            canvas = GetComponent<RectTransform>();
+            enemyTransform = GetComponentInParent<Enemy>().transform;
+            startingY = transform.localPosition.y;
+            StartCoroutine(UpdateLoop());
         }
+
 
         private void LateUpdate()
         {
-            var playerPos = Player.Instance.transform.position;
+            
+        }
 
-            var location = below;
-
-            if (playerPos.y > parentObj.position.y)
+        
+        private IEnumerator UpdateLoop()
+        {
+            while (true)
             {
-                location = above;
+                var isPlayerAboveEnemy = Player.Instance.transform.position.y > enemyTransform.position.y;
+
+                var location = isPlayerAboveEnemy ? -startingY : startingY;
+                transform.localPosition = location * Vector3.up;
+                transform.LookAt(Player.Instance.transform.position);
+                yield return new WaitForSeconds(0.1f);
             }
-
-            //rect.localPosition = location;
-            //canvas.rotation = Quaternion.identity;
-            //canvas.Translate(location);
-
-            canvas.localPosition = location;
-            canvas.LookAt(playerPos);
-
-
-            //transform.rotation = Quaternion.identity;
-            //transform.rotation = Quaternion.FromToRotation(transform.forward, cam.forward);
-            //transform.forward = -cam.forward;
-            //rect.Translate(new Vector3(0, 0.5f, 0));
         }
 
         #endregion

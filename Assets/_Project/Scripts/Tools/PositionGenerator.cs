@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,91 +10,334 @@ namespace MeteorGame
 
     public class PositionGenerator
     {
-        public int regionSize;
-        public List<MySphere> spheres;
-        //Vector3 validRandomPos;
-        int insideWhile = 0;
-        int totalFramesWaited = 0;
+        public int regionExtends;
+        public float maxRegionSize;
+        public List<SpawnPos> spawnPositions;
+        List<EnemyRarity> spawnList;
 
-        List<float> spawnList;
-
-        float maxRegionSize = 40;
         float spacing = 0f;
-        int iterationsBeforeWait = 40;
 
-        PackShape shape = PackShape.Sphere;
+
+        private const int iterationsBeforeRegionExpand = 50;
+
+
+        PackShape regionShape = PackShape.Sphere;
 
         public PositionGenerator()
         {
-            regionSize = 0;
-            spheres = new List<MySphere>();
+            regionExtends = 0;
+            spawnPositions = new List<SpawnPos>();
         }
 
-        public PositionGenerator(PackShape shape, float maxRegionSize, float spacing, List<float> spawnList, int iterationsBeforeWait)
+        public PositionGenerator(PackShape shape, float spacing, List<EnemyRarity> spawnList, float maxExtends)
         {
-            regionSize = 0;
-            spheres = new List<MySphere>();
+            regionExtends = 0;
+            spawnPositions = new List<SpawnPos>();
 
-            this.maxRegionSize = maxRegionSize;
             this.spacing = spacing;
-            this.spawnList = new List<float>(spawnList);
-            this.iterationsBeforeWait = iterationsBeforeWait;
-            this.shape = shape;
+            this.spawnList = new List<EnemyRarity>(spawnList);
+            regionShape = shape;
+            maxRegionSize = maxExtends;
         }
 
 
-        Vector3 FindEmptyRadiusInRegion(float sphereScale, float region)
+
+
+
+        public IEnumerator Generate()
         {
-            if (regionSize < sphereScale)
+            Stopwatch sw = Stopwatch.StartNew();
+            yield return DoGenerate();
+            UnityEngine.Debug.Log("Generate took " + sw.ElapsedMilliseconds + "ms");
+        }
+
+        private IEnumerator DoGenerate()
+        {
+            var uniques = spawnList.Where(o => o == EnemyRarity.Unique).ToList();
+            var rares = spawnList.Where(o => o == EnemyRarity.Rare).ToList();
+            var magics = spawnList.Where(o => o == EnemyRarity.Magic).ToList();
+            var normals = spawnList.Where(o => o == EnemyRarity.Normal).ToList();
+
+            foreach (EnemyRarity e in uniques)
             {
-                return Vector3.zero;
+                SpawnPos pos = null;
+
+                while (pos == null)
+                {
+                    pos = FindSpotFor(e);
+
+                    if (pos == null)
+                    {
+                        regionExtends++;
+                        yield return new WaitForSeconds(0.02f);
+
+                        if (regionExtends > maxRegionSize)
+                        {
+                            throw new System.Exception("regionExtends > maxRegionSize");
+                        }
+                    }
+                }
+
+                spawnPositions.Add(pos);
+                yield return null;
+            }
+
+            foreach (EnemyRarity e in rares)
+            {
+                SpawnPos pos = null;
+
+                while (pos == null)
+                {
+                    pos = FindSpotFor(e);
+
+                    if (pos == null)
+                    {
+                        regionExtends++;
+                        yield return new WaitForSeconds(0.02f);
+
+                        if (regionExtends > maxRegionSize)
+                        {
+                            throw new System.Exception("regionExtends > maxRegionSize");
+                        }
+                    }
+                }
+
+                spawnPositions.Add(pos);
+                yield return null;
+            }
+
+            foreach (EnemyRarity e in magics)
+            {
+                SpawnPos pos = null;
+
+                while (pos == null)
+                {
+                    pos = FindSpotFor(e);
+
+                    if (pos == null)
+                    {
+                        regionExtends++;
+                        yield return new WaitForSeconds(0.02f);
+
+                        if (regionExtends > maxRegionSize)
+                        {
+                            throw new System.Exception("regionExtends > maxRegionSize");
+                        }
+                    }
+                }
+
+                spawnPositions.Add(pos);
+                yield return null;
+            }
+
+            foreach (EnemyRarity e in normals)
+            {
+                SpawnPos pos = null;
+
+                while (pos == null)
+                {
+                    pos = FindSpotFor(e);
+
+                    if (pos == null)
+                    {
+                        regionExtends++;
+                        yield return new WaitForSeconds(0.02f);
+
+                        if (regionExtends > maxRegionSize)
+                        {
+                            throw new System.Exception("regionExtends > maxRegionSize");
+                        }
+                    }
+                }
+
+                spawnPositions.Add(pos);
+                yield return null;
+            }
+        }
+
+        private SpawnPos FindSpotFor(SpawnInfo toSpawn, EnemyRarity rarity)
+        {
+            if (toSpawn.extends.magnitude > regionExtends || toSpawn.r > regionExtends)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < iterationsBeforeRegionExpand; i++)
+            {
+                Vector3 randomPos = Vector3.zero;
+
+                if (regionShape == PackShape.Sphere)
+                {
+                    randomPos = Random.insideUnitSphere * regionExtends;
+                }
+                else if (regionShape == PackShape.Cube)
+                {
+                    var extend = regionExtends;
+
+                    randomPos = new Vector3(Random.Range(-extend, extend)
+                        , Random.Range(-extend, extend)
+                        , Random.Range(-extend, extend));
+                }
+
+                if (IsInRegion(randomPos, toSpawn) && !OverlapsWithExisting(randomPos, toSpawn))
+                {
+                    return new SpawnPos(randomPos, toSpawn, rarity);
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsInRegion(Vector3 randomPos, SpawnInfo toSpawn)
+        {
+            if (toSpawn.shape == ColliderShape.Cube)
+            {
+                if (regionShape == PackShape.Cube)
+                {
+                    Vector3 max = randomPos + toSpawn.extends;
+                    Vector3 min = randomPos - toSpawn.extends;
+
+                    bool check = max.x < regionExtends && max.y < regionExtends && max.z < regionExtends
+                        && min.x > -regionExtends && min.y > -regionExtends && min.z > -regionExtends;
+
+                    return check;
+                }
+
+                if (regionShape == PackShape.Sphere)
+                {
+                    bool check = DoesCubeIntersectSphere(randomPos + toSpawn.extends,
+                                randomPos + toSpawn.extends + Vector3.one,
+                                Vector3.zero,
+                                regionExtends);
+
+                    return check;
+                }
             }
 
 
-            int limit = 200;
-
-            for (int i = 0; i < limit; i++)
+            if (toSpawn.shape == ColliderShape.Sphere)
             {
-                Vector3 validRandomPos = Vector3.zero;
+                if (regionShape == PackShape.Cube)
+                {
+                    bool check = DoesCubeIntersectSphere(Vector3.zero - (Vector3.one * regionExtends),
+                                Vector3.zero + (Vector3.one * regionExtends),
+                                randomPos,
+                                toSpawn.r);
 
-                if (shape == PackShape.Sphere)
-                {
-                    validRandomPos = UnityEngine.Random.insideUnitSphere * (regionSize/2 - sphereScale/2);
-                }
-                else if (shape == PackShape.Cube)
-                {
-                    var a = -regionSize / 2 + sphereScale/2;
-                    var b = regionSize / 2 - sphereScale/2;
-                    validRandomPos = new Vector3(UnityEngine.Random.Range(a,b)
-                        , UnityEngine.Random.Range(a, b)
-                        , UnityEngine.Random.Range(a, b));
+                    return check;
                 }
 
-                if (IsInRegion(validRandomPos) && !OverlapsWithExisting(validRandomPos, sphereScale))
+                if (regionShape == PackShape.Sphere)
                 {
-                    return validRandomPos;
+                    return randomPos.sqrMagnitude + toSpawn.r * toSpawn.r < regionExtends * regionExtends;
                 }
+
+
+                //bool check =
+                //       randomPos.x < regionExtends - toSpawn.r
+                //    && randomPos.y < regionExtends - toSpawn.r
+                //    && randomPos.z < regionExtends - toSpawn.r
+
+                //    && randomPos.x > -regionExtends + toSpawn.r
+                //    && randomPos.y > -regionExtends + toSpawn.r
+                //    && randomPos.z > -regionExtends + toSpawn.r;
+
+                //return check;
             }
 
-            return Vector3.zero;
+            return false;
         }
 
-        private bool IsInRegion(Vector3 validRandomPos)
+        bool DoesCubeIntersectSphere(Vector3 p1, Vector3 p2, Vector3 c, float R)
         {
-            return true;
-        }
-
-        bool OverlapsWithExisting(Vector3 pos, float radi)
-        {
-            foreach (var ex in spheres)
+            float Squared(float x)
             {
-                var dst = Vector3.Distance(pos, ex.center);
-                var smaller = ex.radi < radi ? ex.radi : radi;
-                var bigger = ex.radi > radi ? ex.radi : radi;
+                return x * x;
+            }
 
-                if (dst < radi / 2 + ex.radi / 2 + spacing)
+            float dist_squared = R * R;
+            /* assume C1 and C2 are element-wise sorted, if not, do that now */
+            if (c.x < p1.x) dist_squared -= Squared(c.x - p1.x);
+            else if (c.x > p2.x) dist_squared -= Squared(c.x - p2.x);
+            if (c.y < p1.y) dist_squared -= Squared(c.y - p1.y);
+            else if (c.y > p2.y) dist_squared -= Squared(c.y - p2.y);
+            if (c.z < p1.z) dist_squared -= Squared(c.z - p1.z);
+            else if (c.z > p2.z) dist_squared -= Squared(c.z - p2.z);
+            return dist_squared > 0;
+        }
+
+        private bool OverlapsWithExisting(Vector3 randomPos, SpawnInfo toCheck)
+        {
+            foreach (SpawnPos existing in spawnPositions)
+            {
+                // Cube vs Sphere
+                if (existing.spawnInfo.shape == ColliderShape.Cube)
                 {
-                    return true;
+                    if (toCheck.shape == ColliderShape.Sphere)
+                    {
+                        bool check = DoesCubeIntersectSphere(existing.center - existing.spawnInfo.extends,
+                            existing.center + existing.spawnInfo.extends,
+                            randomPos,
+                            toCheck.r);
+
+                        if (check)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Sphere vs Cube
+                if (existing.spawnInfo.shape == ColliderShape.Sphere)
+                {
+                    if (toCheck.shape == ColliderShape.Cube)
+                    {
+                        bool check = DoesCubeIntersectSphere(randomPos - toCheck.extends,
+                            randomPos + toCheck.extends,
+                            existing.center,
+                            existing.spawnInfo.r);
+
+                        if (check)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Sphere vs Sphere
+                if (existing.spawnInfo.shape == ColliderShape.Sphere)
+                {
+                    if (toCheck.shape == ColliderShape.Sphere)
+                    {
+                        bool check = (randomPos - existing.center).sqrMagnitude < (existing.spawnInfo.r * existing.spawnInfo.r) * 2;
+
+                        if (check)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Cube vs Cube
+                if (existing.spawnInfo.shape == ColliderShape.Cube)
+                {
+                    if (toCheck.shape == ColliderShape.Cube)
+                    {
+                        var aStart = existing.center - existing.spawnInfo.extends;
+                        var aEnd = existing.center + existing.spawnInfo.extends;
+
+                        var bStart = randomPos - toCheck.extends;
+                        var bEnd = randomPos + toCheck.extends;
+
+                        bool check = aStart.x <= bEnd.x && bStart.x <= aEnd.x
+                            && aStart.y <= bEnd.y && bStart.y <= aEnd.y
+                            && aStart.z <= bEnd.z && bStart.z <= aEnd.z;
+
+                        if (check)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
 
@@ -101,53 +346,12 @@ namespace MeteorGame
 
 
 
-        public void Generate()
+        private SpawnPos FindSpotFor(EnemyRarity e)
         {
-            FitSpheresInRegion();
+            return FindSpotFor(EnemyManager.Instance.GetSpawnInfo(e), e);
         }
 
-
-        void FitSpheresInRegion()
-        {
-            bool maxReached = false;
-
-            for (int i = spawnList.Count - 1; i >= 0; i--)
-            {
-                float itemRadi = spawnList[i];
-                Vector3 pos = Vector3.zero;
-
-                if (spheres.Count == 0)
-                {
-                    pos = Vector3.zero;
-                }
-                else
-                {
-                    pos = FindEmptyRadiusInRegion(sphereScale: itemRadi , region: regionSize);
-                }
-
-
-                while (pos == Vector3.zero)
-                {
-                    regionSize++;
-                    //Debug.Log($"couldnt add {itemRadi} - increasing regionsize to {regionSize}");
-
-                    if (regionSize >= maxRegionSize)
-                    {
-                        Debug.Log("regionsize limit reached");
-                        throw new System.Exception("region size limit");
-                    }
-
-                    pos = FindEmptyRadiusInRegion(sphereScale: itemRadi, region: regionSize);
-                }
-
-                var toadd = new MySphere(itemRadi, pos);
-                spheres.Add(toadd);
-                spawnList.RemoveAt(i);
-                //Debug.Log($"added {toadd.radi}");
-
-            }
-        }
-
+        
 
     }
 }
