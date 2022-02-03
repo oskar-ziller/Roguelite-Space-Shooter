@@ -43,7 +43,7 @@ namespace MeteorGame
         {
             while (true)
             {
-                yield return new WaitForSeconds(0.15f);
+                yield return new WaitForSeconds(Random.Range(0.3f, 0.7f));
                 CheckAilmentsAndUpdateVisuals();
             }
         }

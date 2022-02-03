@@ -57,6 +57,7 @@ namespace MeteorGame
 
         private void UpdateHealthBar(Enemy _)
         {
+            return;
             gameObject.SetActive(true);
             SetBarPercent();
 

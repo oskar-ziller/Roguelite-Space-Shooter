@@ -25,7 +25,7 @@ namespace MeteorGame
         {
             enemyTransform = GetComponentInParent<Enemy>().transform;
             startingY = transform.localPosition.y;
-            StartCoroutine(UpdateLoop());
+            StartCoroutine(LifebarLookatCoroutine());
         }
 
 
@@ -35,7 +35,7 @@ namespace MeteorGame
         }
 
         
-        private IEnumerator UpdateLoop()
+        private IEnumerator LifebarLookatCoroutine()
         {
             while (true)
             {

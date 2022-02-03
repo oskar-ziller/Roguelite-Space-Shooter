@@ -41,6 +41,8 @@ namespace MeteorGame
 
         private int id;
 
+        private float currentSpeed;
+
 
 
         private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
@@ -126,7 +128,7 @@ namespace MeteorGame
 
 
 
-
+        private float startingSpeed;
         private Vector3 startingVel;
         private Vector3 spawnPos;
 
@@ -242,7 +244,7 @@ namespace MeteorGame
                     yield return new WaitForSeconds(0.25f);
                 }
 
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(UnityEngine.Random.Range(0.15f, 0.3f));
             }
         }
 
@@ -300,31 +302,37 @@ namespace MeteorGame
         {
             if (ailmentManager.Chill != null)
             {
-                var currentVel = rigidBody.velocity;
-                var shouldBe = startingVel * (1 - ailmentManager.Chill.magnitude);
+                //var currentVel = rigidBody.velocity;
+                //var shouldBe = startingVel * (1 - ailmentManager.Chill.magnitude);
 
-                if (currentVel.sqrMagnitude > shouldBe.sqrMagnitude)
+                var shouldBe = startingSpeed * (1 - ailmentManager.Chill.magnitude);
+
+                if (currentSpeed > shouldBe)
                 {
-                    print($"Ailment chill detected. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
-                        $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
+                    //print($"Ailment chill detected. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
+                    //    $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
 
-                    rigidBody.velocity = shouldBe;
+                    var newVel = startingVel * (1 - ailmentManager.Chill.magnitude);
+                    rigidBody.velocity = newVel;
+                    currentSpeed = newVel.magnitude;
                 }
             }
 
             if (ailmentManager.InChillingArea)
             {
-                var currentVel = rigidBody.velocity;
+                //var currentVel = rigidBody.velocity;
                 var chillingAreaEffect = 0.9f;
-                var shouldBe = startingVel * (1f - chillingAreaEffect);
+                var shouldBe = startingSpeed * (1f - chillingAreaEffect);
 
-                if (currentVel.sqrMagnitude > shouldBe.sqrMagnitude)
+                if (currentSpeed > shouldBe)
                 {
-                    print($"InChillingArea. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
-                        $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
+                    //print($"InChillingArea. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
+                    //    $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
 
                     //rigidBody.AddForce(shouldBe, ForceMode.VelocityChange);
-                    rigidBody.velocity = shouldBe;
+                    var newVel = startingVel * (1f - chillingAreaEffect);
+                    rigidBody.velocity = newVel;
+                    currentSpeed = newVel.magnitude;
                 }
             }
         }
@@ -333,9 +341,10 @@ namespace MeteorGame
         {
             if (ailmentManager.Freeze != null)
             {
-                if (rigidBody.velocity != Vector3.zero)
+                if (currentSpeed != 0)
                 {
                     rigidBody.velocity = Vector3.zero;
+                    currentSpeed = 0;
                 }
             }
         }
@@ -348,9 +357,10 @@ namespace MeteorGame
 
             if (!shouldBeSlower)
             {
-                if (rigidBody.velocity != startingVel)
+                if (currentSpeed != startingSpeed)
                 {
                     rigidBody.velocity = startingVel;
+                    currentSpeed = startingSpeed;
                 }
             }
         }
@@ -362,7 +372,7 @@ namespace MeteorGame
                 StopIfFrozen();
                 SlowDownIfChilled();
                 RecoverVelocityIfNoAilment();
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(UnityEngine.Random.Range(0.15f, 0.3f));
             }
         }
 
@@ -384,7 +394,7 @@ namespace MeteorGame
                 }
                 else
                 {
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(UnityEngine.Random.Range(0.1f, 0.25f));
                 }
             }
         }
@@ -501,7 +511,7 @@ namespace MeteorGame
 
         private void StartMoving()
         {
-            var startingSpeed = EnemyManager.Instance.enemySpeed;
+            startingSpeed = EnemyManager.Instance.enemySpeed;
 
 
             if (rarity == EnemyRarity.Magic)
@@ -525,6 +535,7 @@ namespace MeteorGame
 
             rigidBody.isKinematic = false;
             rigidBody.velocity = startingVel;
+            currentSpeed = startingVel.magnitude;
         }
 
         public void SetTarget(Transform target)

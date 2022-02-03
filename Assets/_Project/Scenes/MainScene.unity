@@ -13605,7 +13605,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 586816109}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 
@@ -15094,7 +15094,6 @@ MonoBehaviour:
   coinDropMedium: {fileID: 8862228908514880469, guid: b8ff22bc96a151d44bef879400007603, type: 3}
   coinDropSmall: {fileID: 3262822414120449602, guid: 1edde124161626a48bbc2a3c37e0a4b0, type: 3}
   goldDropHolder: {fileID: 0}
-  enemySpeed: 0.5
 --- !u!4 &658071496
 Transform:
   m_ObjectHideFlags: 0
@@ -19634,6 +19633,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1073891619112656221, guid: a085ac1065c0177478589268bfb37186, type: 3}
+      propertyPath: totalHealth
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1073891619112656221, guid: a085ac1065c0177478589268bfb37186, type: 3}
+      propertyPath: currentHealth
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1073891619112656221, guid: a085ac1065c0177478589268bfb37186, type: 3}
+      propertyPath: hideLifebarAfterSeconds
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2293438756574210558, guid: a085ac1065c0177478589268bfb37186, type: 3}
       propertyPath: m_Name
       value: Normal
@@ -19652,7 +19663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4751356934767095656, guid: a085ac1065c0177478589268bfb37186, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 51.07
+      value: 40.76
       objectReference: {fileID: 0}
     - target: {fileID: 4751356934767095656, guid: a085ac1065c0177478589268bfb37186, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44740,6 +44751,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1034686766}
+    - target: {fileID: 4520099361766856095, guid: b0d1ed505c10d104c9d912c0d5b4d0a6, type: 3}
+      propertyPath: m_Dithering
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4520099361766856095, guid: b0d1ed505c10d104c9d912c0d5b4d0a6, type: 3}
+      propertyPath: m_RenderPostProcessing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4520099362403056329, guid: b0d1ed505c10d104c9d912c0d5b4d0a6, type: 3}
       propertyPath: m_RootOrder
       value: 2

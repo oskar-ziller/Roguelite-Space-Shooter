@@ -81,7 +81,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 8071990920741559821}
-  hideLifebarAfterSeconds: 0
+  hideLifebarAfterSeconds: 1
   level: 0
   maxLevel: 100
   rarity: 1
@@ -2376,6 +2376,10 @@ PrefabInstance:
     - target: {fileID: 795529933249948841, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_Name
       value: Lifebar
+      objectReference: {fileID: 0}
+    - target: {fileID: 795529933249948841, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_RootOrder

@@ -26,11 +26,13 @@ namespace MeteorGame
         const float baseIgniteDPSMultip = 0.5f; // 50% of the base damage of the hit 
         const float baseIgniteDurationSeconds = 4;
         public const float IgniteTickInterval = 0.5f;
+
         public bool InChillingArea { get; private set; } = false;
 
         public Ailment Chill { get; private set; } = null;
         public Ailment Shock { get; private set; } = null;
         public Ailment Freeze { get; private set; } = null;
+
         public List<Ailment> IgniteStacks { get; private set; } = new List<Ailment>();
 
 
