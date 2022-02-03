@@ -41,14 +41,53 @@ namespace MeteorGame
 
         private int id;
 
-        public AnimationCurve spawnAudioCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 1), new Keyframe(1, 0) });
 
 
+        private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
 
-        internal void ApplyChillingGround()
+        private void OnChillingAreaExpired(ChillingArea a)
         {
-            ailmentManager.ApplyChillingGround();
+            if (collidingChillingAreas.Contains(a))
+            {
+                collidingChillingAreas.Remove(a);
+
+                if (collidingChillingAreas.Count == 0)
+                {
+                    ailmentManager.RemoveChillingAreaAilment();
+                }
+            }
         }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            var chillingArea = other.GetComponent<ChillingArea>();
+
+            if (chillingArea != null)
+            {
+                collidingChillingAreas.Add(chillingArea);
+                chillingArea.AreaExpired += OnChillingAreaExpired;
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            var chillingArea = other.GetComponent<ChillingArea>();
+
+            if (chillingArea != null)
+            {
+                collidingChillingAreas.Remove(chillingArea);
+
+                if (collidingChillingAreas.Count == 0)
+                {
+                    ailmentManager.RemoveChillingAreaAilment();
+                }
+
+            }
+        }
+
+
+
+
 
 
         // totalMonsterHealth = baseLife * monsterTypeHealthModifier
@@ -110,8 +149,18 @@ namespace MeteorGame
 
 
 
+        [ContextMenu("Debug enemy")]
+        void DebugEnemy()
+        {
+            print("Debug enemy");
 
-        public void Init(Vector3 pos, int id)
+
+            Init(transform.position, UnityEngine.Random.Range(-99999, 999999), 99);
+        }
+
+
+
+        public void Init(Vector3 pos, int id, int level = 0)
         {
             this.id = id;
 
@@ -122,12 +171,14 @@ namespace MeteorGame
 
             RepositionToSpawn();
             StartMoving();
-            SetLevel(Mathf.RoundToInt(GameManager.Instance.GameLevel));
+
+            var levelToSet = level == 0 ? Mathf.RoundToInt(GameManager.Instance.GameLevel) : level;
+            SetLevel(levelToSet);
             //SetRandomRotation();
 
 
 
-            baseLife = baseLifeList[level];
+            baseLife = baseLifeList[levelToSet];
 
             var monsterTypeHealthModifier = 1f; // %50-%200 arasi
 
@@ -167,38 +218,32 @@ namespace MeteorGame
 
             //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
 
-            StartCoroutine(UpdateAilmentsCoroutine());
+            StartCoroutine(CheckFrozenOrChilledCoroutine());
+            StartCoroutine(CheckIgniteTickCoroutine());
+            StartCoroutine(CheckChillingAreaCoroutine());
         }
 
-
-        public bool IsFrozenOrChilled()
+        private IEnumerator CheckChillingAreaCoroutine()
         {
-            return ailmentManager.strongestChill != null || ailmentManager.strongestFreeze != null;
-        }
+            while (true)
+            {
+                if (collidingChillingAreas.Count > 0)
+                {
+                    foreach (ChillingArea chillingArea in collidingChillingAreas)
+                    {
+                        TakeDoT(chillingArea.CastBy, 0.25f, applyAilment: false);
+                    }
 
-        public bool IsIgnited()
-        {
-            return ailmentManager.strongestIgnite != null;
-        }
+                    if (!ailmentManager.InChillingArea)
+                    {
+                        ailmentManager.AddChillingAreaAilment();
+                    }
 
-        public bool IsShocked()
-        {
-            return ailmentManager.strongestShock != null;
-        }
+                    yield return new WaitForSeconds(0.25f);
+                }
 
-        private AudioSource EditSourceSettings(AudioSource s)
-        {
-            s.playOnAwake = false;
-            s.spatialBlend = 1;
-            s.volume = 0.5f;
-            s.rolloffMode = AudioRolloffMode.Custom;
-
-            s.minDistance = 0f;
-            s.maxDistance = 90f;
-
-            s.SetCustomCurve(AudioSourceCurveType.CustomRolloff, spawnAudioCurve);
-
-            return s;
+                yield return new WaitForSeconds(0.1f);
+            }
         }
 
 
@@ -210,7 +255,7 @@ namespace MeteorGame
 
         private void Awake()
         {
-            ailmentManager = new AilmentManager(this);
+            ailmentManager = GetComponent<AilmentManager>();
         }
 
 
@@ -238,12 +283,6 @@ namespace MeteorGame
 
         List<int> baseLifeList;
 
-        void Start()
-        {
-            
-        }
-
-
         internal void SetRarity(EnemyRarity rarity)
         {
             this.rarity = rarity;
@@ -255,63 +294,99 @@ namespace MeteorGame
             transform.localScale = Vector3.one * radius;
         }
 
-        private void StopIfFrozen()
-        {
-            if (ailmentManager.strongestFreeze != null)
-            {
-                rigidBody.velocity = Vector3.zero;
-            }
-            else
-            {
-                rigidBody.velocity = startingVel;
-            }
-        }
 
 
         private void SlowDownIfChilled()
         {
-            var currentVel = rigidBody.velocity;
-
-            if (ailmentManager.strongestChill != null)
+            if (ailmentManager.Chill != null)
             {
-                var shouldBe = startingVel * ailmentManager.strongestChill.magnitude;
+                var currentVel = rigidBody.velocity;
+                var shouldBe = startingVel * (1 - ailmentManager.Chill.magnitude);
 
                 if (currentVel.sqrMagnitude > shouldBe.sqrMagnitude)
                 {
+                    print($"Ailment chill detected. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
+                        $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
+
                     rigidBody.velocity = shouldBe;
                 }
             }
-            else
+
+            if (ailmentManager.InChillingArea)
             {
-                if (currentVel.sqrMagnitude < startingVel.sqrMagnitude)
+                var currentVel = rigidBody.velocity;
+                var chillingAreaEffect = 0.9f;
+                var shouldBe = startingVel * (1f - chillingAreaEffect);
+
+                if (currentVel.sqrMagnitude > shouldBe.sqrMagnitude)
+                {
+                    print($"InChillingArea. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
+                        $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
+
+                    //rigidBody.AddForce(shouldBe, ForceMode.VelocityChange);
+                    rigidBody.velocity = shouldBe;
+                }
+            }
+        }
+
+        private void StopIfFrozen()
+        {
+            if (ailmentManager.Freeze != null)
+            {
+                if (rigidBody.velocity != Vector3.zero)
+                {
+                    rigidBody.velocity = Vector3.zero;
+                }
+            }
+        }
+
+        private void RecoverVelocityIfNoAilment()
+        {
+            bool shouldBeSlower = ailmentManager.Freeze != null 
+                || ailmentManager.Chill != null 
+                || ailmentManager.InChillingArea;
+
+            if (!shouldBeSlower)
+            {
+                if (rigidBody.velocity != startingVel)
                 {
                     rigidBody.velocity = startingVel;
                 }
             }
         }
 
-
-        private void Update()
-        {
-            //if (Input.GetKeyDown(KeyCode.S))
-            //{
-            //    PlaySpawnSound();
-            //}
-        }
-
-        IEnumerator UpdateAilmentsCoroutine()
+        private IEnumerator CheckFrozenOrChilledCoroutine()
         {
             while (true)
             {
-                ailmentManager.UpdateAilments();
-                yield return new WaitForSeconds(0.25f);
+                StopIfFrozen();
+                SlowDownIfChilled();
+                RecoverVelocityIfNoAilment();
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
-        private void FixedUpdate()
+        private IEnumerator CheckIgniteTickCoroutine()
         {
-            StopIfFrozen();
-            SlowDownIfChilled();
+            while (true)
+            {
+                if (ailmentManager.IgniteStacks.Count > 0)
+                {
+                    var stacks = ailmentManager.IgniteStacks;
+                    Debug.Log($"Taking ailment damage from {stacks.Count} ignite stacks");
+
+                    foreach (var i in stacks) 
+                    {
+                        IgniteTick((int)i.magnitude);
+                    }
+
+                    yield return new WaitForSeconds(AilmentManager.IgniteTickInterval);
+                }
+                else
+                {
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
         }
 
         public bool IsAlive()
@@ -321,7 +396,7 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
-            print("IgniteTick " + amount);
+            print("Ailment - IgniteTick " + amount);
             TakeDamage(amount);
         }
 
@@ -332,7 +407,7 @@ namespace MeteorGame
                 return;
             }
 
-            var shock = ailmentManager.strongestShock;
+            var shock = ailmentManager.Shock;
 
             if (shock != null)
             {
@@ -361,8 +436,8 @@ namespace MeteorGame
 
         public void TakeDoT(SpellSlot from, float scale, bool applyAilment = true)
         {
-            print($"Taking {from.DamageOverTime} damage per second." +
-                $" Current hit: {(int)(from.DamageOverTime * scale)}");
+            //print($"Taking {from.DamageOverTime} damage per second." +
+            //    $" Current hit: {(int)(from.DamageOverTime * scale)}");
 
             TakeDamage((int)(from.DamageOverTime * scale));
 
@@ -374,22 +449,24 @@ namespace MeteorGame
 
 
 
+
+
         public void TakeHit(SpellSlot from, bool applyAilment = true)
         {
             var inc = 0f;
             var red = 0f;
 
-            if (ailmentManager.strongestIgnite != null)
+            if (ailmentManager.IgniteStacks.Count > 0)
             {
                 inc += from.GetTotal("IncreasedDamageAgainstIgnited") / 100f;
             }
 
-            if (ailmentManager.strongestChill != null || ailmentManager.strongestFreeze != null)
+            if (ailmentManager.Chill != null || ailmentManager.Freeze != null)
             {
                 inc += from.GetTotal("IncreasedDamageAgainstChilledOrFrozen") / 100f;
             }
 
-            if (ailmentManager.strongestShock != null)
+            if (ailmentManager.Shock != null)
             {
                 inc += from.GetTotal("IncreasedDamageAgainstShocked") / 100f;
             }
@@ -400,8 +477,7 @@ namespace MeteorGame
 
             int final = (int)(fireFinal + coldFinal + lightFinal);
 
-
-            //print("Taking a hit of " + final);
+            print("Taking damage of: " + final);
 
             TakeDamage(final);
 
@@ -410,9 +486,6 @@ namespace MeteorGame
                 ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)lightFinal);
             }
         }
-
-
-
 
 
         public void ForceDie()
@@ -445,8 +518,6 @@ namespace MeteorGame
             {
                 startingSpeed *= 0.3f;
             }
-
-
 
             Vector3 movingTowards = new Vector3(transform.position.x, 0, transform.position.z); // directly below
             Vector3 dir = (movingTowards - transform.position).normalized;

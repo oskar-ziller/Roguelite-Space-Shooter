@@ -96,12 +96,10 @@ namespace MeteorGame
             StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
 
-
             if (isSetup)
             {
                 DoScaleUp();
             }
-
         }
 
 
@@ -189,7 +187,7 @@ namespace MeteorGame
 
         private void DoAimAssist()
         {
-            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 5, true).FirstOrDefault();
+            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 8, true).FirstOrDefault();
 
             if (closest != null)
             {
@@ -223,11 +221,16 @@ namespace MeteorGame
         private IEnumerator AimAssistLoop()
         {
             DoAimAssist();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
         }
 
         public virtual void OnTriggerEnter(Collider colliderObj)
         {
+            if (isDummy)
+            {
+                return;
+            }
+
             Enemy collidedEnemy = colliderObj.gameObject.GetComponent<Enemy>();
 
             if (collidedEnemy != null)
@@ -331,6 +334,7 @@ namespace MeteorGame
             /* When a projectile forks, it splits into two identical projectiles
              * that continue travelling at 60 and -60 degree angles
              * from the projectile's original trajectory. */
+
             ForkedFrom.Add(collidingWith);
             ForkingFrom = collidingWith;
 
@@ -376,6 +380,7 @@ namespace MeteorGame
             this.ForkedFrom = new List<Enemy>(p.ForkedFrom);
             this.ChainedFrom = new List<Enemy>(p.ChainedFrom);
             this.PiercedFrom = new List<Enemy>(p.PiercedFrom);
+            this.CastBy = p.CastBy;
         }
 
         protected void DisableCollider()

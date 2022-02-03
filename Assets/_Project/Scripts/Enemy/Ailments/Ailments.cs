@@ -9,6 +9,7 @@ namespace MeteorGame
     public enum Ailments
     {
         Chill,
+        ChillingArea,
         Freeze,
         Shock,
         Ignite,

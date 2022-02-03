@@ -11,7 +11,14 @@ namespace MeteorGame
         public float spinDurInSeconds = 10f;
         public Ease easing = Ease.Linear;
 
-        private void StartSpin()
+
+
+        public void StopSpin()
+        {
+            transform.DOKill();
+        }
+
+        public void StartSpin()
         {
             transform.DOLocalRotate(new Vector3(360, 0, 0), spinDurInSeconds, RotateMode.LocalAxisAdd).SetEase(easing).SetLoops(-1);
         }
@@ -23,7 +30,7 @@ namespace MeteorGame
 
         private void OnValidate()
         {
-            transform.DOKill();
+            StopSpin();
             StartSpin();
         }
     }

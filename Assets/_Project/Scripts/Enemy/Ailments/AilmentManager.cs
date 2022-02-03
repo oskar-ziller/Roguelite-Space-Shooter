@@ -7,30 +7,17 @@ using UnityEngine.UI;
 
 namespace MeteorGame
 {
-    public class AilmentManager
+    public class AilmentManager : MonoBehaviour
     {
         private Enemy owner;
-        private List<Ailment> igniteStacks = new List<Ailment>();
-        private List<Ailment> chillStacks = new List<Ailment>();
-        private List<Ailment> freezeStacks = new List<Ailment>();
-        private List<Ailment> shockStacks = new List<Ailment>();
-
-        private float igniteTick;
-
-        public Ailment strongestIgnite;
-        public Ailment strongestChill;
-        public Ailment strongestFreeze;
-        public Ailment strongestShock;
-
 
         private const float minChillEffect = 0.05f; // 5%
         private const float maxChillEffect = 0.30f; // 30%
         private const float baseChillDurationSeconds = 2;
 
-
         private const float baseFreezeDuration = 0.06f; // 0.06 seconds
-        private const float minFreezeEffect = 0.06f; // 0.06 seconds
-        private const float maxFreezeEffect = 3f; // 3 seconds%
+        private const float minFreezeDur = 0.3f; // 0.3 seconds
+        private const float maxFreezeDur = 3f; // 3 seconds
 
         private const float minShockEffect = 0.05f; // 5%
         private const float maxShockEffect = 0.50f; // 50%
@@ -38,12 +25,18 @@ namespace MeteorGame
 
         const float baseIgniteDPSMultip = 0.5f; // 50% of the base damage of the hit 
         const float baseIgniteDurationSeconds = 4;
-        const float igniteTickIntervalSeconds = 0.5f;
+        public const float IgniteTickInterval = 0.5f;
+        public bool InChillingArea { get; private set; } = false;
 
-        public AilmentManager(Enemy enemy)
+        public Ailment Chill { get; private set; } = null;
+        public Ailment Shock { get; private set; } = null;
+        public Ailment Freeze { get; private set; } = null;
+        public List<Ailment> IgniteStacks { get; private set; } = new List<Ailment>();
+
+
+        private void Awake()
         {
-            owner = enemy;
-            igniteStacks = new List<Ailment>();
+            owner = GetComponent<Enemy>();
         }
 
         private float Formula(float damage, float hp, float increasedBy)
@@ -51,46 +44,81 @@ namespace MeteorGame
             return 0.5f * (float)Math.Pow(damage / hp, 0.4) * ((increasedBy/100) + 1);
         }
 
-        private void AddAilment(Ailment a)
-        {
-            Debug.Log($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
-            Debug.Log($"igniteStacks: {igniteStacks.Count}");
-            Debug.Log($"chillStacks: {chillStacks.Count}");
-            Debug.Log($"freezeStacks: {freezeStacks.Count}");
-            Debug.Log($"shockStacks: {shockStacks.Count}");
 
-            a.startTime = Time.time;
+        private IEnumerator RemoveAilmentWhenExpired(Ailment a)
+        {
+            yield return new WaitForSeconds(a.duration);
+            RemoveAilment(a);
+        }
+
+        private void RemoveAilment(Ailment a)
+        {
+            print("Removing ailment " + a.type);
+
+            if (a.type == Ailments.Chill)
+            {
+                Chill = null;
+            }
+
+            if (a.type == Ailments.Freeze)
+            {
+                Freeze = null;
+            }
+
+            if (a.type == Ailments.Shock)
+            {
+                Shock = null;
+            }
 
             if (a.type == Ailments.Ignite)
             {
-                igniteStacks.Add(a);
+                IgniteStacks.Remove(a);
+            }
+        }
+
+        private void AddAilment(Ailment a)
+        {
+
+            if (a.type == Ailments.Ignite)
+            {
+                print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
+                IgniteStacks.Add(a);
+                StartCoroutine(RemoveAilmentWhenExpired(a));
+                return;
             }
 
             if (a.type == Ailments.Chill)
             {
-                chillStacks.Add(a);
+                if (Chill == null || a.magnitude > Chill.magnitude)
+                {
+                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
+                    Chill = a;
+                    StartCoroutine(RemoveAilmentWhenExpired(a));
+                    return;
+                }
             }
 
             if (a.type == Ailments.Freeze)
             {
-                freezeStacks.Add(a);
+                if (Freeze == null || a.duration > Freeze.duration)
+                {
+                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
+                    Freeze = a;
+                    StartCoroutine(RemoveAilmentWhenExpired(a));
+                    return;
+                }
             }
 
-            if (a.type == Ailments.Freeze)
+            if (a.type == Ailments.Shock)
             {
-                shockStacks.Add(a);
+                if (Shock == null || a.magnitude > Shock.magnitude)
+                {
+                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
+                    Shock = a;
+                    StartCoroutine(RemoveAilmentWhenExpired(a));
+                    return;
+                }
             }
-        }
-
-        // apply chill effect at 10% for 0.25 seconds
-        internal void ApplyChillingGround()
-        {
-            Ailment a = new Ailment();
-            a.type = Ailments.Chill;
-            a.duration = 0.25f;
-            a.magnitude = 0.1f;
-
-            AddAilment(a);
         }
 
 
@@ -150,11 +178,13 @@ namespace MeteorGame
             AddAilment(a);
         }
 
+
+
         private void CheckForFeezeAndChill(SpellSlot from, int damageAmount)
         {
-            bool frozen = strongestFreeze != null;
+            CheckForFreeze(from, damageAmount);
 
-            if (frozen) // if frozen no need to chill
+            if (Freeze != null) // if frozen no need to chill
             {
                 return;
             }
@@ -176,10 +206,10 @@ namespace MeteorGame
                 return;
             }
 
-            var shockChance = from.GetTotal("ChanceToFreeze") / 100f;
+            var freezeChance = from.GetTotal("ChanceToFreeze") / 100f;
             float chanceIncreasedBy = from.GetTotal("IncreasedChanceToFreeze") / 100f;
 
-            var totalChance = shockChance * (1 + chanceIncreasedBy);
+            var totalChance = freezeChance * (1 + chanceIncreasedBy);
 
             var cointoss = UnityEngine.Random.value;
 
@@ -188,31 +218,35 @@ namespace MeteorGame
                 return;
             }
 
-            float effectIncreasedBy = from.GetTotal("IncreasedEffectOfFreeze") / 100f;
-            effectIncreasedBy += from.GetTotal("IncreasedEffectOfColdAilments") / 100f;
 
-            var effect = Formula(damageAmount, owner.totalHealth, effectIncreasedBy);
+            // Freeze duration is 60 milliseconds (0.06 seconds) for every 1% of the target's maximum life
 
-            if (effect < minFreezeEffect)
+            float damagePercentage = damageAmount / owner.totalHealth;
+            float dur = damagePercentage * 0.06f;
+
+
+            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfFreeze") / 100f;
+            durationIncreasedBy += from.GetTotal("IncreasedDurationOfColdAilments") / 100f;
+
+            float durationReducedBy = from.GetTotal("ReducedDurationOfFreeze") / 100f;
+
+            dur = dur * (1 + durationIncreasedBy) * (1 - durationReducedBy);
+
+            if (dur < minFreezeDur)
             {
                 // do nothing
                 return;
             }
 
-            if (effect > maxFreezeEffect)
+            if (dur > maxFreezeDur)
             {
-                effect = maxFreezeEffect;
+                dur = maxFreezeDur;
             }
-
-            var duration = baseFreezeDuration;
-            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfColdAilments");
-
-            duration *= 1 + durationIncreasedBy;
 
             Ailment a = new Ailment();
             a.type = Ailments.Freeze;
-            a.duration = duration;
-            a.magnitude = effect;
+            a.duration = dur;
+            a.magnitude = dur;
 
             AddAilment(a);
         }
@@ -249,21 +283,36 @@ namespace MeteorGame
             a.type = Ailments.Chill;
             a.duration = duration;
             a.magnitude = effect;
+
+            AddAilment(a);
         }
+
+        internal void AddChillingAreaAilment()
+        {
+            if (InChillingArea == false)
+            {
+                InChillingArea = true;
+                return;
+            }
+        }
+
+        internal void RemoveChillingAreaAilment()
+        {
+            InChillingArea = false;
+        }
+
 
         private void CheckForIgnite(SpellSlot from, float damageAmount)
         {
-            // chance based
-
             if (damageAmount <= 0)
             {
                 return;
             }
 
-            var shockChance = from.GetTotal("ChanceToIgnite") / 100f;
+            var igniteChance = from.GetTotal("ChanceToIgnite") / 100f;
             float chanceIncreasedBy = from.GetTotal("IncreasedChanceToIgnite") / 100f;
 
-            var totalChance = shockChance * (1 + chanceIncreasedBy);
+            var totalChance = igniteChance * (1 + chanceIncreasedBy);
 
             var cointoss = UnityEngine.Random.value;
 
@@ -281,6 +330,7 @@ namespace MeteorGame
             var increasedDamage = from.GetTotal("IncreasedIgniteDamage") / 100f;
             var damageMultip = 1 + increasedDamage;
 
+            // The burning damage over time is 50% of the base damage of the hit
             int totalDamage = (int)(damageAmount * damageMultip * baseIgniteDPSMultip);
 
 
@@ -292,77 +342,6 @@ namespace MeteorGame
             AddAilment(a);
         }
 
-        public void UpdateAilments()
-        {
-            RemoveExpiredStakcs();
-
-            strongestIgnite = FindStrongest(igniteStacks);
-            strongestChill = FindStrongest(chillStacks);
-            strongestFreeze = FindStrongest(freezeStacks);
-            strongestShock = FindStrongest(shockStacks);
-
-            CheckIgniteTick();
-        }
-
-        private void CheckIgniteTick()
-        {
-            if (strongestIgnite != null)
-            {
-                if (Time.time - igniteTick > igniteTickIntervalSeconds)
-                {
-                    Debug.Log($"Taking damage from {igniteStacks.Count} ignite stacks");
-
-                    foreach (var item in igniteStacks) // all ignites
-                    {
-                        owner.IgniteTick((int)item.magnitude);
-                    }
-
-                    igniteTick = Time.time;
-                }
-            }
-        }
-
-        private void RemoveStack(List<Ailment> stacks, Ailment a)
-        {
-            stacks.Remove(a);
-        }
-
-        private void RemoveExpiredStakcs()
-        {
-            RemoveExpiredFrom(igniteStacks);
-            RemoveExpiredFrom(chillStacks);
-            RemoveExpiredFrom(freezeStacks);
-            RemoveExpiredFrom(shockStacks);
-        }
-
-        private void RemoveExpiredFrom(List<Ailment> stacks)
-        {
-            var now = Time.time;
-
-            // remove expired stacks
-            for (int i = stacks.Count - 1; i >= 0; i--)
-            {
-                Ailment a = stacks[i];
-
-                if (now - a.startTime > a.duration)
-                {
-                    RemoveStack(stacks, a);
-                    continue;
-                }
-            }
-        }
-
-
-
-        private Ailment FindStrongest(List<Ailment> stacks)
-        {
-            if (stacks.Count == 0)
-            {
-                return null;
-            }
-
-            return stacks.OrderBy(a => a.magnitude).First();
-        }
 
     }
 }

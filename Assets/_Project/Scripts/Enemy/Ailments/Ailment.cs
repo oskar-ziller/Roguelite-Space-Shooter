@@ -9,7 +9,6 @@ namespace MeteorGame
     public class Ailment
     {
         public Ailments type;
-        public float startTime;
         public float duration;
         public float magnitude;
     }

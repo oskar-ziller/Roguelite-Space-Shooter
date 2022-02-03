@@ -22,8 +22,14 @@ namespace MeteorGame
         [Tooltip("Easing of transform scale tween")]
         [SerializeField] private Ease easingShrink;
 
+        private SphereCollider collider;
+
+        public Action<ChillingArea> AreaExpired;
+
 
         private SpellSlot castBy;
+
+        public SpellSlot CastBy => castBy;
 
         #endregion
 
@@ -31,23 +37,9 @@ namespace MeteorGame
 
         private void Awake()
         {
-
+            collider = GetComponent<SphereCollider>();
         }
 
-        private void Start()
-        {
-        
-        }
-
-        private void Update()
-        {
-        
-        }
-
-        private void OnEnable()
-        {
-
-        }
 
         internal void Init(SpellSlot castBy)
         {
@@ -70,35 +62,11 @@ namespace MeteorGame
                 var oldest = SpellCaster.GetOldestCreepingFrostChillingArea();
                 oldest.DestroySelf();
             }
-
-            StartCoroutine(DealDPSLoop());
-        }
-
-
-        private void DealDamage()
-        {
-            float totalRadi = castBy.ExpRadi;
-
-            foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, totalRadi, fromShell: true))
-            {
-                e.TakeDoT(castBy, 0.25f, applyAilment: false);
-                e.ApplyChillingGround(); // apply chill effect at 10% for 0.25 seconds
-            }
-        }
-
-        private IEnumerator DealDPSLoop()
-        {
-            while (true)
-            {
-                DealDamage();
-                yield return new WaitForSeconds(0.25f);
-            }
         }
 
         #endregion
 
         #region Methods
-
         private IEnumerator DestroyWithDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -112,6 +80,7 @@ namespace MeteorGame
             SpellCaster.RemoveCreepingFrostChillingArea(this);
 
             transform.DOScale(Vector3.zero, shrinkDur).SetEase(easingShrink).OnComplete(() => {
+                AreaExpired?.Invoke(this);
                 Destroy(transform.gameObject);
             });
         }

@@ -39,7 +39,7 @@ namespace MeteorGame
         [Header("Misc Settings")]
 
         [Tooltip("Max chain range for projectiles")]
-        public float chainRange = 10f;
+        public float chainRange = 45f;
 
         [Tooltip("Max links allowed per spell slot")]
         public int MaxLinksAllowed = 7;
@@ -66,6 +66,8 @@ namespace MeteorGame
         private float debugGameLevel = 0;
         private float gameLevel = 0; // derived from minutes since start and difficultyCurve
         private bool tabMenuShowing = true;
+
+        public Stopwatch gamePlaySW = Stopwatch.StartNew();
 
         #endregion
 

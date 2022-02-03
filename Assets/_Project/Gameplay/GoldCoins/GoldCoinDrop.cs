@@ -27,6 +27,8 @@ namespace MeteorGame
         private Rigidbody parentRB;
         private bool inMagnet = false;
 
+        private SpinAroundAxis spinAroundAxis;
+
 
         #endregion
 
@@ -40,6 +42,7 @@ namespace MeteorGame
             meshRenderer = GetComponentInChildren<MeshRenderer>();
             lightObj = GetComponent<Light>();
             parentRB = GetComponent<Rigidbody>();
+            spinAroundAxis = GetComponentInChildren<SpinAroundAxis>();
         }
 
         private void Start()
@@ -61,6 +64,8 @@ namespace MeteorGame
 
             if (inMagnet)
             {
+
+
                 var dir = (Player.Instance.transform.position - parentRB.position).normalized;
                 parentRB.velocity += dir * Time.deltaTime * 250f;
             }
@@ -84,6 +89,7 @@ namespace MeteorGame
             else
             {
                 inMagnet = true;
+                spinAroundAxis.StopSpin();
             }
         }
 
@@ -94,6 +100,7 @@ namespace MeteorGame
             if (magnet != null)
             {
                 inMagnet = false;
+                spinAroundAxis.StartSpin();
             }
         }
 

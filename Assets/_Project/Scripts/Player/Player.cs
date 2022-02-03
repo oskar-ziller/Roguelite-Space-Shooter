@@ -56,7 +56,6 @@ namespace MeteorGame
             Instance = this;
         }
 
-
         private void Start()
         {
             if (!isSetup)

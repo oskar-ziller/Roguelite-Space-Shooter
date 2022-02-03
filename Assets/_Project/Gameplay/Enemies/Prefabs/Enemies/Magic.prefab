@@ -42,6 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4751356934767095656}
   - component: {fileID: 1073891619112656221}
+  - component: {fileID: 4196159474930472951}
   - component: {fileID: 8071990920741559821}
   - component: {fileID: 3228806081746508564}
   m_Layer: 9
@@ -84,44 +85,20 @@ MonoBehaviour:
   level: 0
   maxLevel: 100
   rarity: 1
-  spawnSound: {fileID: 8300000, guid: 5fdb13d3756c84fecac96f5a2d124370, type: 3}
-  engineLoop: {fileID: 8300000, guid: 316224186e8ae6543990a05f4dc13981, type: 3}
-  hoverAudioSource: {fileID: 0}
-  spawnAudioCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: -2.435759
-      outSlope: -2.435759
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.026633525
-    - serializedVersion: 3
-      time: 0.054676954
-      value: 0.08900895
-      inSlope: -0.14604452
-      outSlope: -0.14604452
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.05008083
-    - serializedVersion: 3
-      time: 0.9866832
-      value: -0.0061261654
-      inSlope: -0.015828181
-      outSlope: -0.015828181
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.07102964
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   totalHealth: 0
   currentHealth: 0
+--- !u!114 &4196159474930472951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2293438756574210558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5238c8283191c4428f7bf99f031ce2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!54 &8071990920741559821
 Rigidbody:
   m_ObjectHideFlags: 0

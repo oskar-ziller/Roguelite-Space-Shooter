@@ -9,8 +9,6 @@ namespace MeteorGame
 
         #region Variables
 
-        private Enemy owner;
-
         [SerializeField]
         private GameObject igniteVisuals;
 
@@ -20,19 +18,26 @@ namespace MeteorGame
         [SerializeField]
         private GameObject shockVisuals;
 
+        private AilmentManager ailmentManager;
+
+
         #endregion
 
         #region Unity Methods
 
         private void Awake()
         {
-            owner = GetComponentInParent<Enemy>();
         }
 
         private void Start()
         {
+            ailmentManager = GetComponentInParent<AilmentManager>();
             StartCoroutine(CheckAilmentsCoroutine());
         }
+
+        #endregion
+
+        #region Methods
 
         IEnumerator CheckAilmentsCoroutine()
         {
@@ -42,46 +47,56 @@ namespace MeteorGame
                 CheckAilmentsAndUpdateVisuals();
             }
         }
-
-
         private void CheckAilmentsAndUpdateVisuals()
         {
-            if (owner.IsFrozenOrChilled())
+            if (ailmentManager.InChillingArea || ailmentManager.Chill != null || ailmentManager.Freeze != null)
             {
-                chillAndFreezeVisuals.SetActive(true);
+                if (!chillAndFreezeVisuals.activeInHierarchy)
+                {
+                    chillAndFreezeVisuals.SetActive(true);
+                }
             }
             else
             {
-                chillAndFreezeVisuals.SetActive(false);
+                if (chillAndFreezeVisuals.activeInHierarchy)
+                {
+                    chillAndFreezeVisuals.SetActive(false);
+                }
             }
 
-            if (owner.IsIgnited())
+            if (ailmentManager.IgniteStacks.Count > 0)
             {
-                igniteVisuals.SetActive(true);
+                if (!igniteVisuals.activeInHierarchy)
+                {
+                    igniteVisuals.SetActive(true);
+                }
             }
             else
             {
-                igniteVisuals.SetActive(false);
+                if (igniteVisuals.activeInHierarchy)
+                {
+                    igniteVisuals.SetActive(false);
+                }
             }
 
-            if (owner.IsShocked())
+
+            if (ailmentManager.Shock != null)
             {
-                shockVisuals.SetActive(true);
+                if (!shockVisuals.activeInHierarchy)
+                {
+                    shockVisuals.SetActive(true);
+                }
             }
             else
             {
-                shockVisuals.SetActive(false);
+                if (shockVisuals.activeInHierarchy)
+                {
+                    shockVisuals.SetActive(false);
+                }
             }
+
         }
 
-        private void Update()
-        {
-            
-        }
-
-        #endregion
-
-        #region Methods
 
         #endregion
 

@@ -40,6 +40,10 @@ namespace MeteorGame
 
             var sizeVariation = Random.Range(0.9f, 1.1f);
 
+            // Set the particle starting size to radi * 2 and some variation
+            
+            // Particle uses vertex streams to communicate with the shader
+            // to fade out over time
             var main = explosionPS.main;
             main.startSize = totalRadi * 2 * sizeVariation;
 
