@@ -22,6 +22,7 @@ namespace MeteorGame
         public bool jumpReleased;
         public bool jumpDown;
         public bool boostDown;
+        public bool descentDown;
 
         public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
     }
@@ -72,8 +73,7 @@ namespace MeteorGame
         [Header("FALL")]
         [Tooltip("Downwards speed clamp when falling with jump key pressed")]
         [SerializeField] private float fallLimitMin = -30f;
-        [Tooltip("Downwards speed clamp when falling with jump key NOT pressed")]
-        [SerializeField] private float fallLimitMax = -70f;
+
 
 
         private bool CanUseCoyote => coyoteUsable && !isGrounded && timeLeftGrounded + coyoteTime > Time.time;
@@ -175,9 +175,11 @@ namespace MeteorGame
                 jumpReleased = UnityEngine.Input.GetButtonUp("Jump"),
                 jumpDown = UnityEngine.Input.GetButton("Jump"),
                 boostDown = Input.GetKey(KeyCode.LeftShift),
+                descentDown = Input.GetKey(KeyCode.LeftControl),
                 x = UnityEngine.Input.GetAxisRaw("Horizontal"),
                 z = UnityEngine.Input.GetAxisRaw("Vertical")
             };
+
             if (inputs.jumpPressed)
             {
                 lastJumpPressed = Time.time;
@@ -190,10 +192,10 @@ namespace MeteorGame
         #region Methods
 
 
-        public void TurnHorizontal(float amount)
-        {
-            transform.Rotate(Vector3.up, amount);
-        }
+        //public void TurnHorizontal(float amount)
+        //{
+        //    transform.Rotate(Vector3.up, amount);
+        //}
 
         private Vector3 CalculateJump()
         {

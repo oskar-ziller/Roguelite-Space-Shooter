@@ -32,7 +32,7 @@ namespace MeteorGame
 
         public void DoExplode() // explode and spawn chilling area
         {
-            print("DoExplode()");
+            //print("DoExplode()");
             Rigidbody.velocity = Vector3.zero;
             Rigidbody.isKinematic = true;
 

@@ -8,8 +8,6 @@ namespace MeteorGame
     public class MouseLook : MonoBehaviour
     {
 
-        #region Variables
-
         // This enumeration describes which directions this script should control
         [Flags]
         public enum RotationDirection
@@ -21,30 +19,19 @@ namespace MeteorGame
 
         [Tooltip("Which directions this object can rotate")]
         [SerializeField] private RotationDirection rotationDirections;
-
         [Tooltip("The rotation acceleration, in degrees / second")]
         [SerializeField] private Vector2 acceleration;
-
         [Tooltip("A multiplier to the input. Describes the maximum speed in degrees / second. To flip vertical rotation, set Y to a negative value")]
         [SerializeField] private Vector2 sensitivity;
-
         [Tooltip("The maximum angle from the horizon the player can rotate, in degrees")]
         [SerializeField] private float maxVerticalAngleFromHorizon;
-
         [Tooltip("The period to wait until resetting the input value. Set this as low as possible, without encountering stuttering")]
         [SerializeField] private float inputLagPeriod;
-
-        [Tooltip("Player object we want to rotate horizontally")]
-        [SerializeField] private PlayerController player;
 
         private Vector2 velocity; // The current rotation velocity, in degrees
         private Vector2 rotation; // The current rotation, in degrees
         private Vector2 lastInputEvent; // The last received non-zero input value
         private float inputLagTimer; // The time since the last received non-zero input value
-
-        #endregion
-
-        #region Unity Methods
 
         // When this component is enabled, we need to reset the state
         // and figure out the current rotation
@@ -62,7 +49,6 @@ namespace MeteorGame
             {
                 euler.x -= 360;
             }
-
             euler.x = ClampVerticalAngle(euler.x);
             // Set the angles here to clamp the current rotation
             transform.localEulerAngles = euler;
@@ -70,36 +56,6 @@ namespace MeteorGame
             // around the y (up) axis and the x (right) axis
             rotation = new Vector2(euler.y, euler.x);
         }
-
-        private void Awake()
-        {
-
-        }
-
-        private void Start()
-        {
-        }
-
-        private void Update()
-        {
-            
-        }
-
-        private void FixedUpdate()
-        {
-            Vector2 wantedVelocity = GetInput() * sensitivity;
-
-            rotation += wantedVelocity * Time.deltaTime;
-            player.TurnHorizontal((wantedVelocity * Time.deltaTime).x); // rotate player body
-
-            rotation.y = ClampVerticalAngle(rotation.y);
-
-            transform.localEulerAngles = new Vector3(rotation.y, 0, 0);
-        }
-
-        #endregion
-
-        #region Methods
 
         private float ClampVerticalAngle(float angle)
         {
@@ -112,10 +68,9 @@ namespace MeteorGame
             inputLagTimer += Time.deltaTime;
             // Get the input vector. This can be changed to work with the new input system or even touch controls
             Vector2 input = new Vector2(
-                Input.GetAxisRaw("Mouse X"),
-                Input.GetAxisRaw("Mouse Y")
+                Input.GetAxis("Mouse X"),
+                Input.GetAxis("Mouse Y")
             );
-
             // Sometimes at fast framerates, Unity will not receive input events every frame, which results
             // in zero values being given above. This can cause stuttering and make it difficult to fine
             // tune the acceleration setting. To fix this, disregard zero values. If the lag timer has passed the
@@ -127,11 +82,34 @@ namespace MeteorGame
                 lastInputEvent = input;
                 inputLagTimer = 0;
             }
-
             return lastInputEvent;
         }
 
-        #endregion
+        private void Update()
+        {
+            // The wanted velocity is the current input scaled by the sensitivity
+            // This is also the maximum velocity
+            Vector2 wantedVelocity = GetInput() * sensitivity;
 
+            // Zero out the wanted velocity if this controller does not rotate in that direction
+            if ((rotationDirections & RotationDirection.Horizontal) == 0)
+            {
+                wantedVelocity.x = 0;
+            }
+            if ((rotationDirections & RotationDirection.Vertical) == 0)
+            {
+                wantedVelocity.y = 0;
+            }
+
+            // Calculate new rotation
+            velocity = new Vector2(
+                Mathf.MoveTowards(velocity.x, wantedVelocity.x, acceleration.x * Time.deltaTime),
+                Mathf.MoveTowards(velocity.y, wantedVelocity.y, acceleration.y * Time.deltaTime));
+            rotation += velocity * Time.deltaTime;
+            rotation.y = ClampVerticalAngle(rotation.y);
+
+            // Convert the rotation to euler angles
+            transform.localEulerAngles = new Vector3(rotation.y, rotation.x, 0);
+        }
     }
 }

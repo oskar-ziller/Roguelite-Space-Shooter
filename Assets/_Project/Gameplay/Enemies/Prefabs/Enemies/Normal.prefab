@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 8009520271594001728}
   - component: {fileID: 796124555215754065}
   - component: {fileID: 5561713861887180090}
+  - component: {fileID: 207492394646499448}
   m_Layer: 0
   m_Name: Icosphere_1
   m_TagString: Untagged
@@ -187,7 +188,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6290544b9ae210245a4143ff3c9f63b4, type: 2}
+  - {fileID: 2100000, guid: 11117b9192b05284987ce6f2ab9ffe9e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -209,6 +210,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &207492394646499448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4156932411351637397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec37f5b611d28ca4a85eba3e7aa9478c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6500451908690439273
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -341,13 +354,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4751356934767095656}
     m_Modifications:
+    - target: {fileID: 78484791722281096, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 795529933249948841, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_Name
       value: Lifebar
-      objectReference: {fileID: 0}
-    - target: {fileID: 795529933249948841, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_RootOrder
@@ -355,19 +368,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.625
-      objectReference: {fileID: 0}
-    - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2.25
+      value: 5.08
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.74
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -375,7 +384,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalRotation.x
@@ -387,7 +396,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -399,6 +408,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1559182453734513200, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 3310663889533681911, guid: 360228d4241eef1478c5bac4f58120d3, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -5,9 +5,6 @@
     "m_Properties": [
         {
             "m_Id": "7e699dfcff03480ea906f11fd1c6aa32"
-        },
-        {
-            "m_Id": "a43aa2c4d3d94ea083f0952d79aa3bf6"
         }
     ],
     "m_Keywords": [],
@@ -122,6 +119,20 @@
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "411862473c4d4880bd21aea353836b7a"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "7e595931a46b4b1783c1e9f32be7db7e"
+                },
+                "m_SlotId": 2
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "a45da6157f45465781ac4d9209d13835"
                 },
                 "m_SlotId": 0
             }
@@ -566,10 +577,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -748.0,
-            "y": 171.20001220703126,
-            "width": 208.0,
-            "height": 325.5999755859375
+            "x": -710.4000244140625,
+            "y": 164.0,
+            "width": 208.00003051757813,
+            "height": 326.4000244140625
         }
     },
     "m_Slots": [
@@ -838,10 +849,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -253.60000610351563,
-            "y": -74.40000915527344,
+            "x": -332.0,
+            "y": 200.00001525878907,
             "width": 130.40000915527345,
-            "height": 118.4000015258789
+            "height": 117.60001373291016
         }
     },
     "m_Slots": [
@@ -883,7 +894,7 @@
     "m_FloatType": 1,
     "m_RangeValues": {
         "x": 0.0,
-        "y": 5.0
+        "y": 2.0
     }
 }
 
@@ -1146,29 +1157,6 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.Occlusion"
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
-    "m_ObjectId": "a43aa2c4d3d94ea083f0952d79aa3bf6",
-    "m_Guid": {
-        "m_GuidSerialized": "fe1cf679-fc57-473b-992b-1fbca9c3fee1"
-    },
-    "m_Name": "MinusAlpha",
-    "m_DefaultReferenceName": "Vector1_a43aa2c4d3d94ea083f0952d79aa3bf6",
-    "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
-    "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
-    "m_Hidden": false,
-    "m_Value": 0.0,
-    "m_FloatType": 0,
-    "m_RangeValues": {
-        "x": 0.0,
-        "y": 1.0
-    }
 }
 
 {

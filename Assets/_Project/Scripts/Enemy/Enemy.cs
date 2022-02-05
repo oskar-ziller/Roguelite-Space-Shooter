@@ -158,6 +158,8 @@ namespace MeteorGame
 
 
             Init(transform.position, UnityEngine.Random.Range(-99999, 999999), 99);
+
+            EnemyManager.Instance.AddEnemy(this);
         }
 
 
@@ -302,9 +304,6 @@ namespace MeteorGame
         {
             if (ailmentManager.Chill != null)
             {
-                //var currentVel = rigidBody.velocity;
-                //var shouldBe = startingVel * (1 - ailmentManager.Chill.magnitude);
-
                 var shouldBe = startingSpeed * (1 - ailmentManager.Chill.magnitude);
 
                 if (currentSpeed > shouldBe)
@@ -320,17 +319,11 @@ namespace MeteorGame
 
             if (ailmentManager.InChillingArea)
             {
-                //var currentVel = rigidBody.velocity;
-                var chillingAreaEffect = 0.9f;
-                var shouldBe = startingSpeed * (1f - chillingAreaEffect);
+                var shouldBe = startingSpeed * (1f - AilmentManager.ChillingAreaEffect);
 
                 if (currentSpeed > shouldBe)
                 {
-                    //print($"InChillingArea. - Currentvel: {currentVel} - {currentVel.magnitude} - {currentVel.sqrMagnitude} " +
-                    //    $"Shouldbe: {shouldBe} - {shouldBe.magnitude} - {shouldBe.sqrMagnitude}");
-
-                    //rigidBody.AddForce(shouldBe, ForceMode.VelocityChange);
-                    var newVel = startingVel * (1f - chillingAreaEffect);
+                    var newVel = startingVel * (1f - AilmentManager.ChillingAreaEffect);
                     rigidBody.velocity = newVel;
                     currentSpeed = newVel.magnitude;
                 }
@@ -487,7 +480,7 @@ namespace MeteorGame
 
             int final = (int)(fireFinal + coldFinal + lightFinal);
 
-            print("Taking damage of: " + final);
+            //print("Taking damage of: " + final);
 
             TakeDamage(final);
 
@@ -538,11 +531,7 @@ namespace MeteorGame
             currentSpeed = startingVel.magnitude;
         }
 
-        public void SetTarget(Transform target)
-        {
-
-        }
-
+   
 
         private void RepositionToSpawn()
         {

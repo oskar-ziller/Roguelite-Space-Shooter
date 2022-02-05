@@ -25,7 +25,7 @@ namespace MeteorGame
 
         #region Variables
 
-        public float enemySpeed { get; private set; } = 2f;
+        public float enemySpeed { get; private set; } = 0.2f;
 
 
         #endregion
@@ -191,7 +191,7 @@ namespace MeteorGame
 
             foreach (Transform child in enemiesHolder)
             {
-                GameObject.Destroy(child.gameObject);
+                Destroy(child.gameObject);
             }
         }
 

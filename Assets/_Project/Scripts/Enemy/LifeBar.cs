@@ -11,7 +11,7 @@ namespace MeteorGame
         #region Variables
 
         private Enemy owner;
-        private Coroutine hideLifeBar_Co;
+        //private Coroutine hideLifeBar_Co;
         private MeshRenderer mesh;
         private Material mat;
 
@@ -32,12 +32,6 @@ namespace MeteorGame
             owner.DamageTaken += UpdateHealthBar;
 
             mat.SetFloat("_percentage", 1);
-
-            // if not always on, start off
-            if (owner.hideLifebarAfterSeconds != 0)
-            {
-                gameObject.SetActive(false);
-            }
         }
 
         private void Update()
@@ -57,27 +51,26 @@ namespace MeteorGame
 
         private void UpdateHealthBar(Enemy _)
         {
-            return;
-            gameObject.SetActive(true);
+            //gameObject.SetActive(true);
             SetBarPercent();
 
-            if (hideLifeBar_Co != null)
-            {
-                StopCoroutine(hideLifeBar_Co);
-            }
+            //if (hideLifeBar_Co != null)
+            //{
+            //    StopCoroutine(hideLifeBar_Co);
+            //}
 
-            if (owner.hideLifebarAfterSeconds > 0)
-            {
-                hideLifeBar_Co = StartCoroutine(HideHealthbar());
-            }
+            //if (owner.hideLifebarAfterSeconds > 0)
+            //{
+            //    hideLifeBar_Co = StartCoroutine(HideHealthbar());
+            //}
         }
 
 
-        private IEnumerator HideHealthbar()
-        {
-            yield return new WaitForSeconds(owner.hideLifebarAfterSeconds);
-            gameObject.SetActive(false);
-        }
+        //private IEnumerator HideHealthbar()
+        //{
+        //    yield return new WaitForSeconds(owner.hideLifebarAfterSeconds);
+        //    gameObject.SetActive(false);
+        //}
 
 
         #endregion

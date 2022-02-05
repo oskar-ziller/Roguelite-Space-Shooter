@@ -398,10 +398,17 @@ namespace MeteorGame
             bodyGroup.SetActive(false);
         }
 
+        protected void DisableRigidBody()
+        {
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.isKinematic = true;
+        }
+
         protected void DestroySelfSoft()
         {
             HideBody();
             DisableCollider();
+            DisableRigidBody();
 
             Destroy(gameObject, maxTrailDur);
         }

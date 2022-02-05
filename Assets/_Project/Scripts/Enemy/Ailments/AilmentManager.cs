@@ -25,6 +25,8 @@ namespace MeteorGame
 
         const float baseIgniteDPSMultip = 0.5f; // 50% of the base damage of the hit 
         const float baseIgniteDurationSeconds = 4;
+
+        public const float ChillingAreaEffect = 0.1f;
         public const float IgniteTickInterval = 0.5f;
 
         public bool InChillingArea { get; private set; } = false;
@@ -55,7 +57,7 @@ namespace MeteorGame
 
         private void RemoveAilment(Ailment a)
         {
-            print("Removing ailment " + a.type);
+            //print("Removing ailment " + a.type);
 
             if (a.type == Ailments.Chill)
             {
