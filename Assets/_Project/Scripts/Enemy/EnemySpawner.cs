@@ -190,11 +190,12 @@ namespace MeteorGame
 
             yield return generator.Generate();
 
-            var randx = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends);
-            var randz = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends );
+            //var randomPackCenterPosX = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends);
+            //var randomPackCenterPosZ = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends );
+
 
             var height = CalculatePackHeightForCurrentGameLevel();
-            var pos = new Vector3(randx, height, randz);
+            var pos = Random.onUnitSphere * height;
 
             var holder = new GameObject("Pack");
             holder.transform.parent = parentGroup;

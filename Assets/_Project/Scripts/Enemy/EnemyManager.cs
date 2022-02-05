@@ -25,8 +25,9 @@ namespace MeteorGame
 
         #region Variables
 
-        public float enemySpeed { get; private set; } = 0.2f;
+        [SerializeField] private float enemySpeed = 3f;
 
+        public float EnemySpeed => enemySpeed;
 
         #endregion
 

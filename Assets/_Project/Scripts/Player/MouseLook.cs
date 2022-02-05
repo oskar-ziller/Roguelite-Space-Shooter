@@ -49,7 +49,9 @@ namespace MeteorGame
             {
                 euler.x -= 360;
             }
-            euler.x = ClampVerticalAngle(euler.x);
+
+            //euler.x = ClampVerticalAngle(euler.x);
+
             // Set the angles here to clamp the current rotation
             transform.localEulerAngles = euler;
             // Rotation is stored as (horizontal, vertical), which corresponds to the euler angles
@@ -106,7 +108,8 @@ namespace MeteorGame
                 Mathf.MoveTowards(velocity.x, wantedVelocity.x, acceleration.x * Time.deltaTime),
                 Mathf.MoveTowards(velocity.y, wantedVelocity.y, acceleration.y * Time.deltaTime));
             rotation += velocity * Time.deltaTime;
-            rotation.y = ClampVerticalAngle(rotation.y);
+
+            //rotation.y = ClampVerticalAngle(rotation.y);
 
             // Convert the rotation to euler angles
             transform.localEulerAngles = new Vector3(rotation.y, rotation.x, 0);

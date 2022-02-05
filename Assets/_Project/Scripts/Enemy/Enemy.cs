@@ -504,7 +504,7 @@ namespace MeteorGame
 
         private void StartMoving()
         {
-            startingSpeed = EnemyManager.Instance.enemySpeed;
+            startingSpeed = EnemyManager.Instance.EnemySpeed;
 
 
             if (rarity == EnemyRarity.Magic)
@@ -522,7 +522,7 @@ namespace MeteorGame
                 startingSpeed *= 0.3f;
             }
 
-            Vector3 movingTowards = new Vector3(transform.position.x, 0, transform.position.z); // directly below
+            Vector3 movingTowards = Vector3.zero; 
             Vector3 dir = (movingTowards - transform.position).normalized;
             startingVel = dir * startingSpeed;
 

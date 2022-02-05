@@ -36,48 +36,34 @@ namespace MeteorGame
         [SerializeField] private float airAccel = 1f;
         [SerializeField] private float airDecel = 10f;
 
+        [Tooltip("Amount to decel with when pressing no input." +
+            " Makes it so that when pressing buttons, manouverability is better.")]
+        [SerializeField] private float airDecelFreefall = 10f;
+
         [Header("BOOST")]
         [Tooltip("Max speed multiplier wheen boost key is down, higher value = faster when boosting")]
         [SerializeField] private float boostMultipMaxVel = 2f;
         [Tooltip("Accel multiplier wheen boost key is down")]
         [SerializeField] private float boostMultipAccel = 2f;
+        
+        [Tooltip("Decel multiplier wheen boost key is down")]
+        [SerializeField] private float boostMultipDec = 2f;
 
 
         [Header("SPEED")]
         [SerializeField] private float airMaxSpeed = 10f;
 
 
-        [Header("MISC")]
-        [Tooltip("Window of time to allow jumping after leaving ground surface")]
-        [SerializeField] private float coyoteTime = 0.1f;
-        [Tooltip("Window of time to remember wanting to jump before hitting ground. " +
-            "So we can jump even at an early key press.")]
-        [SerializeField] private float jumpBuffer = 0.1f;
 
-
-        [Header("GRAVITY")]
-        [Tooltip("Gravity applied when jump key is down")]
-        [SerializeField] private float minGravity = -1;
-        [Tooltip("Gravity applied when jump key is not down")]
-        [SerializeField] private float maxGravity = -2;
-
-
-        [Header("JUMPING")]
-        [SerializeField] private float jumpForce = 30;
-
-
-        [Header("FALL")]
-        [Tooltip("Downwards speed clamp when falling with jump key pressed")]
-        [SerializeField] private float fallLimitMin = -30f;
 
 
 
         private FrameInput inputs;
         //private Rigidbody rb;
         private float boostAccel = 1f;
+        private float boostDec = 1f;
         private float boostSpeed = 1f;
-        private Vector3 targetJumpVel = Vector3.zero;
-
+        
 
         private Vector3 velocity = Vector3.zero;
 
@@ -110,26 +96,37 @@ namespace MeteorGame
             GatherInput();
 
             boostAccel = 1f;
+            boostDec = 1f;
             boostSpeed = 1f;
 
             if (inputs.boostDown)
             {
                 boostAccel = boostMultipAccel;
+                boostDec = boostMultipDec;
                 boostSpeed = boostMultipMaxVel;
             }
 
             //var groundVel = CalculateGroundVelocity();
             //var asc = CalculateAscend();
-            var fwd = CalculateForward2();
-            var rgh = CalculateRight2();
-            var up = CalculateUp2();
-            //var upSlow = CalculateUpSlow();
+            var fwd = CalculateForward();
+            var rgh = CalculateRight();
+            var up = CalculateUp();
+            var down = CalculateDown();
+            var slow = CalculateSlow();
 
             //var stop = CalculateStop();
             //var grav = CalculateGravity();
             //var desc = CalculateDescent();
 
-            velocity += fwd + rgh + up;
+
+
+            var frameVel = fwd + rgh + up + down + slow;
+
+            //frameVel = frameVel.normalized * airMaxSpeed * Time.deltaTime;
+
+            velocity += frameVel;
+
+            //velocity = velocity.normalized * airMaxSpeed;
             transform.position += velocity;
 
             //velocity += fwd + jumpVel;
@@ -140,133 +137,112 @@ namespace MeteorGame
             //velocity += desc;
         }
 
-        private Vector3 CalculateStop()
+        private Vector3 CalculateDown()
         {
-            if (inputs.jump == 0 && inputs.inputVector == Vector2.zero)
+            var pressingFall = inputs.jump < 0;
+
+            if (pressingFall)
             {
-                var accel = airDecel * boostAccel;
-                return Vector3.MoveTowards(velocity, Vector3.zero, accel * Time.deltaTime) - velocity;
+                var locVel = transform.InverseTransformDirection(velocity);
+                var targetSpeed =  airMaxSpeed * boostSpeed;
+
+                if (locVel.magnitude < Math.Abs(targetSpeed))
+                {
+                    var accel = airAccel * boostAccel;
+
+                    locVel.y = Mathf.MoveTowards(locVel.y, -targetSpeed, accel * Time.deltaTime); ;
+
+                    var globalVel = transform.TransformDirection(locVel);
+
+                    return globalVel - velocity;
+                }
             }
 
             return Vector3.zero;
         }
 
+
+
         private Vector3 CalculateUp()
         {
-            if (inputs.jump != 0)
-            {
-                var targetSpeed = inputs.jump * airMaxSpeed * boostSpeed;
-                var accel = airAccel * boostAccel;
+            var pressingJump = inputs.jump > 0;
 
-                var newY = Mathf.MoveTowards(velocity.y, targetSpeed, accel * Time.deltaTime);
-
-                return new Vector3(velocity.x, newY, velocity.z) - velocity;
-            }
-            else
+            if (pressingJump)
             {
                 var locVel = transform.InverseTransformDirection(velocity);
+                var targetSpeed = airMaxSpeed * boostSpeed;
 
-                var targetSpeed = 0;
-                var accel = airAccel * boostAccel;
-                locVel.y = Mathf.MoveTowards(locVel.y, targetSpeed, accel * Time.deltaTime); ;
-
-                var globalVel = transform.TransformDirection(locVel);
-
-                return globalVel - velocity;
-            }
-
-        }
-
-        private Vector3 CalculateUp2()
-        {
-            if (inputs.jump != 0)
-            {
-                var targetSpeed2 = inputs.jump * airMaxSpeed * boostSpeed;
-                var accel2 = airAccel * boostAccel;
-
-                if (Mathf.Abs(velocity.y) > Mathf.Abs(targetSpeed2))
+                if (locVel.magnitude < Math.Abs(targetSpeed))
                 {
-                    accel2 = airDecel * boostAccel;
+                    var accel = airAccel * boostAccel;
+
+                    locVel.y = Mathf.MoveTowards(locVel.y, targetSpeed, accel * Time.deltaTime); ;
+
+                    var globalVel = transform.TransformDirection(locVel);
+
+                    return globalVel - velocity;
                 }
-
-                var newY = Mathf.MoveTowards(velocity.y, targetSpeed2, accel2 * Time.deltaTime);
-
-                return new Vector3(velocity.x, newY, velocity.z) - velocity;
             }
 
-            var locVel = transform.InverseTransformDirection(velocity);
+            return Vector3.zero;
 
-            var targetSpeed = inputs.jump * airMaxSpeed * boostSpeed;
-            var accel = airAccel * boostAccel;
 
-            if (Mathf.Abs(locVel.y) > Mathf.Abs(targetSpeed))
-            {
-                accel = airDecel * boostAccel;
-            }
 
-            locVel.y = Mathf.MoveTowards(locVel.y, targetSpeed, accel * Time.deltaTime); ;
 
-            var globalVel = transform.TransformDirection(locVel);
 
-            return globalVel - velocity;
+
+
+
+
+
+
+
+
+
+
+
         }
 
 
-        private Vector3 CalculateUpSlow()
+        private Vector3 CalculateSlow()
         {
-            var locVel = transform.InverseTransformDirection(velocity);
+            var pressingJump = inputs.jump != 0;
+            var pressingArrows = inputs.inputVector != Vector2.zero;
+            var pressingBoost = inputs.boostDown;
+            var accel = airDecel * boostDec;
 
-            var targetSpeed = 0;
-            var accel = airAccel * boostAccel;
-            locVel.y = Mathf.MoveTowards(locVel.y, targetSpeed, accel * Time.deltaTime); ;
+            if (!pressingJump && !pressingArrows && !pressingBoost) // pressing nothing, low decel
+            {
+                accel = airDecelFreefall * boostDec;
+            }
 
-            var globalVel = transform.TransformDirection(locVel);
+            var newVel = Vector3.MoveTowards(velocity, Vector3.zero, accel * Time.deltaTime);
 
-            return globalVel - velocity;
+            return newVel - velocity;
         }
+
+
+
 
         private Vector3 CalculateForward()
         {
             if (inputs.inputVector.y != 0)
             {
                 var locVel = transform.InverseTransformDirection(velocity);
-
                 var targetSpeed = inputs.inputVector.y * airMaxSpeed * boostSpeed;
+
                 var accel = airAccel * boostAccel;
+
                 locVel.z = Mathf.MoveTowards(locVel.z, targetSpeed, accel * Time.deltaTime); ;
 
                 var globalVel = transform.TransformDirection(locVel);
 
                 return globalVel - velocity;
             }
-            
+
             return Vector3.zero;
         }
 
-
-        private Vector3 CalculateForward2()
-        {
-            if (inputs.jump != 0)
-            {
-                return Vector3.zero;
-            }
-
-            var locVel = transform.InverseTransformDirection(velocity);
-
-            var targetSpeed = inputs.inputVector.y * airMaxSpeed * boostSpeed;
-            var accel = airAccel * boostAccel;
-
-            if (Mathf.Abs(locVel.z) > Mathf.Abs(targetSpeed))
-            {
-                accel = airDecel * boostAccel;
-            }
-
-            locVel.z = Mathf.MoveTowards(locVel.z, targetSpeed, accel * Time.deltaTime); ;
-
-            var globalVel = transform.TransformDirection(locVel);
-
-            return globalVel - velocity;
-        }
 
 
 
@@ -275,9 +251,10 @@ namespace MeteorGame
             if (inputs.inputVector.x != 0)
             {
                 var locVel = transform.InverseTransformDirection(velocity);
-
                 var targetSpeed = inputs.inputVector.x * airMaxSpeed * boostSpeed;
+
                 var accel = airAccel * boostAccel;
+
                 locVel.x = Mathf.MoveTowards(locVel.x, targetSpeed, accel * Time.deltaTime); ;
 
                 var globalVel = transform.TransformDirection(locVel);
@@ -286,31 +263,6 @@ namespace MeteorGame
             }
 
             return Vector3.zero;
-        }
-
-
-        private Vector3 CalculateRight2()
-        {
-            if (inputs.jump != 0)
-            {
-                return Vector3.zero;
-            }
-
-            var locVel = transform.InverseTransformDirection(velocity);
-
-            var targetSpeed = inputs.inputVector.x * airMaxSpeed * boostSpeed;
-            var accel = airAccel * boostAccel;
-
-            if (Mathf.Abs(locVel.x) > Mathf.Abs(targetSpeed))
-            {
-                accel = airDecel * boostAccel;
-            }
-
-            locVel.x = Mathf.MoveTowards(locVel.x, targetSpeed, accel * Time.deltaTime); ;
-
-            var globalVel = transform.TransformDirection(locVel);
-
-            return globalVel - velocity;
         }
 
         private struct FrameInput
