@@ -16,21 +16,13 @@ namespace MeteorGame
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-        [Tooltip("Collider trigger for actual proj collisions")]
-        [SerializeField] private MainTrigger  mainCollider;
-
-        //[Tooltip("Trigger collider for explosion")]
-        //[SerializeField] protected LargeTrigger explTrigger;
-
-        //[Tooltip("Trigger collider for aim assist.")]
-        //[SerializeField] protected LargeTrigger aimAssistTrigger;
-
-        //[Tooltip("Trigger collider for chain.")]
-        //[SerializeField] protected LargeTrigger chainTrigger;
+        [Tooltip("Trigger collider for projectile")]
+        [SerializeField] private Collider mainProjCollider;
 
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
         public Rigidbody Rigidbody { get { return rigidbody; } }
+
 
         public Enemy AimingAtEnemy { get; protected set; }
         public int CastID { get; protected set; }
@@ -218,10 +210,6 @@ namespace MeteorGame
             rigidbody = GetComponent<Rigidbody>();
             //projectileCollider = GetComponent<SphereCollider>();
 
-
-
-            mainCollider.TriggerEnter += OnMainTriggerEnter;
-
             //explTrigger.TriggerEnter += OnExpTriggerEnter;
             //explTrigger.TriggerExit += OnExpTriggerExit;
 
@@ -318,7 +306,7 @@ namespace MeteorGame
 
 
 
-        public virtual void OnMainTriggerEnter(Collider collider)
+        public virtual void OnTriggerEnter(Collider collider)
         {
 
             if (isDummy)
@@ -395,7 +383,7 @@ namespace MeteorGame
             var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
             var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
-            && e != collidingWith.gameObject
+            && e.gameObject != collidingWith.gameObject
             && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
             
             Enemy e = potentials.Count() > 0 ?
@@ -430,7 +418,7 @@ namespace MeteorGame
             var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
             var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
-            && e != collidingWith.gameObject
+            && e.gameObject != collidingWith.gameObject
             && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
 
             Enemy e = potentials.Count() > 0 ?
@@ -439,6 +427,7 @@ namespace MeteorGame
 
             if (e == null)
             {
+                print("can't fork");
                 return false;
             }
 
@@ -453,6 +442,7 @@ namespace MeteorGame
 
             if (e2 == null)
             {
+                print("use same enemy for fork");
                 e2 = e;
             }
 
@@ -491,13 +481,13 @@ namespace MeteorGame
 
         protected void DisableCollider()
         {
-            mainCollider.gameObject.SetActive(false);
+            mainProjCollider.gameObject.SetActive(false);
             //explTrigger.gameObject.SetActive(false);
         }
 
         protected void EnableCollider()
         {
-            mainCollider.gameObject.SetActive(true);
+            mainProjCollider.gameObject.SetActive(true);
             //explTrigger.gameObject.SetActive(true);
         }
 
