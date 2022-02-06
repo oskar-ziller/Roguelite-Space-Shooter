@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: ExplosionRadius
   m_EditorClassIdentifier: 
   internalName: ExplosionRadius
-  description: Projectiles explode on hit, dealing damage in a radius
+  hasValues: 1
+  description: Projectiles explode on hit, dealing damage in XXX radius

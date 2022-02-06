@@ -65,6 +65,9 @@ namespace MeteorGame
         [SerializeField] private float projSpeed;
         [SerializeField] private int projCount;
 
+        [SerializeField] private int chainAdditionalTimes;
+        [SerializeField] private int forkAdditionalTimes;
+
 
 
 
@@ -107,6 +110,10 @@ namespace MeteorGame
         public int ProjectileCount => projCount;
 
 
+        public int ChainAdditionalTimes => chainAdditionalTimes;
+
+        public int ForkAdditionalTimes => forkAdditionalTimes;
+
         private float CalculateProjSpeed()
         {
             float baseSpeed = Spell.ProjectileSpeed;
@@ -125,6 +132,8 @@ namespace MeteorGame
 
             return (int)(baseCount + increasedBy);
         }
+
+
 
 
 
@@ -216,6 +225,9 @@ namespace MeteorGame
             expRadius = CalculateExpolisonRadius();
 
             chillingAreaLimit = (int)GetTotal("ChillingAreaLimit");
+
+            chainAdditionalTimes = (int)GetTotal("ChainAdditionalTimes");
+            forkAdditionalTimes = (int)GetTotal("ForkAdditionalTimes");
 
             damageOverTime = CalculateDoT();
         }

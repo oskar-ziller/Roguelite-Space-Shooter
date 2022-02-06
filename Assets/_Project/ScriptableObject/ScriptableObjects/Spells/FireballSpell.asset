@@ -17,6 +17,6 @@ MonoBehaviour:
   prettyName: Fireball Spell
   msBetweenCasts: 300
   castTimeMs: 150
-  projectileSpeed: 40
+  projectileSpeed: 50
   projectileLifetimeSeconds: 4
   projectileCount: 1

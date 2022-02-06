@@ -62,13 +62,13 @@ namespace MeteorGame
 
         private void OnTriggerEnter(Collider other)
         {
-            var chillingArea = other.GetComponent<ChillingArea>();
+            //var chillingArea = other.GetComponent<ChillingArea>();
 
-            if (chillingArea != null)
-            {
-                collidingChillingAreas.Add(chillingArea);
-                chillingArea.AreaExpired += OnChillingAreaExpired;
-            }
+            //if (chillingArea != null)
+            //{
+            //    collidingChillingAreas.Add(chillingArea);
+            //    chillingArea.AreaExpired += OnChillingAreaExpired;
+            //}
         }
 
         private void OnTriggerExit(Collider other)
@@ -174,7 +174,6 @@ namespace MeteorGame
             spawnPos = pos;
 
             RepositionToSpawn();
-            StartMoving();
 
             var levelToSet = level == 0 ? Mathf.RoundToInt(GameManager.Instance.GameLevel) : level;
             SetLevel(levelToSet);
@@ -376,7 +375,7 @@ namespace MeteorGame
                 if (ailmentManager.IgniteStacks.Count > 0)
                 {
                     var stacks = ailmentManager.IgniteStacks;
-                    Debug.Log($"Taking ailment damage from {stacks.Count} ignite stacks");
+                    //Debug.Log($"Taking ailment damage from {stacks.Count} ignite stacks");
 
                     foreach (var i in stacks) 
                     {
@@ -399,7 +398,7 @@ namespace MeteorGame
 
         public void IgniteTick(int amount)
         {
-            print("Ailment - IgniteTick " + amount);
+            //print("Ailment - IgniteTick " + amount);
             TakeDamage(amount);
         }
 
@@ -502,28 +501,28 @@ namespace MeteorGame
             Destroy(gameObject);
         }
 
-        private void StartMoving()
+        public void StartMoving(Vector3 dir)
         {
             startingSpeed = EnemyManager.Instance.EnemySpeed;
 
 
             if (rarity == EnemyRarity.Magic)
             {
-                startingSpeed *= 0.8f;
+                startingSpeed *= 0.9f;
             }
 
             if (rarity == EnemyRarity.Rare)
             {
-                startingSpeed *= 0.4f;
+                startingSpeed *= 0.8f;
             }
 
             if (rarity == EnemyRarity.Unique)
             {
-                startingSpeed *= 0.3f;
+                startingSpeed *= 0.7f;
             }
 
-            Vector3 movingTowards = Vector3.zero; 
-            Vector3 dir = (movingTowards - transform.position).normalized;
+            //Vector3 movingTowards = Vector3.zero; 
+            //Vector3 dir = (movingTowards - transform.position).normalized;
             startingVel = dir * startingSpeed;
 
             rigidBody.isKinematic = false;

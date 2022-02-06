@@ -26,8 +26,8 @@ MonoBehaviour:
     min: 4
     max: 12
   - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
-    min: 5
-    max: 8
+    min: 8
+    max: 10
   name: Creeping Frost
   gemColor: {r: 0, g: 0.7392225, b: 1, a: 1}
   spellSO: {fileID: 11400000, guid: f34051d563bba1b4794c1f97c1db879a, type: 2}

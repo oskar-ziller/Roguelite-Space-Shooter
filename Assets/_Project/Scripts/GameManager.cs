@@ -39,7 +39,12 @@ namespace MeteorGame
         [Header("Misc Settings")]
 
         [Tooltip("Max chain range for projectiles")]
-        public float chainRange = 45f;
+        public float ChainAndForkRange = 45f;
+
+
+        [Tooltip("Max aim assist range for projectiles")]
+        public float AimAssistRange = 45f;
+
 
         [Tooltip("Max links allowed per spell slot")]
         public int MaxLinksAllowed = 7;
@@ -173,7 +178,7 @@ namespace MeteorGame
             if (Input.GetKeyDown(KeyCode.KeypadPlus))
             {
                 //debugElapsed += TimeSpan.FromSeconds(15);
-                debugGameLevel += 5;
+                debugGameLevel += 10;
             }
 
             if (Input.GetKeyDown(KeyCode.KeypadMinus))

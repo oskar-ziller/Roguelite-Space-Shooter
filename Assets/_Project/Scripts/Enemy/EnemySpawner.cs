@@ -27,7 +27,7 @@ namespace MeteorGame
 
 
         [Tooltip("How far enemy pack can spawn from Arena center")]
-        [SerializeField] private int spawnAreaExtends;
+        [SerializeField] private int maxSpawnAreaExtends;
 
         [Tooltip("Starting height for enemies at level 0")]
         [SerializeField] private int startPosMinHeight;
@@ -185,7 +185,7 @@ namespace MeteorGame
             var generator = new PositionGenerator(shape: randShape,
                                                   spacing: spacingBetweenEnemies,
                                                   spawnList: enemiesToSpawn,
-                                                  maxExtends: spawnAreaExtends);
+                                                  maxExtends: maxSpawnAreaExtends);
 
 
             yield return generator.Generate();
@@ -295,13 +295,15 @@ namespace MeteorGame
 
         private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<SpawnPos> candidates, Transform parent)
         {
-            print("SpawnCandidatesAroundPoint");
             var uniques = candidates.Where(c => c.rarity == EnemyRarity.Unique).ToList();
             var rares = candidates.Where(c => c.rarity == EnemyRarity.Rare).ToList();
             var magics = candidates.Where(c => c.rarity == EnemyRarity.Magic).ToList();
             var normals = candidates.Where(c => c.rarity == EnemyRarity.Normal).ToList();
+            print("SpawnCandidatesAroundPoint");
 
             Vector3 startPos;
+
+            List<Enemy> enemiesInPack = new List<Enemy>();
 
 
             foreach (var c in uniques)
@@ -314,7 +316,7 @@ namespace MeteorGame
                 startPos = point + c.center;
 
                 Enemy e = SpawnEnemy(uniqueEnemyPrefab, parent, EnemyRarity.Unique, startPos);
-                print("spawning enemy");
+                enemiesInPack.Add(e);
                 yield return new WaitForSeconds(0.02f);
             }
 
@@ -328,7 +330,7 @@ namespace MeteorGame
                 startPos = point + c.center;
 
                 Enemy e = SpawnEnemy(rareEnemyPrefab, parent, EnemyRarity.Rare, startPos);
-                print("spawning enemy");
+                enemiesInPack.Add(e);
                 yield return new WaitForSeconds(0.02f);
             }
 
@@ -342,7 +344,7 @@ namespace MeteorGame
                 startPos = point + c.center;
 
                 Enemy e = SpawnEnemy(magicEnemyPrefab, parent, EnemyRarity.Magic, startPos);
-                print("spawning enemy");
+                enemiesInPack.Add(e);
                 yield return new WaitForSeconds(0.02f);
             }
 
@@ -356,7 +358,13 @@ namespace MeteorGame
                 startPos = point + c.center;
 
                 Enemy e = SpawnEnemy(normalEnemyPrefab, parent, EnemyRarity.Normal, startPos);
+                enemiesInPack.Add(e);
                 yield return new WaitForSeconds(0.02f);
+            }
+
+            foreach (Enemy e in enemiesInPack)
+            {
+                e.StartMoving(dir: (Vector3.zero - point).normalized);
             }
         
             yield return null;
@@ -392,6 +400,13 @@ namespace MeteorGame
             float magicOccurence = 550f / 10000f;
             float rareOccurence = 50f / 10000f;
             float uniqueOccurence = 5f / 10000f;
+
+
+            //normalOccurence = 0;
+            //magicOccurence = 0;
+            //rareOccurence = 0;
+            //uniqueOccurence = 1;
+
 
             entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, normalOccurence));
             entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, magicOccurence));

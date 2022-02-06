@@ -86,8 +86,14 @@ namespace MeteorGame
         }
 
 
+        /// <summary>
+        /// Gets called when enemy dies and drops gold prefab.
+        /// </summary>
+        /// <param name="dropFrom"></param>
         private void DropGold(Enemy dropFrom)
         {
+            return;
+
             var howMany = dropManager.PickRandomNumber(dropFrom);
 
             for (int i = 0; i < howMany; i++)
@@ -130,55 +136,54 @@ namespace MeteorGame
         }
 
 
-        internal List<Enemy> EnemiesInRange(Enemy e, float range, bool fromShell = false)
-        {
-            return EnemiesInRange(e.transform.position, range, fromShell);
-        }
+        //internal List<Enemy> EnemiesInRange(Enemy e, float range, bool fromShell = false)
+        //{
+        //    return EnemiesInRange(e.transform.position, range, fromShell);
+        //}
 
 
+        //internal List<Enemy> EnemiesInRange(Vector3 pos, float range, bool fromShell = false)
+        //{
+        //    var toreturn = new List<Enemy>();
 
-        internal List<Enemy> EnemiesInRange(Vector3 pos, float range, bool fromShell = false)
-        {
-            var toreturn = new List<Enemy>();
+        //    for (int i = 0; i < aliveEnemies.Count; i++)
+        //    {
+        //        Enemy e = aliveEnemies[i];
 
-            for (int i = 0; i < aliveEnemies.Count; i++)
-            {
-                Enemy e = aliveEnemies[i];
+        //        var vec = (e.transform.position - pos);
+        //        float dist = vec.sqrMagnitude;
 
-                var vec = (e.transform.position - pos);
-                float dist = vec.sqrMagnitude;
+        //        if (fromShell)
+        //        {
+        //            if (e.rarity == EnemyRarity.Normal)
+        //            {
+        //                dist -= normalSpawnInfo.r * normalSpawnInfo.r;
+        //            }
 
-                if (fromShell)
-                {
-                    if (e.rarity == EnemyRarity.Normal)
-                    {
-                        dist -= normalSpawnInfo.r * normalSpawnInfo.r;
-                    }
+        //            if (e.rarity == EnemyRarity.Magic)
+        //            {
+        //                dist -= magicSpawnInfo.r * magicSpawnInfo.r;
+        //            }
 
-                    if (e.rarity == EnemyRarity.Magic)
-                    {
-                        dist -= magicSpawnInfo.r * magicSpawnInfo.r;
-                    }
+        //            if (e.rarity == EnemyRarity.Unique)
+        //            {
+        //                dist -= uniqueSpawnInfo.r * uniqueSpawnInfo.r;
+        //            }
 
-                    if (e.rarity == EnemyRarity.Unique)
-                    {
-                        dist -= uniqueSpawnInfo.r * uniqueSpawnInfo.r;
-                    }
+        //            if (e.rarity == EnemyRarity.Rare)
+        //            {
+        //                dist -= rareSpawnInfo.extends.sqrMagnitude;
+        //            }
+        //        }
 
-                    if (e.rarity == EnemyRarity.Rare)
-                    {
-                        dist -= rareSpawnInfo.extends.sqrMagnitude;
-                    }
-                }
+        //        if (dist <= range * range)
+        //        {
+        //            toreturn.Add(e);
+        //        }
+        //    }
 
-                if (dist <= range * range)
-                {
-                    toreturn.Add(e);
-                }
-            }
-
-            return toreturn;
-        }
+        //    return toreturn;
+        //}
 
         internal void DestroyAllEnemies()
         {
@@ -196,24 +201,24 @@ namespace MeteorGame
             }
         }
 
-        internal Enemy PickEnemyToChainTo(Enemy from, Enemy except = null)
-        {
-            List<Enemy> potential = EnemiesInRange(from, GameManager.Instance.chainRange, true);
+        //internal Enemy PickEnemyToChainTo(Enemy from, Enemy except = null)
+        //{
+        //    List<Enemy> potential = EnemiesInRange(from, GameManager.Instance.chainRange, true);
 
-            if (potential.Count == 0)
-            {
-                return null;
-            }
+        //    if (potential.Count == 0)
+        //    {
+        //        return null;
+        //    }
 
-            var refined = potential.Where(p => p != except && p != from);
+        //    var refined = potential.Where(p => p != except && p != from);
 
-            if (refined.Count() == 0)
-            {
-                return null;
-            }
+        //    if (refined.Count() == 0)
+        //    {
+        //        return null;
+        //    }
 
-            return refined.ElementAt(UnityEngine.Random.Range(0, refined.Count()));
-        }
+        //    return refined.ElementAt(UnityEngine.Random.Range(0, refined.Count()));
+        //}
 
 
 
@@ -221,15 +226,20 @@ namespace MeteorGame
         private SpawnInfo uniqueSpawnInfo, rareSpawnInfo, magicSpawnInfo, normalSpawnInfo;
 
 
+        public float uniqueSpawnRadi;
+        public Vector3 rareSpawnExtends;
+        public float magicSpawnRadi;
+        public float normalSpawnRadi;
+
 
         internal SpawnInfo GetSpawnInfo(EnemyRarity e)
         {
             if (uniqueSpawnInfo == null)
             {
-                uniqueSpawnInfo = new SpawnInfo(13.2f);
-                rareSpawnInfo = new SpawnInfo(new Vector3(21f, 9f, 21f)/2f);
-                magicSpawnInfo = new SpawnInfo(5.2f);
-                normalSpawnInfo = new SpawnInfo(2.6f);
+                uniqueSpawnInfo = new SpawnInfo(uniqueSpawnRadi);
+                rareSpawnInfo = new SpawnInfo(rareSpawnExtends / 2f);
+                magicSpawnInfo = new SpawnInfo(magicSpawnRadi / 2f);
+                normalSpawnInfo = new SpawnInfo(normalSpawnRadi / 2f);
             }
 
             if (e == EnemyRarity.Unique)

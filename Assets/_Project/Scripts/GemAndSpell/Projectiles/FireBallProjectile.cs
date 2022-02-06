@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace MeteorGame
@@ -36,7 +37,6 @@ namespace MeteorGame
             HideBody();
             DisableCollider();
 
-            var totalRadi = CastBy.ExpRadi;
 
             var sizeVariation = Random.Range(0.9f, 1.1f);
 
@@ -44,18 +44,19 @@ namespace MeteorGame
             
             // Particle uses vertex streams to communicate with the shader
             // to fade out over time
-            var main = explosionPS.main;
-            main.startSize = totalRadi * 2 * sizeVariation;
+            ParticleSystem.MainModule main = explosionPS.main;
+            main.startSize = CastBy.ExpRadi * 2 * sizeVariation;
 
             explosionPS.Play();
 
-            foreach (Enemy e in EnemyManager.Instance.EnemiesInRange(transform.position, totalRadi, fromShell: true))
-            {
-                if (e == collidingWith)
-                {
-                    continue;
-                }
+            var expRadiSqr = CastBy.ExpRadi * CastBy.ExpRadi;
 
+            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            && e != collidingWith.gameObject
+            && (e.transform.position - transform.position).sqrMagnitude < expRadiSqr).ToList();
+
+            foreach (Enemy e in potentials)
+            {
                 e.TakeHit(CastBy, applyAilment: false);
             }
         }

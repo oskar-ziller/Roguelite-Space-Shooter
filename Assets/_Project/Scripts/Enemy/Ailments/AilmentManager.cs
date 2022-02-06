@@ -85,7 +85,6 @@ namespace MeteorGame
 
             if (a.type == Ailments.Ignite)
             {
-                print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
                 IgniteStacks.Add(a);
                 StartCoroutine(RemoveAilmentWhenExpired(a));
                 return;
@@ -95,7 +94,6 @@ namespace MeteorGame
             {
                 if (Chill == null || a.magnitude > Chill.magnitude)
                 {
-                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
                     Chill = a;
                     StartCoroutine(RemoveAilmentWhenExpired(a));
                     return;
@@ -106,7 +104,6 @@ namespace MeteorGame
             {
                 if (Freeze == null || a.duration > Freeze.duration)
                 {
-                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
                     Freeze = a;
                     StartCoroutine(RemoveAilmentWhenExpired(a));
                     return;
@@ -117,7 +114,7 @@ namespace MeteorGame
             {
                 if (Shock == null || a.magnitude > Shock.magnitude)
                 {
-                    print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
+                    //print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
                     Shock = a;
                     StartCoroutine(RemoveAilmentWhenExpired(a));
                     return;

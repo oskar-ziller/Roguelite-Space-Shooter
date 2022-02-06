@@ -60,6 +60,7 @@ namespace MeteorGame
 
             foreach (EnemyRarity e in uniques)
             {
+                UnityEngine.Debug.Log("finding spot for unique");
                 SpawnPos pos = null;
 
                 while (pos == null)
@@ -69,6 +70,7 @@ namespace MeteorGame
                     if (pos == null)
                     {
                         regionExtends++;
+                        UnityEngine.Debug.Log("failed - region++: " + regionExtends);
                         yield return new WaitForSeconds(0.02f);
 
                         if (regionExtends > maxRegionSize)
@@ -77,6 +79,8 @@ namespace MeteorGame
                         }
                     }
                 }
+
+                UnityEngine.Debug.Log($"Found spot. center: {pos.center} rarity: {pos.rarity} pos.spawnInfo.r: {pos.spawnInfo.r}");
 
                 spawnPositions.Add(pos);
                 yield return null;
@@ -159,6 +163,8 @@ namespace MeteorGame
         {
             if (toSpawn.extends.magnitude > regionExtends || toSpawn.r > regionExtends)
             {
+                UnityEngine.Debug.Log($"magnitude {toSpawn.extends.magnitude} regionExtends {regionExtends} " +
+                    $"toSpawn.r {toSpawn.r}");
                 return null;
             }
 
@@ -278,7 +284,7 @@ namespace MeteorGame
                         bool check = DoesCubeIntersectSphere(existing.center - existing.spawnInfo.extends,
                             existing.center + existing.spawnInfo.extends,
                             randomPos,
-                            toCheck.r);
+                            toCheck.r + spacing);
 
                         if (check)
                         {
@@ -295,7 +301,7 @@ namespace MeteorGame
                         bool check = DoesCubeIntersectSphere(randomPos - toCheck.extends,
                             randomPos + toCheck.extends,
                             existing.center,
-                            existing.spawnInfo.r);
+                            existing.spawnInfo.r + spacing);
 
                         if (check)
                         {
@@ -309,7 +315,9 @@ namespace MeteorGame
                 {
                     if (toCheck.shape == ColliderShape.Sphere)
                     {
-                        bool check = (randomPos - existing.center).sqrMagnitude < (existing.spawnInfo.r * existing.spawnInfo.r) * 2;
+                        float existingR = existing.spawnInfo.r;
+                        float withSpacing = existingR + spacing;
+                        bool check = (randomPos - existing.center).sqrMagnitude < withSpacing * withSpacing;
 
                         if (check)
                         {

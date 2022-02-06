@@ -16,6 +16,18 @@ namespace MeteorGame
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
+        [Tooltip("Collider trigger for actual proj collisions")]
+        [SerializeField] private MainTrigger  mainCollider;
+
+        //[Tooltip("Trigger collider for explosion")]
+        //[SerializeField] protected LargeTrigger explTrigger;
+
+        //[Tooltip("Trigger collider for aim assist.")]
+        //[SerializeField] protected LargeTrigger aimAssistTrigger;
+
+        //[Tooltip("Trigger collider for chain.")]
+        //[SerializeField] protected LargeTrigger chainTrigger;
+
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
         public Rigidbody Rigidbody { get { return rigidbody; } }
@@ -45,18 +57,28 @@ namespace MeteorGame
         private List<Enemy> ChainedFrom;
         private List<Enemy> ForkedFrom;
 
+
+
+        //protected HashSet<GameObject> InExplosionRange => inExplosionRange;
+        //protected HashSet<GameObject> InChainRange => inChainRange;
+        //protected HashSet<GameObject> InAimAssistRange => inAimAssistRange;
+
         private List<TrailRenderer> trailRenderers;
         private float maxTrailDur = 0f;
 
         private SpinAround spinner;
 
         private Rigidbody rigidbody;
-        private SphereCollider projectileCollider;
+
+        //private HashSet<GameObject> inExplosionRange = new HashSet<GameObject>();
+        //private HashSet<GameObject> inChainRange = new HashSet<GameObject>();
+        //private HashSet<GameObject> inAimAssistRange = new HashSet<GameObject>();
+
+        private bool aimAssisted = false;
+
 
         public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID)
         {
-            var spell = castBySlot.Spell;
-
             StartingSpeed = castBySlot.ProjectileSpeed;
             TotalProjectiles = castBySlot.ProjectileCount;
             CastBy = castBySlot;
@@ -70,11 +92,48 @@ namespace MeteorGame
 
             // look at where we are moving towards (is assumed in Movers this is the case)
             transform.LookAt(aimingAt);
-
-            
+            //SetTriggers();
 
             isSetup = true;
         }
+
+
+        //private void SetTriggers()
+        //{
+        //    float expRadi = CastBy.ExpRadi;
+
+        //    if (expRadi > 0)
+        //    {
+        //        explTrigger.gameObject.SetActive(true);
+        //        explTrigger.transform.localScale = Vector3.one * expRadi * 2;
+        //    }
+        //    else
+        //    {
+        //        explTrigger.gameObject.SetActive(false);
+        //    }
+
+        //    if (CastBy.ChainAdditionalTimes > 0 || CastBy.ForkAdditionalTimes > 0)
+        //    {
+        //        chainTrigger.gameObject.SetActive(true);
+        //        chainTrigger.transform.localScale = Vector3.one * GameManager.Instance.ChainAndForkRange * 2;
+        //    }
+        //    else
+        //    {
+        //        chainTrigger.gameObject.SetActive(false);
+        //    }
+
+        //    if (aimAssist)
+        //    {
+        //        aimAssistTrigger.gameObject.SetActive(true);
+        //        aimAssistTrigger.transform.localScale = Vector3.one * GameManager.Instance.AimAssistRange * 2;
+        //    }
+        //    else
+        //    {
+        //        aimAssistTrigger.gameObject.SetActive(false);
+        //    }
+
+        //}
+
 
         public void SetProjectileID(int id)
         {
@@ -157,15 +216,54 @@ namespace MeteorGame
             spinner = GetComponent<SpinAround>();
 
             rigidbody = GetComponent<Rigidbody>();
-            projectileCollider = GetComponent<SphereCollider>();
-        }
+            //projectileCollider = GetComponent<SphereCollider>();
 
 
-        internal virtual void OnTriggerExit(Collider other)
-        {
-            ForkingFrom = null;
-            PiercingFrom = null;
+
+            mainCollider.TriggerEnter += OnMainTriggerEnter;
+
+            //explTrigger.TriggerEnter += OnExpTriggerEnter;
+            //explTrigger.TriggerExit += OnExpTriggerExit;
+
+            //chainTrigger.TriggerEnter += OnChainTriggerEnter;
+            //chainTrigger.TriggerExit += OnChainTriggerExit;
+
+            //aimAssistTrigger.TriggerEnter += OnAimAssistTriggerEnter;
+            //aimAssistTrigger.TriggerExit += OnAimAssistTriggerExit;
         }
+
+        //private void OnAimAssistTriggerExit(Collider obj)
+        //{
+        //    InAimAssistRange.Remove(obj.gameObject);
+        //}
+
+        //private void OnAimAssistTriggerEnter(Collider obj)
+        //{
+        //    InAimAssistRange.Add(obj.gameObject);
+        //}
+
+        //private void OnChainTriggerExit(Collider obj)
+        //{
+        //    InChainRange.Remove(obj.gameObject);
+        //}
+
+        //private void OnChainTriggerEnter(Collider obj)
+        //{
+        //    InChainRange.Add(obj.gameObject);
+        //}
+
+
+        //public virtual void OnExpTriggerEnter(Collider obj)
+        //{
+        //    InExplosionRange.Add(obj.gameObject);
+        //}
+
+
+        //public virtual void OnExpTriggerExit(Collider obj)
+        //{
+        //    InExplosionRange.Remove(obj.gameObject);
+        //}
+
 
 
         internal virtual void Expire()
@@ -180,24 +278,17 @@ namespace MeteorGame
         }
 
 
-        private bool ShouldAimAssist()
-        {
-            return aimAssist && AimingAtEnemy == null && !collided && ForkedFrom.Count == 0;
-        }
+
 
         private void DoAimAssist()
         {
-            var closest = EnemyManager.Instance.EnemiesInRange(transform.position, 8, true).FirstOrDefault();
+            //var dir = InAimAssistRange.First().transform.position - transform.position;
 
-            if (closest != null)
-            {
-                var dir = closest.transform.position - transform.position;
+            //Rigidbody.DOKill();
+            //Rigidbody.isKinematic = false;
 
-                Rigidbody.DOKill();
-                Rigidbody.isKinematic = false;
-
-                Rigidbody.velocity = dir.normalized * StartingSpeed;
-            }
+            //Rigidbody.velocity = dir.normalized * StartingSpeed;
+            //aimAssisted = true;
         }
 
         public virtual void FixedUpdate()
@@ -212,26 +303,30 @@ namespace MeteorGame
                 Expire();
             }
 
-            if (ShouldAimAssist())
+            //bool shouldAimAssist = !aimAssisted && aimAssist && AimingAtEnemy == null
+            //    && !collided && ForkedFrom.Count == 0 && ChainedFrom.Count == 0
+            //    && InAimAssistRange.Count > 0;
+
+            if (false)
             {
-                StartCoroutine(AimAssistLoop());
+                DoAimAssist();
             }
         }
 
-        private IEnumerator AimAssistLoop()
-        {
-            DoAimAssist();
-            yield return new WaitForSeconds(0.2f);
-        }
 
-        public virtual void OnTriggerEnter(Collider colliderObj)
+
+
+
+
+        public virtual void OnMainTriggerEnter(Collider collider)
         {
+
             if (isDummy)
             {
                 return;
             }
 
-            Enemy collidedEnemy = colliderObj.gameObject.GetComponent<Enemy>();
+            Enemy collidedEnemy = collider.gameObject.GetComponent<Enemy>();
 
             if (collidedEnemy != null)
             {
@@ -252,6 +347,8 @@ namespace MeteorGame
                 HandleEnemyCollision();
             }
         }
+
+
 
         public bool ShouldPierce()
         {
@@ -285,9 +382,7 @@ namespace MeteorGame
 
         public bool ShouldChain()
         {
-            int shouldChainCount = (int)CastBy.GetTotal("ChainAdditionalTimes");
-
-            if (ChainedFrom.Count >= shouldChainCount)
+            if (ChainedFrom.Count >= CastBy.ChainAdditionalTimes)
             {
                 return false;
             }
@@ -297,31 +392,28 @@ namespace MeteorGame
 
         public void DoChain()
         {
-            ChainedFrom.Add(collidingWith);
+            var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            Enemy enemyToChainTo = EnemyManager.Instance.PickEnemyToChainTo(collidingWith);
+            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            && e != collidingWith.gameObject
+            && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
+            
+            Enemy e = potentials.Count() > 0 ?
+                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
-            if (enemyToChainTo == null)
+            if (e != null)
             {
-                print("enemyToChainTo == null");
-                // If a projectile has no valid chain targets,
-                // it will target a nearby enemy but pass through without hitting them.
+                SetVelocityTowards(e.transform.position, StartingSpeed);
+                ChainedFrom.Add(collidingWith);
                 return;
             }
 
-            SetVelocityTowards(enemyToChainTo.transform.position, StartingSpeed);
+            print("enemyToChainTo == null");
         }
 
         public bool ShouldFork()
         {
-            int count = (int)CastBy.GetTotal("ForkAdditionalTimes");
-
-            if (count == 0)
-            {
-                return false;
-            }
-
-            if (ForkedFrom.Count >= count)
+            if (ForkedFrom.Count >= CastBy.ForkAdditionalTimes)
             {
                 return false;
             }
@@ -335,30 +427,44 @@ namespace MeteorGame
              * that continue travelling at 60 and -60 degree angles
              * from the projectile's original trajectory. */
 
-            ForkedFrom.Add(collidingWith);
-            ForkingFrom = collidingWith;
+            var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            Enemy enemyToChainTo = EnemyManager.Instance.PickEnemyToChainTo(collidingWith);
-            Enemy enemyToChainTo2 = EnemyManager.Instance.PickEnemyToChainTo(collidingWith, enemyToChainTo);
+            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            && e != collidingWith.gameObject
+            && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
 
-            if (enemyToChainTo == null)
+            Enemy e = potentials.Count() > 0 ?
+                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+
+
+            if (e == null)
             {
                 return false;
             }
 
-            if (enemyToChainTo2 == null)
+            ForkedFrom.Add(collidingWith);
+            ForkingFrom = collidingWith;
+
+
+            potentials = potentials.Where(p => p != e);
+
+            Enemy e2 = potentials.Count() > 0 ?
+                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+
+            if (e2 == null)
             {
-                enemyToChainTo2 = enemyToChainTo;
+                e2 = e;
             }
 
+            
             ProjectileBase clone = Instantiate(this, transform.position, Quaternion.identity);
             ProjectileBase clone2 = Instantiate(this, transform.position, Quaternion.identity);
 
             clone.CopyFrom(this);
             clone2.CopyFrom(this);
 
-            clone.SetVelocityTowards(enemyToChainTo.transform.position, StartingSpeed);
-            clone2.SetVelocityTowards(enemyToChainTo2.transform.position, StartingSpeed);
+            clone.SetVelocityTowards(e.transform.position, StartingSpeed);
+            clone2.SetVelocityTowards(e2.transform.position, StartingSpeed);
 
             return true;
         }
@@ -385,12 +491,14 @@ namespace MeteorGame
 
         protected void DisableCollider()
         {
-            projectileCollider.enabled = false;
+            mainCollider.gameObject.SetActive(false);
+            //explTrigger.gameObject.SetActive(false);
         }
 
         protected void EnableCollider()
         {
-            projectileCollider.enabled = true;
+            mainCollider.gameObject.SetActive(true);
+            //explTrigger.gameObject.SetActive(true);
         }
 
         protected void HideBody()
