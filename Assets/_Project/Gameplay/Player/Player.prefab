@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8518727544688227437}
-  - component: {fileID: 1962777641027882716}
   m_Layer: 0
   m_Name: SpawnPoint1
   m_TagString: Untagged
@@ -33,19 +32,6 @@ Transform:
   m_Father: {fileID: 7229953027799949434}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1962777641027882716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 195864329251881895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1faeb06f7681abb4d900d303d6c7ff78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  belongsToSlot: 1
 --- !u!1 &1633243104632983314
 GameObject:
   m_ObjectHideFlags: 0
@@ -413,6 +399,8 @@ MonoBehaviour:
     damageOverTime: 0
     projSpeed: 0
     projCount: 0
+    chainAdditionalTimes: 0
+    forkAdditionalTimes: 0
   spellSlot2:
     isUnlocked: 0
     slotNo: 2
@@ -428,6 +416,8 @@ MonoBehaviour:
     damageOverTime: 0
     projSpeed: 0
     projCount: 0
+    chainAdditionalTimes: 0
+    forkAdditionalTimes: 0
 --- !u!114 &1767474877601490453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -442,15 +432,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   airAccel: 900
   airDecel: 900
+  airDecelFreefall: 10
   boostMultipMaxVel: 4
   boostMultipAccel: 4
+  boostMultipDec: 2
   airMaxSpeed: 50
-  coyoteTime: 0.1
-  jumpBuffer: 0.1
-  minGravity: -1
-  maxGravity: -2
-  jumpForce: 30
-  fallLimitMin: -30
 --- !u!114 &8454831337768183200
 MonoBehaviour:
   m_ObjectHideFlags: 0

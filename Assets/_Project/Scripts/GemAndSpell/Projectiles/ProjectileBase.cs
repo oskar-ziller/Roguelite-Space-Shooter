@@ -67,7 +67,12 @@ namespace MeteorGame
         //private HashSet<GameObject> inAimAssistRange = new HashSet<GameObject>();
 
         private bool aimAssisted = false;
+        private bool expiring;
 
+        public void SetCastBy(SpellSlot spellSlot)
+        {
+            CastBy = spellSlot;
+        }
 
         public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID)
         {
@@ -90,42 +95,7 @@ namespace MeteorGame
         }
 
 
-        //private void SetTriggers()
-        //{
-        //    float expRadi = CastBy.ExpRadi;
-
-        //    if (expRadi > 0)
-        //    {
-        //        explTrigger.gameObject.SetActive(true);
-        //        explTrigger.transform.localScale = Vector3.one * expRadi * 2;
-        //    }
-        //    else
-        //    {
-        //        explTrigger.gameObject.SetActive(false);
-        //    }
-
-        //    if (CastBy.ChainAdditionalTimes > 0 || CastBy.ForkAdditionalTimes > 0)
-        //    {
-        //        chainTrigger.gameObject.SetActive(true);
-        //        chainTrigger.transform.localScale = Vector3.one * GameManager.Instance.ChainAndForkRange * 2;
-        //    }
-        //    else
-        //    {
-        //        chainTrigger.gameObject.SetActive(false);
-        //    }
-
-        //    if (aimAssist)
-        //    {
-        //        aimAssistTrigger.gameObject.SetActive(true);
-        //        aimAssistTrigger.transform.localScale = Vector3.one * GameManager.Instance.AimAssistRange * 2;
-        //    }
-        //    else
-        //    {
-        //        aimAssistTrigger.gameObject.SetActive(false);
-        //    }
-
-        //}
-
+       
 
         public void SetProjectileID(int id)
         {
@@ -146,17 +116,18 @@ namespace MeteorGame
         {
             StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
-
-            if (isSetup)
-            {
-                DoScaleUp();
-            }
         }
 
 
-        private void DoScaleUp()
+
+        private void ResetScale()
         {
-            transform.DOScale(1, 2f);
+            transform.localScale = Vector3.one;
+        }
+
+        private void ScaleToDummyScale()
+        {
+            transform.localScale = Vector3.one / CastBy.ProjectileCount;
         }
 
         /// <summary>
@@ -256,13 +227,14 @@ namespace MeteorGame
 
         internal virtual void Expire()
         {
+            expiring = true;
             Rigidbody.DOKill();
             DestroySelfSoft();
         }
 
         private bool ShouldExpire()
         {
-            return Time.time > expireTime && isSetup;
+            return !expiring && Time.time > expireTime && isSetup;
         }
 
 
@@ -493,6 +465,7 @@ namespace MeteorGame
 
         protected void HideBody()
         {
+            print("hiding body");
             bodyGroup.SetActive(false);
         }
 
@@ -536,6 +509,9 @@ namespace MeteorGame
         {
             DisableCollider();
             DisableTrails();
+            ScaleToDummyScale();
+
+
 
             Rigidbody.isKinematic = true;
             isDummy = true;
@@ -545,6 +521,7 @@ namespace MeteorGame
         {
             EnableCollider();
             EnableTrails();
+            ResetScale();
 
             Rigidbody.isKinematic = false;
             isDummy = false;

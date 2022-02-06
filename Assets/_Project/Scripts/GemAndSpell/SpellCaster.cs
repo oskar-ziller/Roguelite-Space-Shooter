@@ -97,8 +97,7 @@ namespace MeteorGame
             for (int i = 0; i < spellSlot.ProjectileCount; i++)
             {
                 var dummy = SpawnProjectile(spellSlot);
-                dummy.MakeDummy();
-
+                
                 if (spellSlot.slotNo == 1)
                 {
                     dummy.transform.SetParent(playerProjectileHolder1);
@@ -109,16 +108,19 @@ namespace MeteorGame
                     dummy.transform.SetParent(playerProjectileHolder2);
                 }
 
+                dummy.SetCastBy(spellSlot);
+                dummy.MakeDummy();
+
                 listToUse.Add(dummy);
                 dummy.SetProjectileID(i);
-                dummy.EnableSpinner();
+                //dummy.EnableSpinner();
             }
         }
 
         private ProjectileBase SpawnProjectile(SpellSlot castBy)
         {
             Vector3 spawnPos;
-
+            
             if (castBy.slotNo == 1)
             {
                 spawnPos = playerProjectileHolder1.position;
@@ -214,30 +216,30 @@ namespace MeteorGame
 
             SpawnDummies(spellSlot);
 
-            List<ProjectileBase> listToUse;
+            //List<ProjectileBase> listToUse;
 
-            if (spellSlot.slotNo == 1)
-            {
-                listToUse = dummyProjectiles;
-            }
-            else
-            {
-                listToUse = dummyProjectiles2;
-            }
+            //if (spellSlot.slotNo == 1)
+            //{
+            //    listToUse = dummyProjectiles;
+            //}
+            //else
+            //{
+            //    listToUse = dummyProjectiles2;
+            //}
 
-            var defaultScale = 0.15f;
-            var minScale = 0.01f;
-            var maxCount = 8f;
-            var currCount = listToUse.Count;
+            ////var defaultScale = 0.15f;
+            ////var minScale = 0.01f;
+            ////var maxCount = 8f;
+            ////var currCount = listToUse.Count;
 
-            foreach (var item in listToUse)
-            {
-                item.transform.localScale = Vector3.zero;
+            ////foreach (var item in listToUse)
+            ////{
+            ////    item.transform.localScale = Vector3.zero;
 
-                var scale = defaultScale - (currCount * ((defaultScale - minScale) / maxCount));
+            ////    var scale = defaultScale - (currCount * ((defaultScale - minScale) / maxCount));
 
-                item.transform.DOScale(scale, dur);
-            }
+            ////    item.transform.DOScale(scale, dur);
+            //}
         }
 
 
