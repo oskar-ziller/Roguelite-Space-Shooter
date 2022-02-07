@@ -95,7 +95,9 @@ MonoBehaviour:
   maxRange: 0.012
   speed: 0
   range: 0
-  rotateSpeed: 0
+  distFromCenter: 0.1
+  rotateSpeed: 45
+  startDeg: 0
 --- !u!1 &8715521394957105094
 GameObject:
   m_ObjectHideFlags: 0

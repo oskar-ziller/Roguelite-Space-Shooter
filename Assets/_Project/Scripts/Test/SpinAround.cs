@@ -14,9 +14,10 @@ namespace MeteorGame
         public float minSpeed, maxSpeed, minRange, maxRange;
         public float speed = 0, range = 0;
 
-        private float distFromCenter = 0.1f;
+        public float distFromCenter = 0.11f;
 
         public float rotateSpeed = 2f;
+        public float startDeg = 0f;
 
         private Vector3 offset = Vector3.zero;
 
@@ -34,10 +35,7 @@ namespace MeteorGame
             RandomizeRange();
         }
 
-        internal void SetDistFromCenter(float x)
-        {
-            distFromCenter = x;
-        }
+
 
         private void OnValidate()
         {
@@ -53,11 +51,10 @@ namespace MeteorGame
             }
 
             var degBetweenn = 360f / totalCount;
-            var startDeg = progression.x * rotateSpeed;
 
             var eulerAmount = startDeg + (degBetweenn * (projID - 1));
 
-            offset = Quaternion.Euler(0, 0, eulerAmount) * Vector3.up * distFromCenter;
+            offset = Quaternion.Euler(0, 0, eulerAmount) * Vector3.up * distFromCenter * transform.localScale.x;
         }
 
         private void RandomizeProgress()
@@ -108,6 +105,7 @@ namespace MeteorGame
             //RandomizeRange();
 
             progression += Time.deltaTime * velocity;
+            startDeg += Time.deltaTime * rotateSpeed;
         }
     }
 }

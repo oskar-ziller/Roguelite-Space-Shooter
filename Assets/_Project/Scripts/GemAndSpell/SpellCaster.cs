@@ -61,7 +61,7 @@ namespace MeteorGame
 
         private void OnGemAddedRemoved(SpellSlot slot, GemItem gem)
         {
-            OnSpellChanged(slot, null);
+            OnSpellChanged(slot, slot.Spell);
         }
 
 
@@ -78,17 +78,27 @@ namespace MeteorGame
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
         {
             ClearDummyDict(slot.slotNo);
-            SpawnDummies(slot);
+            
+
+            if (spell != null)
+            {
+                SpawnDummies(slot);
+                ScaleDummies(slot, 1f);
+            }
+
         }
 
         private static void SpawnDummies(SpellSlot slot)
         {
             List<ProjectileDummy> dummies = Instance.dummyDict[slot.slotNo];
 
+            // starts at this and rotates counter clockwise as a whole group
+            float randomStartDeg = Random.Range(0, 350);
+
             for (int i = 0; i < slot.ProjectileCount; i++)
             {
                 var dummy = SpawnDummy(slot);
-                dummy.SetSpinnerVals(i, slot.ProjectileCount);
+                dummy.SetSpinnerVals(i, slot.ProjectileCount, randomStartDeg);
                 dummies.Add(dummy);
             }
         }
@@ -109,7 +119,7 @@ namespace MeteorGame
 
             foreach (var item in dummies)
             {
-                item.transform.DOScale(calculatedScale, dur);
+                item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
                 //item.transform.DOScale(1f/ dummies.Count, dur);
             }
         }
@@ -138,8 +148,6 @@ namespace MeteorGame
             {
                 return;
             }
-
-
 
             var dur = (spell.MsBetweenCasts + spell.CastTimeMs) / 1000f;
 
@@ -213,7 +221,7 @@ namespace MeteorGame
                 var p = Instance.SpawnProjectile(slot);
                 p.transform.position = dummy.transform.position;
                 p.transform.localScale = dummy.transform.localScale;
-                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i);
+                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i, Instance.holderDict[slot.slotNo].position);
                 p.ScaleDur = (50f * 3f) / p.StartingSpeed;
                 projList.Add(p);
             }

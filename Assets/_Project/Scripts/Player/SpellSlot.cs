@@ -332,9 +332,10 @@ namespace MeteorGame
             //GameManager.Instance.TabMenuManager.RebuildInventoryUI();
         }
 
+
         private void ChangeSpell(SpellItem spellToEquip)
         {
-            if (Spell != null)
+            if (Spell != null) // Spell == null when empty
             {
                 Spell.UnEquip();
                 RemoveFromModifierDict(Spell.Gem);

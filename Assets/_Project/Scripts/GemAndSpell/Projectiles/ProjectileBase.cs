@@ -47,6 +47,11 @@ namespace MeteorGame
         public float CachedDummyScale { get; protected set; }
         public float ScaleDur { get; internal set; }
 
+        public Vector3 CastPos { get; protected set; }
+
+
+        public Transform MainMesh => mainMesh;
+
         protected Enemy collidingWith;
 
         private Enemy ForkingFrom;
@@ -62,6 +67,7 @@ namespace MeteorGame
         private List<Enemy> ChainedFrom;
         private List<Enemy> ForkedFrom;
 
+        private SphereCollider collider;
 
 
         //protected HashSet<GameObject> InExplosionRange => inExplosionRange;
@@ -89,7 +95,7 @@ namespace MeteorGame
             CastBy = spellSlot;
         }
 
-        public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID)
+        public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
         {
             StartingSpeed = castBySlot.ProjectileSpeed;
             TotalProjectiles = castBySlot.ProjectileCount;
@@ -98,6 +104,7 @@ namespace MeteorGame
             AimingAtEnemy = hitEnemy;
             CastID = castID;
             ProjectileID = projectileID;  // when single cast has multiple projectiles
+            CastPos = castPos;
 
             CalculateExpireTime();
 
@@ -189,6 +196,8 @@ namespace MeteorGame
 
             //spinner = GetComponent<SpinAround>();
             rigidbody = GetComponent<Rigidbody>();
+            collider = GetComponent<SphereCollider>();
+
 
 
             //projectileCollider = GetComponent<SphereCollider>();
@@ -493,6 +502,7 @@ namespace MeteorGame
         {
             mainMesh.gameObject.SetActive(false);
             DisableRigidBody();
+            collider.enabled = false;
 
             Destroy(gameObject, maxTrailDur);
         }

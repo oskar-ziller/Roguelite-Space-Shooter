@@ -32,12 +32,12 @@ namespace MeteorGame
         
         }
 
-        internal void SetSpinnerVals(int id, int projectileCount)
+        internal void SetSpinnerVals(int id, int projectileCount, float startDeg)
         {
             spinner.projID = id;
             spinner.totalCount = projectileCount;
-            spinner.SetDistFromCenter(bodyMesh.localScale.x * transform.localScale.x);
             spinner.ResetSelf();
+            spinner.startDeg = startDeg;
         }
 
         #endregion
