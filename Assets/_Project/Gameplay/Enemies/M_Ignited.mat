@@ -33,50 +33,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailAlbedoMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailMask:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailNormalMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmissionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _OcclusionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _ParallaxMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SpecGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -90,43 +46,13 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_2baf9c4347cf408b9f4de60273f37794: 0.4
-    - Vector1_2f9b04033f5e401288d15cf34e99a71f: 0.4
-    - Vector1_5d79f1c8b3b549668815568b626621ae: 2.4
-    - Vector1_92e995d9f55d48a39a9b165a59ae9117: 0.513
-    - Vector1_bc7f305cd7544b42baffce828db49bfa: 63.23
-    - Vector1_f86753b3081c4b50b92868546206940d: 0.043
-    - _AlphaClip: 0
-    - _Blend: 2
-    - _BumpScale: 1
-    - _ClearCoatMask: 0
-    - _ClearCoatSmoothness: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DetailAlbedoMapScale: 1
-    - _DetailNormalMapScale: 1
-    - _DstBlend: 1
-    - _EnvironmentReflections: 1
-    - _GlossMapScale: 0
-    - _Glossiness: 0
-    - _GlossyReflections: 0
-    - _Metallic: 0
-    - _OcclusionStrength: 1
-    - _Parallax: 0.005
-    - _QueueOffset: 0
-    - _ReceiveShadows: 1
-    - _Smoothness: 0.5
-    - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
-    - _SrcBlend: 5
-    - _Surface: 1
-    - _WorkflowMode: 1
-    - _ZWrite: 0
+    - Vector1_2baf9c4347cf408b9f4de60273f37794: 1.39
+    - Vector1_2f9b04033f5e401288d15cf34e99a71f: 0.001
+    - Vector1_5d79f1c8b3b549668815568b626621ae: 13.3
+    - Vector1_92e995d9f55d48a39a9b165a59ae9117: 1.2
+    - Vector1_bc7f305cd7544b42baffce828db49bfa: 85.23
+    - Vector1_f86753b3081c4b50b92868546206940d: 0.086
     m_Colors:
-    - Color_3ab97b5cd00a4714b67dc91342b21fc0: {r: 11.984314, g: 0.5647059, b: 0, a: 0}
-    - Color_9dbe0583660844fd83494c072f17b52d: {r: 1.4980392, g: 1.0901961, b: 0, a: 0}
-    - _BaseColor: {r: 1, g: 0.21463488, b: 0, a: 0.0627451}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - Color_3ab97b5cd00a4714b67dc91342b21fc0: {r: 0.5660378, g: 0.086276345, b: 0, a: 0.9647059}
+    - Color_9dbe0583660844fd83494c072f17b52d: {r: 0.4811321, g: 0.29150492, b: 0, a: 1}
   m_BuildTextureStacks: []

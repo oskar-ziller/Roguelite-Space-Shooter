@@ -17,6 +17,12 @@ namespace MeteorGame
         public void Move()
         {
 
+            if (_moveable.TotalProjectiles == 1)
+            {
+                OnTweenEnded();
+                return;
+            }
+
 
             List<Vector3> path = new List<Vector3>();
             var rigidBody = _moveable.Rigidbody;
@@ -29,7 +35,7 @@ namespace MeteorGame
 
             int curveCount = 1;
 
-            var len = Math.Min(dist / 2f, 11f);
+            var len = Math.Min(dist / 2f, 20f);
 
             var centerPos = _moveable.CastPos;
             var currDirectionFromCenter = (_moveable.MainMesh.position - centerPos).normalized;
@@ -41,7 +47,7 @@ namespace MeteorGame
 
 
             rigidBody.isKinematic = true;
-            rigidBody.transform.DOMove(pos, 0.25f).SetEase(Ease.Linear).onComplete += OnTweenEnded;
+            rigidBody.transform.DOMove(pos, _moveable.ScaleDur/2).SetEase(Ease.InSine).onComplete += OnTweenEnded;
         }
 
         private void OnTweenEnded()

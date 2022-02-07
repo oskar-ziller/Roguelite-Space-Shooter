@@ -16,6 +16,7 @@ namespace MeteorGame
         [SerializeField] private Inventory inventory;
 
         public Inventory Inv => inventory;
+
         public float TweeningCurrency => currencyTweening;
 
         private float currencyTweening = 0; // used to tween and display currency

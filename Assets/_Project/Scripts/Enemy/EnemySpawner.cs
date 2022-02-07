@@ -182,8 +182,10 @@ namespace MeteorGame
                 randShape = PackShape.Cube;
             }
 
+            var randomSpacingRange = Random.Range(-spacingBetweenEnemies / 2, spacingBetweenEnemies / 2);
+
             var generator = new PositionGenerator(shape: randShape,
-                                                  spacing: spacingBetweenEnemies,
+                                                  spacing: spacingBetweenEnemies + randomSpacingRange,
                                                   spawnList: enemiesToSpawn,
                                                   maxExtends: maxSpawnAreaExtends);
 
@@ -396,10 +398,10 @@ namespace MeteorGame
 
         public WeightedRandomEnemy()
         {
-            float normalOccurence = 9400f / 10000f;
-            float magicOccurence = 550f / 10000f;
-            float rareOccurence = 50f / 10000f;
-            float uniqueOccurence = 5f / 10000f;
+            float normalOccurence = 9000f / 10000f;
+            float magicOccurence = 840f / 10000f;
+            float rareOccurence = 160f / 10000f;
+            float uniqueOccurence = 10f / 10000f;
 
 
             //normalOccurence = 0;
@@ -409,9 +411,9 @@ namespace MeteorGame
 
 
             entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, normalOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 10, magicOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 30, rareOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 150, uniqueOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 2, magicOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 3, rareOccurence));
+            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 4, uniqueOccurence));
         }
 
         public List<EnemyRarity> CreateSpawnList()

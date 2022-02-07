@@ -47,12 +47,14 @@ namespace MeteorGame
         public SpellSlot CastBy { get; protected set; }
 
         public float CachedDummyScale { get; protected set; }
-        public float ScaleDur { get; internal set; }
+
 
         public Vector3 CastPos { get; protected set; }
 
 
         public Transform MainMesh => mainMesh;
+
+        public float ScaleDur { get; internal set; }
 
         protected Enemy collidingWith;
 
@@ -140,7 +142,7 @@ namespace MeteorGame
         {
             StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
-            ScaleProjectileWhileMove(ScaleDur);
+            ScaleProjectileWhileMove();
         }
 
 
@@ -494,10 +496,10 @@ namespace MeteorGame
             rigidbody.isKinematic = true;
         }
 
-        private  void ScaleProjectileWhileMove(float dur)
+        private  void ScaleProjectileWhileMove()
         {
-            bodyMesh.DOScale(MeshScaleMain, dur);
-            transform.DOScale(1f, dur);
+            bodyMesh.DOScale(MeshScaleMain, 3f);
+            transform.DOScale(1f, 3f);
         }
 
         protected void DestroySelfSoft()

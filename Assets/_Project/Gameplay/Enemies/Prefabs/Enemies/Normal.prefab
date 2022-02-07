@@ -59,7 +59,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2293438756574210558}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -230,13 +230,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 916271683822012149}
     m_Modifications:
     - target: {fileID: 1657025055567895126, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1657025055567895126, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1657025055567895126, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1657025055567895126, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1756900520676364042, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 4300000, guid: b5ca089e9137f2841a6fa7b5e952c153, type: 2}
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 1808877071841821381, guid: 71ddc34e9d9bd6e4bb54675b856ab415, type: 3}
       propertyPath: m_Name
       value: Ailments

@@ -185,7 +185,7 @@ namespace MeteorGame
                         , Random.Range(-extend, extend));
                 }
 
-                if (IsInRegion(randomPos, toSpawn) && !OverlapsWithExisting(randomPos, toSpawn))
+                if (!OverlapsWithExisting(randomPos, toSpawn))
                 {
                     return new SpawnPos(randomPos, toSpawn, rarity);
                 }
@@ -316,7 +316,7 @@ namespace MeteorGame
                     if (toCheck.shape == ColliderShape.Sphere)
                     {
                         float existingR = existing.spawnInfo.r;
-                        float withSpacing = existingR + spacing;
+                        float withSpacing = existingR + toCheck.r + spacing;
                         bool check = (randomPos - existing.center).sqrMagnitude < withSpacing * withSpacing;
 
                         if (check)

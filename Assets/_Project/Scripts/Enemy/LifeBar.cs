@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,11 @@ namespace MeteorGame
         private MeshRenderer mesh;
         private Material mat;
 
+        public float tweenDur = 0.1f;
+        public float tweenVariation = 0.05f;
+
+
+        private float percentageTweening = 1f; // used for tween
 
         #endregion
 
@@ -43,16 +49,47 @@ namespace MeteorGame
 
         #region Methods
 
-        private void SetBarPercent()
+
+
+        private Tween barPercentTween;
+
+        internal void StartBarPercentTween()
         {
-            var percentage = (float)owner.currentHealth / owner.totalHealth;
-            mat.SetFloat("_percentage", percentage);
+            if (barPercentTween != null && barPercentTween.active)
+            {
+                barPercentTween.Complete();
+                barPercentTween.Kill();
+                //percentageTweening = 1f;
+                mat.SetFloat("_percentage", percentageTweening);
+            }
+
+            var current = mat.GetFloat("_percentage");
+            var target = (float)owner.currentHealth / owner.totalHealth;
+
+
+            var dur = tweenDur + Random.Range(-tweenVariation, tweenVariation);
+
+            barPercentTween = DOTween.To(() => percentageTweening, x => percentageTweening = x, target, dur).SetUpdate(true);
+            //barPercentTween.onStepComplete += StepComplete;
+            barPercentTween.onUpdate += StepComplete;
         }
+
+
+        private void StepComplete()
+        {
+            print("step");
+            mat.SetFloat("_percentage", percentageTweening);
+        }
+
+
+ 
 
         private void UpdateHealthBar(Enemy _)
         {
             //gameObject.SetActive(true);
-            SetBarPercent();
+            var current = mat.GetFloat("_percentage");
+            percentageTweening = current;
+            StartBarPercentTween();
 
             //if (hideLifeBar_Co != null)
             //{

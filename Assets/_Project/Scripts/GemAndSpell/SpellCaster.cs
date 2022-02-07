@@ -27,6 +27,8 @@ namespace MeteorGame
 
         private Dictionary<int, Transform> holderDict = new Dictionary<int, Transform>();
 
+        public float scaleDur = 0.4f;
+
 
         WandAnim wandAnim1, wandAnim2;
 
@@ -221,9 +223,10 @@ namespace MeteorGame
                 var p = Instance.SpawnProjectile(slot);
                 p.transform.position = dummy.transform.position;
                 p.transform.localScale = dummy.transform.localScale;
+                p.ScaleDur = Instance.scaleDur;
                 p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i, Instance.holderDict[slot.slotNo].position);
-                p.ScaleDur = (50f * 8f) / p.StartingSpeed;
-                p.ScaleDur = 4f;
+                //p.ScaleDur = (50f * 8f) / p.StartingSpeed;
+                //p.ScaleDur = 4f;
                 projList.Add(p);
             }
         }

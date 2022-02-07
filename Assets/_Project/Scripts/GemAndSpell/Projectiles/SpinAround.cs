@@ -28,7 +28,7 @@ namespace MeteorGame
 
         public void ResetSelf()
         {
-            progression = Vector3.one;
+            progression = Vector3.one * Random.value;
 
             CalculateOffset();
             RandomizeVel();
