@@ -16,6 +16,10 @@ namespace MeteorGame
 
         public void Move()
         {
+
+            OnTweenEnded();
+            return;
+
             List<Vector3> path = new List<Vector3>();
             var rigidBody = _moveable.Rigidbody;
             var projDir = (_moveable.MovingTowards - rigidBody.position).normalized;

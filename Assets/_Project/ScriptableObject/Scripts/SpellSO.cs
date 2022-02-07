@@ -19,6 +19,9 @@ namespace MeteorGame
         internal float lastCastTime;
         public int projectileCount;
 
+        public ProjectileBase projectilePrefab;
+        public ProjectileDummy dummyPrefab;
+
         private void OnEnable()
         {
             lastCastTime = 0;

@@ -10,12 +10,8 @@ namespace MeteorGame
     {
         public static SpellCaster Instance { get; private set; }
 
-        [SerializeField] private ProjectileBase fireballProjectile;
-        [SerializeField] private ProjectileBase ballLightningProjectile;
-        [SerializeField] private ProjectileBase creepingFrostProjectile;
-
         [Tooltip("Transform to hold the new projectile until move")]
-        [SerializeField] private Transform playerProjectileHolder1, playerProjectileHolder2;
+        [SerializeField] private Transform dummyHolder1, dummyHolder2;
 
         [Tooltip("Transform to hold the new projectile after move")]
         [SerializeField] private Transform projectileHolder;
@@ -24,8 +20,13 @@ namespace MeteorGame
         private List<ChillingArea> creepingFrostChillingAreas = new List<ChillingArea>();
         private int castID = 0;
 
-        private List<ProjectileBase> dummyProjectiles = new List<ProjectileBase>();
-        private List<ProjectileBase> dummyProjectiles2 = new List<ProjectileBase>();
+        // have a list for 2 slots and combine into dictionary
+        private Dictionary<int, List<ProjectileDummy>> dummyDict = new Dictionary<int, List<ProjectileDummy>>();
+
+        private Dictionary<int, List<ProjectileBase>> projDict = new Dictionary<int, List<ProjectileBase>>();
+
+        private Dictionary<int, Transform> holderDict = new Dictionary<int, Transform>();
+
 
         WandAnim wandAnim1, wandAnim2;
 
@@ -43,6 +44,18 @@ namespace MeteorGame
             wandAnim1 = wandAnims.First(w => w.belongsToSlot == 1);
             wandAnim2 = wandAnims.First(w => w.belongsToSlot == 2);
 
+            dummyDict.Add(1, new List<ProjectileDummy>());
+            dummyDict.Add(2, new List<ProjectileDummy>());
+
+
+            projDict.Add(1, new List<ProjectileBase>());
+            projDict.Add(2, new List<ProjectileBase>());
+
+
+            holderDict.Add(1, dummyHolder1);
+            holderDict.Add(2, dummyHolder2);
+
+
             Instance = this;
         }
 
@@ -51,108 +64,65 @@ namespace MeteorGame
             OnSpellChanged(slot, null);
         }
 
+
+        private static void ClearDummyDict(int slotNo)
+        {
+            for (int i = Instance.dummyDict[slotNo].Count - 1; i >= 0; i--)
+            {
+                Destroy(Instance.dummyDict[slotNo][i].gameObject);
+            }
+
+            Instance.dummyDict[slotNo].Clear();
+        }
+
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
         {
-            List<ProjectileBase> listToUse;
-
-            if (slot.slotNo == 1)
-            {
-                listToUse = dummyProjectiles;
-            }
-            else
-            {
-                listToUse = dummyProjectiles2;
-            }
-
-            if (listToUse.Count > 0)
-            {
-                foreach (var item in listToUse)
-                {
-                    Destroy(item.gameObject);
-                }
-
-                listToUse.Clear();
-            }
-
-            if (slot.Spell != null) // spell is set to null when unequipped
-            {
-                SpawnDummiesWithEffect(slot);
-            }
-
+            ClearDummyDict(slot.slotNo);
+            SpawnDummies(slot);
         }
 
-        private void SpawnDummies(SpellSlot spellSlot)
+        private static void SpawnDummies(SpellSlot slot)
         {
-            List<ProjectileBase> listToUse;
+            List<ProjectileDummy> dummies = Instance.dummyDict[slot.slotNo];
 
-            if (spellSlot.slotNo == 1)
+            for (int i = 0; i < slot.ProjectileCount; i++)
             {
-                listToUse = dummyProjectiles;
-            }
-            else
-            {
-                listToUse = dummyProjectiles2;
-            }
-
-            for (int i = 0; i < spellSlot.ProjectileCount; i++)
-            {
-                var dummy = SpawnProjectile(spellSlot);
-                
-                if (spellSlot.slotNo == 1)
-                {
-                    dummy.transform.SetParent(playerProjectileHolder1);
-                }
-
-                if (spellSlot.slotNo == 2)
-                {
-                    dummy.transform.SetParent(playerProjectileHolder2);
-                }
-
-                dummy.SetCastBy(spellSlot);
-                dummy.MakeDummy();
-
-                listToUse.Add(dummy);
-                dummy.SetProjectileID(i);
-                //dummy.EnableSpinner();
+                var dummy = SpawnDummy(slot);
+                dummy.SetSpinnerVals(i, slot.ProjectileCount);
+                dummies.Add(dummy);
             }
         }
 
-        private ProjectileBase SpawnProjectile(SpellSlot castBy)
+        [Tooltip("After how many projectileCount the dummy scale should be halved")]
+        public float dummyHalfScaleProjectileCount = 8f;
+
+        /// <summary>
+        /// Scales dummies at start from 0->1
+        /// </summary>
+        /// <param name="slot"></param>
+        private static void ScaleDummies(SpellSlot slot, float dur)
         {
-            Vector3 spawnPos;
-            
-            if (castBy.slotNo == 1)
-            {
-                spawnPos = playerProjectileHolder1.position;
-            }
-            else
-            {
-                spawnPos = playerProjectileHolder2.position;
-            }
 
-            ProjectileBase spellProjectile = null;
+            var dummies = Instance.dummyDict[slot.slotNo];
 
-            if (castBy.Spell.Name == "Fireball")
+            var calculatedScale = Helper.Map(dummies.Count, 1, Instance.dummyHalfScaleProjectileCount, 1, 0.5f);
+
+            foreach (var item in dummies)
             {
-                spellProjectile = fireballProjectile;
+                item.transform.DOScale(calculatedScale, dur);
+                //item.transform.DOScale(1f/ dummies.Count, dur);
             }
+        }
 
-            if (castBy.Spell.Name == "BallLightning")
-            {
-                spellProjectile = ballLightningProjectile;
-            }
+        private static ProjectileDummy SpawnDummy(SpellSlot slot)
+        {
+            var parent = Instance.holderDict[slot.slotNo];
+            var d = Instantiate(slot.Spell.dummyPrefab);
+            d.transform.SetParent(parent);
+            d.transform.localPosition = Vector3.zero;
+            d.transform.localScale = Vector3.zero;
 
-            if (castBy.Spell.Name == "CreepingFrost")
-            {
-                spellProjectile = creepingFrostProjectile;
-            }
-
-            if (spellProjectile == null)
-            {
-                throw new System.Exception("something went wrong spawning spell projectile");
-            }
-
-            return Instantiate(spellProjectile, spawnPos, Quaternion.identity);
+            return d;
         }
 
         public static void Cast(SpellSlot slot)
@@ -169,78 +139,86 @@ namespace MeteorGame
                 return;
             }
 
-            var rand = UnityEngine.Random.Range(0, 360);
-            var aimingAt = Player.Instance.AimingAt(out var hitEnemy);
 
-
-            List<ProjectileBase> listToUse;
 
             var dur = (spell.MsBetweenCasts + spell.CastTimeMs) / 1000f;
 
             if (slot.slotNo == 1)
             {
-                listToUse = Instance.dummyProjectiles;
                 Instance.wandAnim1.Shoot(dur);
             }
             else
             {
-                listToUse = Instance.dummyProjectiles2;
                 Instance.wandAnim2.Shoot(dur);
             }
 
-            for (int i = 0; i < listToUse.Count; i++)
-            {
-                var proj = listToUse[i];
-                proj.MakeNormal();
-                proj.transform.SetParent(Instance.projectileHolder);
-                proj.Setup(slot, aimingAt, hitEnemy, Instance.castID, i);
-                proj.transform.Rotate(new Vector3(0, 0, rand), Space.Self);
-                proj.Move();
-            }
 
-            listToUse.Clear();
+            SpawnProjectilesFromDummes(slot);
+
+            MoveProjectiles(slot.slotNo);
+            ClearProjectilesDict(slot.slotNo);
 
             spell.Cast();
             Instance.castID++;
 
-            Instance.SpawnDummiesWithEffect(slot);
+            ClearDummyDict(slot.slotNo);
+            SpawnDummies(slot);
+            ScaleDummies(slot, dur);
         }
 
 
-        private void SpawnDummiesWithEffect(SpellSlot spellSlot)
+
+
+        private static void ClearProjectilesDict(int slotNo)
         {
-            var spell = spellSlot.Spell;
-            var castTime = spell.CastTimeMs / 1000f;
-            var msBetween = spell.MsBetweenCasts / 1000f;
-            var dur = castTime + msBetween;
-
-            SpawnDummies(spellSlot);
-
-            //List<ProjectileBase> listToUse;
-
-            //if (spellSlot.slotNo == 1)
-            //{
-            //    listToUse = dummyProjectiles;
-            //}
-            //else
-            //{
-            //    listToUse = dummyProjectiles2;
-            //}
-
-            ////var defaultScale = 0.15f;
-            ////var minScale = 0.01f;
-            ////var maxCount = 8f;
-            ////var currCount = listToUse.Count;
-
-            ////foreach (var item in listToUse)
-            ////{
-            ////    item.transform.localScale = Vector3.zero;
-
-            ////    var scale = defaultScale - (currCount * ((defaultScale - minScale) / maxCount));
-
-            ////    item.transform.DOScale(scale, dur);
-            //}
+            Instance.projDict[slotNo].Clear();
         }
+
+        private static void MoveProjectiles(int slotNo)
+        {
+            var list = Instance.projDict[slotNo];
+
+            foreach (var proj in list)
+            {
+                proj.Move();
+            }
+        }
+
+
+        private ProjectileBase SpawnProjectile(SpellSlot slot)
+        {
+            var parent = Instance.projectileHolder;
+            var p = Instantiate(slot.Spell.projPrefab);
+            p.transform.SetParent(parent);
+
+            return p;
+        }
+
+        private static void SpawnProjectilesFromDummes(SpellSlot slot)
+        {
+            List<ProjectileDummy> dummies = Instance.dummyDict[slot.slotNo];
+
+            if (dummies.Count == 0)
+            {
+                return;
+            }
+
+            var projList = Instance.projDict[slot.slotNo];
+            var aimingAt = Player.Instance.AimingAt(out var hitEnemy);
+
+            for (int i = 0; i < dummies.Count; i++)
+            {
+                var dummy = dummies[i];
+
+                var p = Instance.SpawnProjectile(slot);
+                p.transform.position = dummy.transform.position;
+                p.transform.localScale = dummy.transform.localScale;
+                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i);
+                p.ScaleDur = (50f * 3f) / p.StartingSpeed;
+                projList.Add(p);
+            }
+        }
+
 
 
         #region chillingareastuff

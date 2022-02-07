@@ -31,6 +31,9 @@ namespace MeteorGame
         public float LifeTime => projectileLifetimeSeconds;
 
 
+        public ProjectileBase projPrefab;
+        public ProjectileDummy dummyPrefab;
+
         //public float ExplosionRadius => CalculateExplosionRadius();
 
 
@@ -40,6 +43,9 @@ namespace MeteorGame
         public SpellItem(SpellSO spellSO, GemItem gemItem)
         {
             this.gemItem = gemItem;
+
+            projPrefab = spellSO.projectilePrefab;
+            dummyPrefab = spellSO.dummyPrefab;
 
             Name = spellSO.internalName;
             prettyName = spellSO.prettyName;

@@ -45,11 +45,7 @@ namespace MeteorGame
             _projectileMover = new LinearMover(this);
         }
 
-        public override void Move()
-        {
-            Begin();
-            base.Move();
-        }
+
 
         public override bool HandleEnemyCollision()
         {

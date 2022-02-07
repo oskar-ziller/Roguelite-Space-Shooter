@@ -56,7 +56,7 @@ namespace MeteorGame
 
         private void Setup()
         {
-            if (lockedObj != null) // Only SLOT2 has lockedObj since SLOT1 is unlocked from start
+            if (lockedObj != null) // If lockedObj exists we are SLOT2
             {
                 lockedObj.GetComponent<TooltipTrigger>().infoText += unlockCost.ToString();
             }
@@ -122,6 +122,8 @@ namespace MeteorGame
             {
                 manager.ownerSlot.RemoveSpell();
             }
+
+            tabMenuManager.TriedUnequipSpell();
         }
 
         #endregion

@@ -119,12 +119,13 @@ namespace MeteorGame
             {
                 slotManager.ownerSlot.RemoveLinked(gem);
             }
+
+            tabMenuManager.TriedUnequipSlotLink();
         }
 
         public void OnUnlockClicked()
         {
             slotManager.OnUnlockClickedLink(this);
-
         }
 
         private void Lock()

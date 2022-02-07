@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Fireball_Body
+  m_Name: M_Fireball_Flamey
   m_Shader: {fileID: -6465566751694194690, guid: b53c1ee512aac3d478c8638541ecc593, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -94,7 +94,7 @@ Material:
     - Vector1_5a4959adf649434396982eaf3ccefdb6: 6.34
     - Vector1_a440dd12a06c442989be3d7750751091: 1
     - Vector1_b5bad7821a8e4693a0c0039dd1e8191b: 17.86
-    - Vector1_bbd9187e1d6e42afa2ac826df153f9b7: 4.5
+    - Vector1_bbd9187e1d6e42afa2ac826df153f9b7: 4.19
     - Vector1_e000607600e547018075e82386622143: 1
     - _AlphaClip: 0
     - _Blend: 0
@@ -123,9 +123,9 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_5877e71cc0ea4024af0c4c3b5f67c086: {r: 32, g: 16.564707, b: 0, a: 1}
-    - Color_798757dce89d42d3b54139e16058584e: {r: 1, g: 0.51632607, b: 0, a: 0}
-    - Color_c602a77f17224ad7a86749641eb06322: {r: 18.379171, g: 2.1622555, b: 0, a: 1}
+    - Color_5877e71cc0ea4024af0c4c3b5f67c086: {r: 62.122437, g: 32.524837, b: 0, a: 1}
+    - Color_798757dce89d42d3b54139e16058584e: {r: 0.2, g: 0.84313726, b: 0.03529412, a: 0}
+    - Color_c602a77f17224ad7a86749641eb06322: {r: 2.9960785, g: 1.7098039, b: 0, a: 0.5882353}
     - Vector2_2e78fa75ac834bd9a3191abacc9e3e93: {r: 0.02, g: 0.1, b: 0.02, a: 0}
     - Vector2_321b5cbc031843cebb992e8987a307ca: {r: 0.06, g: 0.04, b: 0.04, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +16,18 @@ namespace MeteorGame
         private UIInventoryManager invManager;
 
         private List<SlotManagerUI> slotManagers;
+        private bool isSetup;
+        private bool isShowing;
 
-        private void Awake()
+
+        public bool IsShowing => isShowing;
+
+        public void Setup()
         {
             errorDisplayer = GetComponentInChildren<ErrorDisplayer>();
             invManager = GetComponentInChildren<UIInventoryManager>();
             slotManagers = GetComponentsInChildren<SlotManagerUI>().ToList();
+            isSetup = true;
         }
 
         public void DisplayError(UIError error)
@@ -28,15 +35,49 @@ namespace MeteorGame
             errorDisplayer.DisplayError(error);
         }
 
-        public void RebuildTabMenu()
+        private void RebuildTabMenu()
         {
             invManager.Rebuild();
 
-            foreach (SlotManagerUI sm in slotManagers)
+            foreach (SlotManagerUI slot in slotManagers)
             {
-                sm.UpdateUI();
+                slot.UpdateUI();
+            }
+        }
+
+        public void Show()
+        {
+            if (!isSetup)
+            {
+                return;
             }
 
+            gameObject.SetActive(true);
+            Cursor.lockState = CursorLockMode.Confined;
+            RebuildTabMenu();
+            isShowing = true;
+        }
+
+        public void Hide()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            isShowing = false;
+            gameObject.SetActive(false);
+        }
+
+        internal void TriedEquipInventoryItem()
+        {
+            RebuildTabMenu();
+        }
+
+        internal void TriedUnequipSlotLink()
+        {
+            RebuildTabMenu();
+        }
+
+        internal void TriedUnequipSpell()
+        {
+            RebuildTabMenu();
         }
     }
 }

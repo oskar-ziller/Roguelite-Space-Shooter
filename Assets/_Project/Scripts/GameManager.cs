@@ -56,7 +56,6 @@ namespace MeteorGame
 
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private TabMenuManager tabMenuManager;
-        [SerializeField] private Canvas tabMenuCanvas;
 
         public float MaxGameLevel => maxGameLevel;
         public AnimationCurve DifficultyCurve => difficultyCurve;
@@ -70,7 +69,6 @@ namespace MeteorGame
         private TimeSpan debugElapsed;
         private float debugGameLevel = 0;
         private float gameLevel = 0; // derived from minutes since start and difficultyCurve
-        private bool tabMenuShowing = true;
 
         public Stopwatch gamePlaySW = Stopwatch.StartNew();
 
@@ -159,16 +157,12 @@ namespace MeteorGame
             //TabMenuManager.RebuildTabMenu();
 
             enemySpawner.BeginSpawning();
-            HideTabMenu();
+            tabMenuManager.Setup();
         }
 
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                SwapPauseResume();
-            }
 
             if (Input.GetKeyDown(KeyCode.Tab))
             {
@@ -227,55 +221,21 @@ namespace MeteorGame
 
         private void ShowHideTabMenu()
         {
-            SwapPauseResume();
-
-            if (tabMenuShowing)
+            if (tabMenuManager.IsShowing)
             {
-                HideTabMenu();
-            }
-            else
-            {
-                ShowTabMenu();
-            }
-        }
-
-
-        private void SwapPauseResume()
-        {
-            if (IsGamePaused)
-            {
+                tabMenuManager.Hide();
                 ResumeGame();
             }
             else
             {
+                tabMenuManager.Show();
                 PauseGame();
             }
         }
 
 
-        private void ShowTabMenu()
-        {
-            if (tabMenuShowing)
-            {
-                return;
-            }
+       
 
-            Cursor.lockState = CursorLockMode.Confined;
-            tabMenuCanvas.gameObject.SetActive(true);
-            tabMenuShowing = true;
-        }
-
-        private void HideTabMenu()
-        {
-            if (!tabMenuShowing)
-            {
-                return;
-            }
-
-            Cursor.lockState = CursorLockMode.Locked;
-            tabMenuCanvas.gameObject.SetActive(false);
-            tabMenuShowing = false;
-        }
 
 
         #endregion

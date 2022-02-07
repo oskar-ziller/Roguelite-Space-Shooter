@@ -7,23 +7,33 @@ using UnityEngine;
 
 namespace MeteorGame
 {
-    [RequireComponent(typeof(Rigidbody))]
+    
     public abstract class ProjectileBase : MonoBehaviour
     {
-        [Tooltip("The main body group of the projectile")]
-        [SerializeField] private GameObject bodyGroup;
+        [Tooltip("Mesh object of projectile to scale from 0 to meshScale as it gets away from cast point")]
+        [SerializeField] private Transform mainMesh;
+
+        [Tooltip("Scale to scale the mainMesh to match the Collider size")]
+        [SerializeField] private float meshScaleMain;
 
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-        [Tooltip("Trigger collider for projectile")]
-        [SerializeField] private Collider mainProjCollider;
+        //[Tooltip("Trigger collider for projectile")]
+        //[SerializeField] private Collider mainProjCollider;
+
+
+
+        [Tooltip("Scale for ONE dummy projectile at the spawn point")]
+        [SerializeField] private float dummyScale;
+
 
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
-        public Rigidbody Rigidbody { get { return rigidbody; } }
+        public Rigidbody Rigidbody => rigidbody;
+        //protected float DummyScale => dummyScale;
 
-
+        public float MeshScaleMain => meshScaleMain;
         public Enemy AimingAtEnemy { get; protected set; }
         public int CastID { get; protected set; }
         public int ProjectileID { get; protected set; } // when single cast has multiple projectiles
@@ -33,6 +43,9 @@ namespace MeteorGame
         public Vector3 StartedMovingFrom { get; protected set; }
         public IMover ProjectileMover { get; protected set; }
         public SpellSlot CastBy { get; protected set; }
+
+        public float CachedDummyScale { get; protected set; }
+        public float ScaleDur { get; internal set; }
 
         protected Enemy collidingWith;
 
@@ -58,9 +71,8 @@ namespace MeteorGame
         private List<TrailRenderer> trailRenderers;
         private float maxTrailDur = 0f;
 
-        private SpinAround spinner;
+        //private SpinAround spinner;
 
-        private Rigidbody rigidbody;
 
         //private HashSet<GameObject> inExplosionRange = new HashSet<GameObject>();
         //private HashSet<GameObject> inChainRange = new HashSet<GameObject>();
@@ -68,6 +80,9 @@ namespace MeteorGame
 
         private bool aimAssisted = false;
         private bool expiring;
+
+        private Rigidbody rigidbody;
+
 
         public void SetCastBy(SpellSlot spellSlot)
         {
@@ -116,19 +131,14 @@ namespace MeteorGame
         {
             StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
+            ScaleProjectileWhileMove(ScaleDur);
         }
 
 
 
-        private void ResetScale()
-        {
-            transform.localScale = Vector3.one;
-        }
 
-        private void ScaleToDummyScale()
-        {
-            transform.localScale = Vector3.one / CastBy.ProjectileCount;
-        }
+
+  
 
         /// <summary>
         /// Returns true if collision is handled by base class.
@@ -176,9 +186,11 @@ namespace MeteorGame
 
             maxTrailDur = trailRenderers.Max(t => t.time);
 
-            spinner = GetComponent<SpinAround>();
 
+            //spinner = GetComponent<SpinAround>();
             rigidbody = GetComponent<Rigidbody>();
+
+
             //projectileCollider = GetComponent<SphereCollider>();
 
             //explTrigger.TriggerEnter += OnExpTriggerEnter;
@@ -251,12 +263,25 @@ namespace MeteorGame
             //aimAssisted = true;
         }
 
+
+        public virtual void Update()
+        {
+            if (isDummy)
+            {
+                return;
+            }
+
+            // scales back to original size as it moves away from player
+        }
+
         public virtual void FixedUpdate()
         {
             if (isDummy)
             {
                 return;
             }
+
+           
 
             if (ShouldExpire())
             {
@@ -280,7 +305,6 @@ namespace MeteorGame
 
         public virtual void OnTriggerEnter(Collider collider)
         {
-
             if (isDummy)
             {
                 return;
@@ -303,7 +327,7 @@ namespace MeteorGame
                 collided = true;
                 collidingWith = collidedEnemy;
 
-                Rigidbody.DOKill();
+                transform.DOKill();
                 HandleEnemyCollision();
             }
         }
@@ -451,23 +475,7 @@ namespace MeteorGame
             this.CastBy = p.CastBy;
         }
 
-        protected void DisableCollider()
-        {
-            mainProjCollider.gameObject.SetActive(false);
-            //explTrigger.gameObject.SetActive(false);
-        }
 
-        protected void EnableCollider()
-        {
-            mainProjCollider.gameObject.SetActive(true);
-            //explTrigger.gameObject.SetActive(true);
-        }
-
-        protected void HideBody()
-        {
-            print("hiding body");
-            bodyGroup.SetActive(false);
-        }
 
         protected void DisableRigidBody()
         {
@@ -475,57 +483,52 @@ namespace MeteorGame
             rigidbody.isKinematic = true;
         }
 
+        private  void ScaleProjectileWhileMove(float dur)
+        {
+            mainMesh.DOScale(MeshScaleMain, dur);
+            transform.DOScale(1f, dur);
+        }
+
         protected void DestroySelfSoft()
         {
-            HideBody();
-            DisableCollider();
+            mainMesh.gameObject.SetActive(false);
             DisableRigidBody();
 
             Destroy(gameObject, maxTrailDur);
         }
 
-        public void EnableSpinner()
-        {
-            spinner.enabled = true;
-        }
-
-        private void DisableTrails()
-        {
-            foreach (var tr in trailRenderers)
-            {
-                tr.enabled = false;
-            }
-        }
-
-        private void EnableTrails()
-        {
-            foreach (var tr in trailRenderers)
-            {
-                tr.enabled = true;
-            }
-        }
-
-        public void MakeDummy()
-        {
-            DisableCollider();
-            DisableTrails();
-            ScaleToDummyScale();
+        //public void EnableSpinner()
+        //{
+        //    spinner.enabled = true;
+        //}
 
 
 
-            Rigidbody.isKinematic = true;
-            isDummy = true;
-        }
+        //private void EnableTrails()
+        //{
+        //    foreach (var tr in trailRenderers)
+        //    {
+        //        tr.enabled = true;
+        //    }
+        //}
 
-        public void MakeNormal()
-        {
-            EnableCollider();
-            EnableTrails();
-            ResetScale();
 
-            Rigidbody.isKinematic = false;
-            isDummy = false;
-            spinner.enabled = false;
-        }
+
+        //public void MakeDummy(float dur)
+        //{
+        //    CachedDummyScale = (dummyScale / CastBy.ProjectileCount);
+        //    DisableRigidBody();
+
+        //    isDummy = true;
+        //}
+
+        //public void MakeNormal()
+        //{
+        //    Rigidbody.isKinematic = false;
+        //    isDummy = false;
+        //    //spinner.enabled = false;
+        //}
+
+
     }
 }

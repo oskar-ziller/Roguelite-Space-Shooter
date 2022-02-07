@@ -31,11 +31,12 @@ namespace MeteorGame
 
         public void DoExplode()
         {
-            Rigidbody.velocity = Vector3.zero;
-            Rigidbody.isKinematic = true;
+            //Rigidbody.velocity = Vector3.zero;
+            //Rigidbody.isKinematic = true;
 
-            HideBody();
-            DisableCollider();
+            //HideBody();
+            //DisableCollider();
+            DestroySelfSoft();
 
 
             var sizeVariation = Random.Range(0.9f, 1.1f);

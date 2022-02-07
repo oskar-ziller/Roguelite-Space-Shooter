@@ -54,15 +54,14 @@ namespace MeteorGame
             //Application.targetFrameRate = 144;
 
             Instance = this;
+
         }
 
         private void Start()
         {
-            if (!isSetup)
-            {
-                Setup();
-            }
+            Setup();
         }
+
 
         private void Setup()
         {
@@ -80,7 +79,7 @@ namespace MeteorGame
             spellSlot1.IncreaseMaxLinks();
             spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
 
-            GameManager.Instance.TabMenuManager.RebuildTabMenu();
+            //GameManager.Instance.TabMenuManager.RebuildTabMenu();
 
             currencyTweening = currency;
 
@@ -100,7 +99,7 @@ namespace MeteorGame
         {
             if (isSetup)
             {
-                GameManager.Instance.TabMenuManager.RebuildTabMenu();
+                //GameManager.Instance.TabMenuManager.RebuildTabMenu();
             }
         }
 
@@ -108,7 +107,7 @@ namespace MeteorGame
         {
             if (isSetup)
             {
-                GameManager.Instance.TabMenuManager.RebuildTabMenu();
+                //GameManager.Instance.TabMenuManager.RebuildTabMenu();
             }
         }
 

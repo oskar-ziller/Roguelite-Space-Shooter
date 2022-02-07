@@ -20,3 +20,5 @@ MonoBehaviour:
   projectileSpeed: 50
   projectileLifetimeSeconds: 4
   projectileCount: 1
+  projectilePrefab: {fileID: 6188853978788883409, guid: 8dced4614df9f424ca8f767c451325fc, type: 3}
+  dummyPrefab: {fileID: 3947332782983735750, guid: 7a33c4148bb08f64aabbda9ef0c7e4dc, type: 3}

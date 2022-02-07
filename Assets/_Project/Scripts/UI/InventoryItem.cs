@@ -151,6 +151,9 @@ namespace MeteorGame
             {
                 spellSlot.Equip(gem);
             }
+
+            // signal we may linked a new gem/spell from inventory to slots
+            tabMenuManager.TriedEquipInventoryItem();
         }
     }
 }

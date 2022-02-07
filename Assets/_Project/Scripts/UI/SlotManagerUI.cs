@@ -35,7 +35,6 @@ namespace MeteorGame
 
         private void Start()
         {
-            
         }
 
         private void Update()
@@ -47,17 +46,22 @@ namespace MeteorGame
         #region Methods
 
 
-        private void Setup()
+        public void Setup()
         {
             ownerSlot = Player.Instance.SpellSlot(slotNo);
             tabMenuManager = GetComponentInParent<TabMenuManager>();
             rectTransform = GetComponent<RectTransform>();
             header = GetComponentInChildren<SlotHeaderUI>();
 
-            CreateSlotLinkUIs();
             isSetup = true;
         }
 
+
+        /// <summary>
+        /// If empty, creates GameManager.MaxLinksAllowed amount of links.
+        /// 
+        /// If not empty calls update for header and non deactivated links.
+        /// </summary>
         public void UpdateUI()
         {
             if (!isSetup)
@@ -65,9 +69,15 @@ namespace MeteorGame
                 Setup();
             }
 
+            if (links.Count == 0)
+            {
+                CreateSlotLinkUIs();
+            }
+
             DeactivateUnusedLinkSlots();
 
             header.UpdateUI();
+
 
             foreach (SlotLinkUI item in links)
             {
