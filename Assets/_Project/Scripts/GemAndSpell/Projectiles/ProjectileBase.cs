@@ -13,6 +13,8 @@ namespace MeteorGame
         [Tooltip("Mesh object of projectile to scale from 0 to meshScale as it gets away from cast point")]
         [SerializeField] private Transform mainMesh;
 
+        [SerializeField] private Transform bodyMesh;
+
         [Tooltip("Scale to scale the mainMesh to match the Collider size")]
         [SerializeField] private float meshScaleMain;
 
@@ -199,7 +201,7 @@ namespace MeteorGame
             collider = GetComponent<SphereCollider>();
 
 
-
+            //collider.radius = meshScaleMain / 2f;
             //projectileCollider = GetComponent<SphereCollider>();
 
             //explTrigger.TriggerEnter += OnExpTriggerEnter;
@@ -494,7 +496,7 @@ namespace MeteorGame
 
         private  void ScaleProjectileWhileMove(float dur)
         {
-            mainMesh.DOScale(MeshScaleMain, dur);
+            bodyMesh.DOScale(MeshScaleMain, dur);
             transform.DOScale(1f, dur);
         }
 
