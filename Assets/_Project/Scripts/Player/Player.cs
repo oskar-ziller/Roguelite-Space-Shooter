@@ -75,10 +75,7 @@ namespace MeteorGame
             spellSlot2.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot2.SpellChanged += OnSpellChanged;
 
-            DebugAddAllGemsToInv();
-            spellSlot1.UnlockSpellSlot();
-            spellSlot1.IncreaseMaxLinks();
-            spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
+            
 
             //GameManager.Instance.TabMenuManager.RebuildTabMenu();
 
@@ -87,9 +84,19 @@ namespace MeteorGame
             isSetup = true;
         }
 
+
+        public void DebugAddStuff()
+        {
+            DebugAddAllGemsToInv();
+            spellSlot1.UnlockSpellSlot();
+            spellSlot1.IncreaseMaxLinks();
+            spellSlot1.Equip(inventory.Spells.First(s => s.Name == "Fireball").Gem);
+        }
+
+
         private void DebugAddAllGemsToInv()
         {
-            foreach (GemSO gemSO in GameManager.Instance.AllGems.All)
+            foreach (GemSO gemSO in GameManager.Instance.ScriptableObjects.Gems)
             {
                 GemItem gem = new GemItem(gemSO, level: 0);
                 inventory.AddGem(gem);

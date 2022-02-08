@@ -145,6 +145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 2693522667815251866}
   hideLifebarAfterSeconds: 1
+  moveDuration: 4
+  moveEasing: 15
   level: 0
   maxLevel: 100
   rarity: 2

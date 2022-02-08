@@ -21,13 +21,34 @@ namespace MeteorGame
         public Transform goldDropHolder;
 
 
-        private DropManager dropManager = new DropManager();
+        [SerializeField] private int maxEnemyLevel;
+
+
+        [Tooltip("Speed at which enemies go with 1f speed multiplier")]
+        [SerializeField] private int baseEnemySpeed;
+
+
+        [Tooltip("Enemy health curve between 0-MaxEnemyLevel")]
+        [SerializeField] private AnimationCurve enemyHealthCurve;
+
+
+        [Tooltip("Base hp for enemies at level = 0 and multiplier = 1")]
+        [SerializeField] private int baseHP;
+
+
+        //private DropManager dropManager = new DropManager();
+
 
         #region Variables
 
-        [SerializeField] private float enemySpeed = 3f;
+        public AnimationCurve EnemyHealthCurve => enemyHealthCurve;
+        public int MaxEnemyLevel => maxEnemyLevel;
 
-        public float EnemySpeed => enemySpeed;
+
+        public int BaseEnemySpeed => baseEnemySpeed;
+
+        public int BaseHP => baseHP;
+
 
         #endregion
 
@@ -54,13 +75,6 @@ namespace MeteorGame
         private void Update()
         {
 
-            if (GameManager.Instance.waitingForChallenge)
-            {
-                if (aliveEnemies.Count == 0)
-                {
-                    GameManager.Instance.StopChallenge();
-                }
-            }
         
         }
 
@@ -92,15 +106,13 @@ namespace MeteorGame
         /// <param name="dropFrom"></param>
         private void DropGold(Enemy dropFrom)
         {
-            return;
+            //var howMany = dropManager.PickRandomNumber(dropFrom);
 
-            var howMany = dropManager.PickRandomNumber(dropFrom);
-
-            for (int i = 0; i < howMany; i++)
-            {
-                var whichCoin = dropManager.PickRandomCoinSize(dropFrom);
-                SpawnGoldDrop(whichCoin, dropFrom.transform.position);
-            }
+            //for (int i = 0; i < howMany; i++)
+            //{
+            //    var whichCoin = dropManager.PickRandomCoinSize(dropFrom);
+            //    SpawnGoldDrop(whichCoin, dropFrom.transform.position);
+            //}
         }
 
         internal void OnEnemyDeath(Enemy e)
@@ -223,47 +235,6 @@ namespace MeteorGame
 
 
 
-        private SpawnInfo uniqueSpawnInfo, rareSpawnInfo, magicSpawnInfo, normalSpawnInfo;
-
-
-        public float uniqueSpawnRadi;
-        public Vector3 rareSpawnExtends;
-        public float magicSpawnRadi;
-        public float normalSpawnRadi;
-
-
-        internal SpawnInfo GetSpawnInfo(EnemyRarity e)
-        {
-            if (uniqueSpawnInfo == null)
-            {
-                uniqueSpawnInfo = new SpawnInfo(uniqueSpawnRadi);
-                rareSpawnInfo = new SpawnInfo(rareSpawnExtends / 2f);
-                magicSpawnInfo = new SpawnInfo(magicSpawnRadi / 2f);
-                normalSpawnInfo = new SpawnInfo(normalSpawnRadi / 2f);
-            }
-
-            if (e == EnemyRarity.Unique)
-            {
-                return uniqueSpawnInfo;
-            }
-
-            if (e == EnemyRarity.Rare)
-            {
-                return rareSpawnInfo;
-            }
-
-            if (e == EnemyRarity.Magic)
-            {
-                return magicSpawnInfo;
-            }
-
-            if (e == EnemyRarity.Normal)
-            {
-                return normalSpawnInfo;
-            }
-
-            return null;
-        }
 
         #endregion
 

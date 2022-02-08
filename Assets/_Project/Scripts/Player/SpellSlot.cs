@@ -16,10 +16,10 @@ namespace MeteorGame
         [Serializable]
         private class ModifierFromEquipped
         {
-            public Modifier m;
+            public ModifierSO m;
             public float val = float.MinValue;
 
-            public ModifierFromEquipped(Modifier m, float val)
+            public ModifierFromEquipped(ModifierSO m, float val)
             {
                 this.m = m;
                 this.val = val;

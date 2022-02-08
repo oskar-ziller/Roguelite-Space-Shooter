@@ -21,5 +21,9 @@ namespace MeteorGame
         public ProjectileBase projectilePrefab;
         public ProjectileDummy dummyPrefab;
 
+
+        [Tooltip("Uncheck to disable from loading")]
+        public bool isEnabled = true;
+
     }
 }

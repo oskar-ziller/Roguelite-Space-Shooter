@@ -13,32 +13,17 @@ namespace MeteorGame
     {
         #region Variables
 
-        [SerializeField] private Vector3 debugKeySpawnPos;
-        [SerializeField] private Transform parentGroup;
-
-
+        [SerializeField] private Transform enemyHolder;
         [SerializeField] private Transform packTestCube, packTestSphere;
 
-
-        [SerializeField] private Enemy normalEnemyPrefab;
-        [SerializeField] private Enemy magicEnemyPrefab;
-        [SerializeField] private Enemy rareEnemyPrefab;
-        [SerializeField] private Enemy uniqueEnemyPrefab;
-
-
-        [Tooltip("How far enemy pack can spawn from Arena center")]
-        [SerializeField] private int maxSpawnAreaExtends;
 
         [Tooltip("Starting height for enemies at level 0")]
         [SerializeField] private int startPosMinHeight;
 
-        [Tooltip("Starting height for enemies at Max Level")]
-        [SerializeField] private int startPosMaxHeight;
+        [Tooltip("How much further should max level enemies spawn on top of startPosMinHeight")]
+        [SerializeField] private int startPosVariance;
 
-        private WeightedRandomEnemy spawnDirector = new WeightedRandomEnemy();
-
-        //[Tooltip("Delay between each pack in seconds")]
-        //[SerializeField] private int delayBetweenPacks;
+        private WeightedRandomEnemy spawnDirector;
 
 
         [Tooltip("Min delay between two pack spawns in seconds")]
@@ -58,7 +43,7 @@ namespace MeteorGame
         [SerializeField] private float minMoney;
 
         [Tooltip("Pack spawner max money")]
-        [SerializeField] private float maxMoney;
+        [SerializeField] private float moneyVariance;
 
         [Tooltip("Pack spawner money curve")]
         [SerializeField] private AnimationCurve packSpawnerMoneyCurve;
@@ -66,45 +51,57 @@ namespace MeteorGame
         private Coroutine spawnLoop_Co;
 
 
-        private Stopwatch timeSinceBreak = Stopwatch.StartNew();
-
-        public AudioClip uniqueSpawnClip;
-        public AudioClip rareSpawnClip;
-        public AudioClip magicSpawnClip;
-        public AudioClip normalSpawnClip;
-
-
-
-
         [Tooltip("Spacing between two enemies in a pack")]
         [SerializeField] private float spacingBetweenEnemies;
 
-        private int totalSpawned = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private float CurrentLevelRatio { get { return GameManager.Instance.GameLevel / GameManager.Instance.MaxGameLevel; } }
+
+        private float PackMoneyAtCurrentGameLevel
+        {
+            get
+            {
+                return minMoney + (EvalCurveForCurrentLevel(packSpawnerMoneyCurve) * moneyVariance);
+            }
+        }
+
+        private float PackHeightAtCurrentGameLevel
+        {
+            get
+            {
+                return startPosMinHeight + (EvalCurveForCurrentLevel(packSpawnPosHeightCurve) * moneyVariance);
+            }
+        }
+
+
+
+
+
+
+
 
         #endregion
 
         #region Unity Methods
 
-        private void Awake()
+
+        public void Setup()
         {
-
+            spawnDirector = new WeightedRandomEnemy();
         }
-
-        private void Start()
-        {
-
-        }
-
-        private void BreakStart()
-        {
-            print("BreakStart");
-        }
-
-        private void BreakEnd()
-        {
-            print("BreakEnd");
-        }
-
 
         private float CalculateNextWaveDelay()
         {
@@ -121,59 +118,20 @@ namespace MeteorGame
         {
             while (true)
             {
-                if (!GameManager.Instance.waitingForChallenge)
-                {
-                    yield return PackSpawnStart();
-                    yield return new WaitForSeconds(CalculateNextWaveDelay());
-                }
-
-                yield return new WaitForSeconds(1);
+                yield return PackSpawnStart();
+                yield return new WaitForSeconds(CalculateNextWaveDelay());
             }
         }
 
 
-        private float CalculatePackMoneyForCurrentGameLevel()
+        private float EvalCurveForCurrentLevel(AnimationCurve c)
         {
-            float level = GameManager.Instance.GameLevel;
-            float maxLevel = GameManager.Instance.MaxGameLevel;
-
-            var curveVal = packSpawnerMoneyCurve.Evaluate(level / maxLevel);
-            return minMoney + curveVal * maxMoney;
+            return c.Evaluate(CurrentLevelRatio);
         }
 
 
-        private float CalculatePackHeightForCurrentGameLevel()
+        private IEnumerator GeneratePositions(List<EnemySO> enemiesToSpawn)
         {
-            float level = GameManager.Instance.GameLevel;
-            float maxLevel = GameManager.Instance.MaxGameLevel;
-
-            var curveVal = packSpawnPosHeightCurve.Evaluate(level / maxLevel);
-            return startPosMinHeight + curveVal * startPosMaxHeight;
-        }
-
-        public IEnumerator PackSpawnStart()
-        {
-            print("PackSpawnStart");
-
-            var random = new System.Random();
-
-            spawnDirector.totalMoney = CalculatePackMoneyForCurrentGameLevel();
-            List<EnemyRarity> enemiesToSpawn = spawnDirector.CreateSpawnList();
-
-
-            var normals = enemiesToSpawn.Where(e => e == EnemyRarity.Normal).ToList();
-            var magics = enemiesToSpawn.Where(e => e == EnemyRarity.Magic).ToList();
-            var rares = enemiesToSpawn.Where(e => e == EnemyRarity.Rare).ToList();
-            var uniques = enemiesToSpawn.Where(e => e == EnemyRarity.Unique).ToList();
-
-            print($"totalMoney: {spawnDirector.totalMoney}");
-            print($"total enemies to spawn {enemiesToSpawn.Count}");
-            print($"normals: {normals.Count}");
-            print($"magics: {magics.Count}");
-            print($"rares: {rares.Count}");
-            print($"uniques: {uniques.Count}");
-
-            
             bool cointoss = Random.value < 0.5f;
             PackShape randShape = PackShape.Sphere;
 
@@ -184,23 +142,34 @@ namespace MeteorGame
 
             var randomSpacingRange = Random.Range(-spacingBetweenEnemies / 2, spacingBetweenEnemies / 2);
 
-            var generator = new PositionGenerator(shape: randShape,
+            var generator = new PositionGenerator(packShape: randShape,
                                                   spacing: spacingBetweenEnemies + randomSpacingRange,
-                                                  spawnList: enemiesToSpawn,
-                                                  maxExtends: maxSpawnAreaExtends);
-
+                                                  spawnList: enemiesToSpawn);
 
             yield return generator.Generate();
-
-            //var randomPackCenterPosX = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends);
-            //var randomPackCenterPosZ = random.Next(-spawnAreaExtends + generator.regionExtends, spawnAreaExtends - generator.regionExtends );
+        }
 
 
-            var height = CalculatePackHeightForCurrentGameLevel();
+
+        public IEnumerator PackSpawnStart()
+        {
+
+            print($"PackSpawnStart");
+
+
+            spawnDirector.totalMoney = PackMoneyAtCurrentGameLevel;
+            List<EnemySO> enemiesToSpawn = spawnDirector.CreateSpawnList();
+
+            print($"Total enemies to spawn {enemiesToSpawn.Count}");
+           
+            yield return GeneratePositions(enemiesToSpawn);
+
+
+            var height = PackHeightAtCurrentGameLevel;
             var pos = Random.onUnitSphere * height;
 
             var holder = new GameObject("Pack");
-            holder.transform.parent = parentGroup;
+            holder.transform.parent = enemyHolder;
 
             Transform packTest;
 
@@ -250,198 +219,34 @@ namespace MeteorGame
 
         #region Methods
 
-        private Enemy GetPrefab(EnemyRarity r)
+
+        private Enemy SpawnEnemy(EnemySO enemySO)
         {
-            if (r == EnemyRarity.Normal)
-            {
-                return normalEnemyPrefab;
-            }
-
-            if (r == EnemyRarity.Magic)
-            {
-                return magicEnemyPrefab;
-            }
-
-            if (r == EnemyRarity.Rare)
-            {
-                return rareEnemyPrefab;
-            }
-
-            if (r == EnemyRarity.Unique)
-            {
-                return uniqueEnemyPrefab;
-            }
-
-            throw new System.Exception("Undefined rarity");
-        }
-
-
-        private Enemy SpawnEnemy(Enemy prefab, Transform parent, EnemyRarity rarity, Vector3 startPos)
-        {
-            Enemy e = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            Enemy e = Instantiate(enemySO.Prefab, Vector3.zero, Quaternion.identity);
             e.gameObject.layer = LayerMask.NameToLayer("Enemies");
-            e.transform.parent = parent;
-
-            e.OnDeath += EnemyManager.Instance.OnEnemyDeath;
-
-            EnemyManager.Instance.AddEnemy(e);
-
-            //e.ChangeSize(size);
-            e.SetRarity(rarity);
-            e.Init(startPos, totalSpawned);
-
-            totalSpawned++;
-
             return e;
         }
 
-        private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<SpawnPos> candidates, Transform parent)
+        private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<FindSpawnPosResult> candidates, Transform parent)
         {
-            var uniques = candidates.Where(c => c.rarity == EnemyRarity.Unique).ToList();
-            var rares = candidates.Where(c => c.rarity == EnemyRarity.Rare).ToList();
-            var magics = candidates.Where(c => c.rarity == EnemyRarity.Magic).ToList();
-            var normals = candidates.Where(c => c.rarity == EnemyRarity.Normal).ToList();
             print("SpawnCandidatesAroundPoint");
 
-            Vector3 startPos;
+            Vector3 spawnPos;
 
-            List<Enemy> enemiesInPack = new List<Enemy>();
-
-
-            foreach (var c in uniques)
+            foreach (FindSpawnPosResult result in candidates)
             {
-                if (uniqueEnemyPrefab == null)
-                {
-                    break;
-                }
+                spawnPos = point + result.SpawnPos;
 
-                startPos = point + c.center;
+                Enemy e = SpawnEnemy(result.EnemySO);
 
-                Enemy e = SpawnEnemy(uniqueEnemyPrefab, parent, EnemyRarity.Unique, startPos);
-                enemiesInPack.Add(e);
                 yield return new WaitForSeconds(0.02f);
             }
 
-            foreach (var c in rares)
-            {
-                if (rareEnemyPrefab == null)
-                {
-                    break;
-                }
-
-                startPos = point + c.center;
-
-                Enemy e = SpawnEnemy(rareEnemyPrefab, parent, EnemyRarity.Rare, startPos);
-                enemiesInPack.Add(e);
-                yield return new WaitForSeconds(0.02f);
-            }
-
-            foreach (var c in magics)
-            {
-                if (magicEnemyPrefab == null)
-                {
-                    break;
-                }
-
-                startPos = point + c.center;
-
-                Enemy e = SpawnEnemy(magicEnemyPrefab, parent, EnemyRarity.Magic, startPos);
-                enemiesInPack.Add(e);
-                yield return new WaitForSeconds(0.02f);
-            }
-
-            foreach (var c in normals)
-            {
-                if (normalEnemyPrefab == null)
-                {
-                    break;
-                }
-
-                startPos = point + c.center;
-
-                Enemy e = SpawnEnemy(normalEnemyPrefab, parent, EnemyRarity.Normal, startPos);
-                enemiesInPack.Add(e);
-                yield return new WaitForSeconds(0.02f);
-            }
-
-            foreach (Enemy e in enemiesInPack)
-            {
-                e.StartMoving(dir: (Vector3.zero - point).normalized);
-            }
-        
             yield return null;
         }
 
 
         #endregion
-
-    }
-
-    public class WeightedRandomEnemy
-    {
-        public class EnemySpawnEntry
-        {
-            public EnemyRarity Rarity;
-            public float weight;
-            public float cost;
-
-            public EnemySpawnEntry(EnemyRarity r, float cost, float weight)
-            {
-                Rarity = r;
-                this.cost = cost;
-                this.weight = weight;
-            }
-        }
-
-        public List<EnemySpawnEntry> entries = new List<EnemySpawnEntry>();
-        public float totalMoney;
-
-        public WeightedRandomEnemy()
-        {
-            float normalOccurence = 9000f / 10000f;
-            float magicOccurence = 840f / 10000f;
-            float rareOccurence = 160f / 10000f;
-            float uniqueOccurence = 10f / 10000f;
-
-
-            //normalOccurence = 0;
-            //magicOccurence = 0;
-            //rareOccurence = 0;
-            //uniqueOccurence = 1;
-
-
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Normal, 1, normalOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Magic, 2, magicOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Rare, 3, rareOccurence));
-            entries.Add(new EnemySpawnEntry(EnemyRarity.Unique, 4, uniqueOccurence));
-        }
-
-        public List<EnemyRarity> CreateSpawnList()
-        {
-            var toReturn = new List<EnemyRarity>();
-
-            float totalWeight = entries.Sum(e => e.weight);
-
-            while (totalMoney > 0)
-            {
-                float randomWeight = UnityEngine.Random.Range(0, totalWeight);
-                float currentWeight = 0f;
-
-                foreach (var e in entries)
-                {
-                    currentWeight += e.weight;
-
-                    if (randomWeight <= currentWeight)
-                    {
-                        totalMoney -= e.cost;
-                        toReturn.Add(e.Rarity); // selected one
-                        break;
-                    }
-                }
-            }
-
-            return toReturn;
-        }
 
     }
 

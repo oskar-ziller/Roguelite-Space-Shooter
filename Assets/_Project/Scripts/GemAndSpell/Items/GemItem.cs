@@ -72,7 +72,7 @@ namespace MeteorGame
             }
         }
 
-        public int GetModifierValueForCurrentLevel(Modifier m)
+        public int GetModifierValueForCurrentLevel(ModifierSO m)
         {
             var gemMod = modifiers.FirstOrDefault(mod => mod.modifier == m);
 

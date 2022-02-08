@@ -94,6 +94,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec37f5b611d28ca4a85eba3e7aa9478c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tweenDur: 0.1
+  tweenVariation: 0.05
 --- !u!1 &8213559398470571458
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,6 +145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 2275342655129591268}
   hideLifebarAfterSeconds: 1
+  moveDuration: 4
+  moveEasing: 15
   level: 0
   maxLevel: 100
   rarity: 3

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,58 +8,32 @@ using UnityEngine.UI;
 
 namespace MeteorGame
 {
-
-    public enum EnemyRarity
-    {
-        Normal,
-        Magic,
-        Rare,
-        Unique
-    }
-
     public class Enemy : MonoBehaviour
     {
-        //[Tooltip("Starting speed"), Range(0f, 5f)]
-        //[SerializeField] private float startingSpeed = 1f;
-
         [Tooltip("Rigidbody of whole enemy")]
         [SerializeField] private Rigidbody rigidBody;
-
-        [Tooltip("After this many seconds of no damage, hide healthbar on enemies. 0 = always on")]
-        public float hideLifebarAfterSeconds = 0f;
-
-
-        [Tooltip("Enemy level")]
-        [SerializeField] public int level;
-
-        [Tooltip("Enemy max level")]
-        [SerializeField] private int maxLevel;
-
-        [Tooltip("Rarity of this enemy")]
-        public EnemyRarity rarity;
+        [SerializeField] private int level;
 
         public Action<Enemy> DamageTaken;
-
         private int id;
-
         private float currentSpeed;
 
+        private EnemySO enemySO;
 
+        //private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
 
-        private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
+        //private void OnChillingAreaExpired(ChillingArea a)
+        //{
+        //    if (collidingChillingAreas.Contains(a))
+        //    {
+        //        collidingChillingAreas.Remove(a);
 
-        private void OnChillingAreaExpired(ChillingArea a)
-        {
-            if (collidingChillingAreas.Contains(a))
-            {
-                collidingChillingAreas.Remove(a);
-
-                if (collidingChillingAreas.Count == 0)
-                {
-                    ailmentManager.RemoveChillingAreaAilment();
-                }
-            }
-        }
+        //        if (collidingChillingAreas.Count == 0)
+        //        {
+        //            ailmentManager.RemoveChillingAreaAilment();
+        //        }
+        //    }
+        //}
 
         private void OnTriggerEnter(Collider other)
         {
@@ -73,18 +48,18 @@ namespace MeteorGame
 
         private void OnTriggerExit(Collider other)
         {
-            var chillingArea = other.GetComponent<ChillingArea>();
+            //var chillingArea = other.GetComponent<ChillingArea>();
 
-            if (chillingArea != null)
-            {
-                collidingChillingAreas.Remove(chillingArea);
+            //if (chillingArea != null)
+            //{
+            //    collidingChillingAreas.Remove(chillingArea);
 
-                if (collidingChillingAreas.Count == 0)
-                {
-                    ailmentManager.RemoveChillingAreaAilment();
-                }
+            //    if (collidingChillingAreas.Count == 0)
+            //    {
+            //        ailmentManager.RemoveChillingAreaAilment();
+            //    }
 
-            }
+            //}
         }
 
 
@@ -164,14 +139,14 @@ namespace MeteorGame
 
 
 
-        public void Init(Vector3 pos, int id, int level = 0)
+        public void Init(Vector3 endPos, int id, int level = 0)
         {
             this.id = id;
 
             baseLifeList = baseLifeArr.ToList();
             baseLifeList.Reverse();
 
-            spawnPos = pos;
+            this.spawnPos = endPos;
 
             RepositionToSpawn();
 
@@ -180,31 +155,31 @@ namespace MeteorGame
             //SetRandomRotation();
 
 
-            int index = levelToSet < baseLifeList.Count ?  levelToSet : baseLifeList.Count - 1;
+            //int index = levelToSet < baseLifeList.Count ?  levelToSet : baseLifeList.Count - 1;
 
-            baseLife = baseLifeList[index];
+            //baseLife = baseLifeList[index];
 
-            var monsterTypeHealthModifier = 1f; // %50-%200 arasi
+            //var monsterTypeHealthModifier = 1f; // %50-%200 arasi
 
-            var monsterRarityModifier = 1.3f;
+            //var monsterRarityModifier = 1.3f;
 
-            if (rarity == EnemyRarity.Magic)
-            {
-                monsterRarityModifier = 2.87f;
-                //monsterRarityModifier = 1.87f;
-            }
+            //if (rarity == EnemyRarity.Magic)
+            //{
+            //    monsterRarityModifier = 2.87f;
+            //    //monsterRarityModifier = 1.87f;
+            //}
 
-            if (rarity == EnemyRarity.Rare)
-            {
-                monsterRarityModifier = 12.63f;
-                //monsterRarityModifier = 6.63f;
-            }
+            //if (rarity == EnemyRarity.Rare)
+            //{
+            //    monsterRarityModifier = 12.63f;
+            //    //monsterRarityModifier = 6.63f;
+            //}
 
-            if (rarity == EnemyRarity.Unique)
-            {
-                monsterRarityModifier = 18.25f;
-                //monsterRarityModifier = 8.25f;
-            }
+            //if (rarity == EnemyRarity.Unique)
+            //{
+            //    monsterRarityModifier = 18.25f;
+            //    //monsterRarityModifier = 8.25f;
+            //}
 
             // totalMonsterHealth = baseLife * monsterTypeHealthModifier
             //                                  * monsterRarityModifier
@@ -216,39 +191,69 @@ namespace MeteorGame
             * rares = 463% more
             * uniques = 625% more. */
 
+            var curve = EnemyManager.Instance.EnemyHealthCurve;
+            var val = curve.Evaluate(level / EnemyManager.Instance.MaxEnemyLevel);
 
-            totalHealth = (int)(baseLife * monsterTypeHealthModifier * monsterRarityModifier);
+
+            totalHealth = Mathf.CeilToInt(EnemyManager.Instance.BaseHP * val * enemySO.HealthMultiplier);
             currentHealth = totalHealth;
 
             //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
 
+
             StartCoroutine(CheckFrozenOrChilledCoroutine());
             StartCoroutine(CheckIgniteTickCoroutine());
-            StartCoroutine(CheckChillingAreaCoroutine());
         }
 
-        private IEnumerator CheckChillingAreaCoroutine()
-        {
-            while (true)
-            {
-                if (collidingChillingAreas.Count > 0)
-                {
-                    foreach (ChillingArea chillingArea in collidingChillingAreas)
-                    {
-                        TakeDoT(chillingArea.CastBy, 0.25f, applyAilment: false);
-                    }
+        //private void MoveToEndPos()
+        //{
+        //    //List<Vector3> path = new List<Vector3>();
+        //    //path.Add(transform.position);
 
-                    if (!ailmentManager.InChillingArea)
-                    {
-                        ailmentManager.AddChillingAreaAilment();
-                    }
+        //    //var dist = Vector3.Distance(transform.position, endPos);
+        //    //var dir = (endPos - transform.position).normalized;
+        //    //Vector3 left = Vector3.Cross(dir, Vector3.up).normalized;
 
-                    yield return new WaitForSeconds(0.25f);
-                }
 
-                yield return new WaitForSeconds(UnityEngine.Random.Range(0.15f, 0.3f));
-            }
-        }
+        //    //var angle = UnityEngine.Random.Range(-10, 10);
+        //    //var len = UnityEngine.Random.Range(300, 500);
+
+        //    //// rotate transform.right randomly and get a random direction on that plane
+        //    //Vector3 customAxis = Quaternion.AngleAxis(angle, left) * dir;
+
+          
+        //    //Vector3 pos = transform.position + len * customAxis;
+        //    //path.Add(pos);
+        //    //path.Add(endPos);
+
+
+        //    //transform.DOPath(path.ToArray(), moveDuration, PathType.CatmullRom, PathMode.Ignore).SetEase(moveEasing).onComplete += OnMoveToSpawnEnded;
+        
+        //}
+
+
+        //private IEnumerator CheckChillingAreaCoroutine()
+        //{
+        //    while (true)
+        //    {
+        //        if (collidingChillingAreas.Count > 0)
+        //        {
+        //            foreach (ChillingArea chillingArea in collidingChillingAreas)
+        //            {
+        //                TakeDoT(chillingArea.CastBy, 0.25f, applyAilment: false);
+        //            }
+
+        //            if (!ailmentManager.InChillingArea)
+        //            {
+        //                ailmentManager.AddChillingAreaAilment();
+        //            }
+
+        //            yield return new WaitForSeconds(0.25f);
+        //        }
+
+        //        yield return new WaitForSeconds(UnityEngine.Random.Range(0.15f, 0.3f));
+        //    }
+        //}
 
 
 
@@ -305,17 +310,6 @@ namespace MeteorGame
 
 
         List<int> baseLifeList;
-
-        internal void SetRarity(EnemyRarity rarity)
-        {
-            this.rarity = rarity;
-        }
-
-
-        internal void ChangeSize(float radius)
-        {
-            transform.localScale = Vector3.one * radius;
-        }
 
 
 
@@ -523,26 +517,9 @@ namespace MeteorGame
 
         public void StartMoving(Vector3 dir)
         {
-            startingSpeed = EnemyManager.Instance.EnemySpeed;
+            startingSpeed = EnemyManager.Instance.BaseEnemySpeed * enemySO.SpeedMultiplier;
 
 
-            if (rarity == EnemyRarity.Magic)
-            {
-                startingSpeed *= 0.9f;
-            }
-
-            if (rarity == EnemyRarity.Rare)
-            {
-                startingSpeed *= 0.8f;
-            }
-
-            if (rarity == EnemyRarity.Unique)
-            {
-                startingSpeed *= 0.7f;
-            }
-
-            //Vector3 movingTowards = Vector3.zero; 
-            //Vector3 dir = (movingTowards - transform.position).normalized;
             startingVel = dir * startingSpeed;
 
             rigidBody.isKinematic = false;

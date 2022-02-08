@@ -51,7 +51,7 @@ namespace MeteorGame
 
 
         [Header("SPEED")]
-        [SerializeField] private float airMaxSpeed = 10f;
+        [Range(0, 50)] [SerializeField] private float maxSpeed = 5f;
 
 
 
@@ -67,6 +67,8 @@ namespace MeteorGame
 
         private Vector3 frameTravelVec = Vector3.zero;
         private float frameTravelDist = 0f;
+
+        private float maxSpeedReal => maxSpeed / 100f;
 
         #endregion
 
@@ -190,7 +192,7 @@ namespace MeteorGame
         private Vector3 CalculateUp()
         {
             var locVel = transform.InverseTransformDirection(frameTravelVec);
-            var targetSpeed = inputs.jump * airMaxSpeed * boostSpeed;
+            var targetSpeed = inputs.jump * maxSpeedReal * boostSpeed;
 
             var accel = airAccel * boostAccel;
 
@@ -231,7 +233,7 @@ namespace MeteorGame
         private Vector3 CalculateForward()
         {
             var locVel = transform.InverseTransformDirection(frameTravelVec);
-            var targetSpeed = inputs.inputVector.y * airMaxSpeed * boostSpeed;
+            var targetSpeed = inputs.inputVector.y * maxSpeedReal * boostSpeed;
 
             var accel = airAccel * boostAccel;
 
@@ -253,7 +255,7 @@ namespace MeteorGame
         private Vector3 CalculateRight()
         {
             var locVel = transform.InverseTransformDirection(frameTravelVec);
-            var targetSpeed = inputs.inputVector.x * airMaxSpeed * boostSpeed;
+            var targetSpeed = inputs.inputVector.x * maxSpeedReal * boostSpeed;
 
             var accel = airAccel * boostAccel;
 

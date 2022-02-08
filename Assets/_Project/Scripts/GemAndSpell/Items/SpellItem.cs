@@ -30,8 +30,8 @@ namespace MeteorGame
         public float ProjectileSpeed => projectileSpeed;
         public int ProjectileCount => projectileCount;
         public float LifeTime => projectileLifetimeSeconds;
+        public float CastTimeModified => CalculateCastTime();
 
-        public float TotalCastTime => timeBetweenCasts + (castTime * (1 - (slottedAt.IncreasedCastSpeed / 100f)));
 
         public ProjectileBase projPrefab;
         public ProjectileDummy dummyPrefab;
@@ -107,10 +107,39 @@ namespace MeteorGame
         //    return (int)totalRadi;
         //}
 
+        public float CalculateCastTime()
+        {
+
+            /*
+
+
+
+
+           player is using a skill with a base cast time of 0.8 seconds,
+            and the player has a total of 50% increased Cast Speed,
+            then the modified cast time can be calculated as follows: 
+
+            1/0.8 = 1.25 casts per second -> base
+            1.25 * (1 + 0.5) = 1.88 casts per second -> modified
+            1/1.88 = 0.53 seconds -> new cast time
+
+
+        public float TotalCastTime => timeBetweenCasts + (castTime * (1 - (slottedAt.IncreasedCastSpeed / 100f)));
+
+            */
+
+
+            var castsPerSecond = 1 / castTime;
+            var modified = castsPerSecond * (1 + (slottedAt.IncreasedCastSpeed/100f));
+            var newCastTime = 1 / modified;
+
+            return newCastTime;
+        }
+
         public void Cast()
         {
             lastCastTime = Time.time;
-            nextCastTime = lastCastTime + TotalCastTime;
+            nextCastTime = lastCastTime + CalculateCastTime();
         }
 
 

@@ -234,7 +234,7 @@ namespace MeteorGame
 
 
         /// <summary>
-        /// Picks a random number (like between 0-19) based on weights
+        /// Picks a random number based on weights
         /// Higher rarities have higher chance to return bigger numbers
         /// </summary>
         /// <param name="e"></param>
@@ -243,26 +243,29 @@ namespace MeteorGame
         {
             WeightedRandomGenerator generatorToUse;
 
-            if (e.rarity == EnemyRarity.Normal)
-            {
-                generatorToUse = wrCountNormal;
-            }
-            else if (e.rarity == EnemyRarity.Magic)
-            {
-                generatorToUse = wrCountMagic;
-            }
-            else if (e.rarity == EnemyRarity.Rare)
-            {
-                generatorToUse = wrCountRare;
-            }
-            else if (e.rarity == EnemyRarity.Unique)
-            {
-                generatorToUse = wrCountUnique;
-            }
-            else
-            {
-                throw new Exception("Enemy rarity is undefined for generators. Rarity: " + e.rarity);
-            }
+            generatorToUse = wrCountNormal;
+
+
+            //if (e.rarity == EnemyRarity.Normal)
+            //{
+            //    generatorToUse = wrCountNormal;
+            //}
+            //else if (e.rarity == EnemyRarity.Magic)
+            //{
+            //    generatorToUse = wrCountMagic;
+            //}
+            //else if (e.rarity == EnemyRarity.Rare)
+            //{
+            //    generatorToUse = wrCountRare;
+            //}
+            //else if (e.rarity == EnemyRarity.Unique)
+            //{
+            //    generatorToUse = wrCountUnique;
+            //}
+            //else
+            //{
+            //    throw new Exception("Enemy rarity is undefined for generators. Rarity: " + e.rarity);
+            //}
 
             return generatorToUse.PickRandomNumber();
         }
@@ -278,27 +281,28 @@ namespace MeteorGame
         public CoinSize PickRandomCoinSize(Enemy e)
         {
             WeightedRandomGenerator generatorToUse;
+            generatorToUse = wrSizeNormal;
 
-            if (e.rarity == EnemyRarity.Normal)
-            {
-                generatorToUse = wrSizeNormal;
-            }
-            else if (e.rarity == EnemyRarity.Magic)
-            {
-                generatorToUse = wrSizeMagic;
-            }
-            else if (e.rarity == EnemyRarity.Rare)
-            {
-                generatorToUse = wrSizeRare;
-            }
-            else if (e.rarity == EnemyRarity.Unique)
-            {
-                generatorToUse = wrSizeUnique;
-            }
-            else
-            {
-                throw new Exception("Enemy rarity is undefined for generators. Rarity: " + e.rarity);
-            }
+            //if (e.rarity == EnemyRarity.Normal)
+            //{
+            //    generatorToUse = wrSizeNormal;
+            //}
+            //else if (e.rarity == EnemyRarity.Magic)
+            //{
+            //    generatorToUse = wrSizeMagic;
+            //}
+            //else if (e.rarity == EnemyRarity.Rare)
+            //{
+            //    generatorToUse = wrSizeRare;
+            //}
+            //else if (e.rarity == EnemyRarity.Unique)
+            //{
+            //    generatorToUse = wrSizeUnique;
+            //}
+            //else
+            //{
+            //    throw new Exception("Enemy rarity is undefined for generators. Rarity: " + e.rarity);
+            //}
 
             return generatorToUse.PickRandomSize();
         }

@@ -15,12 +15,6 @@ namespace MeteorGame
 
         #region Variables
 
-        [Header("Spell Data")]
-        public AllModifiers AllModifiers;
-        public AllGems AllGems;
-        public AllSpells AllSpells;
-
-
         [Header("Difficulty Settings")]
         
         [Tooltip("How many minutes should gamelevel take to reac max")]
@@ -50,10 +44,7 @@ namespace MeteorGame
         public int MaxLinksAllowed = 7;
 
 
-
-
         [Header("References")]
-
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private TabMenuManager tabMenuManager;
 
@@ -62,15 +53,22 @@ namespace MeteorGame
         public float GameLevel => gameLevel;
         public TabMenuManager TabMenuManager => tabMenuManager;
         public bool IsGamePaused { get; private set; }
-        public bool waitingForChallenge { get; private set; }
+
+        public ScriptableObjectManager ScriptableObjects => scriptableObjects;
+
 
         private Stopwatch gameStartSW = Stopwatch.StartNew();
-        private float lastChallengeLevelCompleted = -1;
         private TimeSpan debugElapsed;
         private float debugGameLevel = 0;
         private float gameLevel = 0; // derived from minutes since start and difficultyCurve
 
         public Stopwatch gamePlaySW = Stopwatch.StartNew();
+
+
+        private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
+
+
+
 
         #endregion
 
@@ -91,59 +89,6 @@ namespace MeteorGame
             IsGamePaused = false;
         }
 
-        public void StartChallenge()
-        {
-            return;
-
-            if (!waitingForChallenge)
-            {
-                gameStartSW.Stop();
-                waitingForChallenge = true;
-            }
-        }
-
-        public void StopChallenge()
-        {
-            if (waitingForChallenge)
-            {
-                gameStartSW.Start();
-                waitingForChallenge = false;
-                lastChallengeLevelCompleted = gameLevel;
-            }
-        }
-
-        public Modifier GetModifierSO(string s)
-        {
-            return AllModifiers.Get(s);
-        }
-
-        public SpellSO GetSpellSO(string s)
-        {
-            return AllSpells.Get(s);
-        }
-
-
-        /*
-
-        timeFactor = 0.0506 * difficultyValue * 1^0.2
-        stageFactor = 1.15^{stagesCompleted}}
-        coeff = (1 + timeInMinutes * timeFactor) * stageFactor
-
-        difficultyValue is equal to 1 for Drizzle, 2 for Rainstorm, and 3 for Monsoon.
-
-        enemyLevel = 1 + (coeff-1) / 0.33
-
-        moneyCost = baseCost * coeff^1.25
-
-        Whenever a monster spawns, its reward is directly multiplied by coeff :
-
-        enemyXPReward = coeff * monsterValue * rewardMultiplier
-
-        enemyGoldReward = 2 * coeff * monsterValue * rewardMultiplier
-
-        Credits per second = 0.75 * (1 + 0.4 * coeff) * 1 / 2
-        */
-
 
         private void Awake()
         {
@@ -152,12 +97,22 @@ namespace MeteorGame
 
         private void Start()
         {
+
+            // load scriptable objects
+            scriptableObjects.Load();
+
+
             gameStartSW.Restart();
             Cursor.lockState = CursorLockMode.Locked;
             //TabMenuManager.RebuildTabMenu();
 
+            enemySpawner.Setup();
             enemySpawner.BeginSpawning();
+
             tabMenuManager.Setup();
+
+
+            Player.Instance.DebugAddStuff();
         }
 
 
@@ -194,14 +149,6 @@ namespace MeteorGame
             var res = Mathf.Floor(eval * maxGameLevel);
 
             gameLevel = res + debugGameLevel;
-
-            bool laterThanLastChallenge = gameLevel > lastChallengeLevelCompleted;
-            bool atChallengeLevel = ((gameLevel - 1) % checkpointLevelInterval == 0);
-
-            if (!waitingForChallenge && laterThanLastChallenge && atChallengeLevel && gameLevel > 1)
-            {
-                StartChallenge();
-            }
 
             if (gameLevel > maxGameLevel)
             {

@@ -151,7 +151,7 @@ namespace MeteorGame
                 return;
             }
 
-            var dur = spell.TotalCastTime;
+            var dur = spell.CastTimeModified;
 
             if (slot.slotNo == 1)
             {

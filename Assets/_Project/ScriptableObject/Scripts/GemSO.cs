@@ -17,6 +17,9 @@ namespace MeteorGame
 
         public SpellSO spellSO;
 
+        [Tooltip("Uncheck to disable from loading")]
+        public bool isEnabled = true;
+
         [TextArea]
         public string description;
     }
