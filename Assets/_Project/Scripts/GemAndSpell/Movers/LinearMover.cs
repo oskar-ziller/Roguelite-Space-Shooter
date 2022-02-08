@@ -21,7 +21,7 @@ namespace MeteorGame
             var projDir = (_moveable.MovingTowards - rigidBody.position).normalized;
 
 
-            var total = _moveable.TotalProjectiles;
+            var total = _moveable.CastProjCount;
             var current = _moveable.ProjectileID;
 
             var len = 2f;

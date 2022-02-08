@@ -39,7 +39,7 @@ namespace MeteorGame
         public Enemy AimingAtEnemy { get; protected set; }
         public int CastID { get; protected set; }
         public int ProjectileID { get; protected set; } // when single cast has multiple projectiles
-        public int TotalProjectiles { get; protected set; } // when single cast has multiple projectiles
+        public int CastProjCount { get; protected set; } // when single cast has multiple projectiles
         public float StartingSpeed { get; protected set; }
         public Vector3 MovingTowards { get; protected set; }
         public Vector3 StartedMovingFrom { get; protected set; }
@@ -54,7 +54,11 @@ namespace MeteorGame
 
         public Transform MainMesh => mainMesh;
 
-        public float ScaleDur { get; internal set; }
+
+        public float SpreadFromCenter; // with LMP etc. how spread each proj should be from their center
+        public float ScaleDur;
+        public float PathDur;
+        public float PathLen;
 
         protected Enemy collidingWith;
 
@@ -102,7 +106,7 @@ namespace MeteorGame
         public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
         {
             StartingSpeed = castBySlot.ProjectileSpeed;
-            TotalProjectiles = castBySlot.ProjectileCount;
+            CastProjCount = castBySlot.ProjectileCount;
             CastBy = castBySlot;
             MovingTowards = aimingAt;
             AimingAtEnemy = hitEnemy;
@@ -496,10 +500,13 @@ namespace MeteorGame
             rigidbody.isKinematic = true;
         }
 
+
+        //public float scaleTime = 0.5f;
+
         private  void ScaleProjectileWhileMove()
         {
-            bodyMesh.DOScale(MeshScaleMain, 3f);
-            transform.DOScale(1f, 3f);
+            bodyMesh.DOScale(MeshScaleMain, ScaleDur);
+            transform.DOScale(1f, ScaleDur);
         }
 
         protected void DestroySelfSoft()

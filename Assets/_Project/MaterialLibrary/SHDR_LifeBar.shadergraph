@@ -425,7 +425,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "153e8cf1b41243b1911059b34a344749",
     "m_Id": 0,
-    "m_DisplayName": "ShapeExtends",
+    "m_DisplayName": "BottomControl",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -912,7 +912,7 @@
     "m_Guid": {
         "m_GuidSerialized": "5c13298d-c89c-48fb-a429-2163efaf23c2"
     },
-    "m_Name": "ShapeExtends",
+    "m_Name": "BottomControl",
     "m_DefaultReferenceName": "Vector1_7650401e580c46b1ba247db4eb1b0335",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -920,11 +920,11 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
-    "m_Value": -5.0,
-    "m_FloatType": 0,
+    "m_Value": 0.4000000059604645,
+    "m_FloatType": 1,
     "m_RangeValues": {
         "x": 0.0,
-        "y": 5.0
+        "y": 1.0
     }
 }
 
@@ -1436,7 +1436,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "c1670bb8c1c042ddbccf319963ee2950",
     "m_Id": 0,
-    "m_DisplayName": "MinimumBar",
+    "m_DisplayName": "TopControl",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -1575,7 +1575,7 @@
     "m_Guid": {
         "m_GuidSerialized": "03d2fbbd-5eb2-4f79-ab19-c4c259c76dc2"
     },
-    "m_Name": "MinimumBar",
+    "m_Name": "TopControl",
     "m_DefaultReferenceName": "Vector1_d25eb45015774546a36e38c36c7b7de8",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1583,8 +1583,8 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
-    "m_Value": 0.5,
-    "m_FloatType": 0,
+    "m_Value": 0.4000000059604645,
+    "m_FloatType": 1,
     "m_RangeValues": {
         "x": 0.0,
         "y": 1.0

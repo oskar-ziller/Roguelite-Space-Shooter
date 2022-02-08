@@ -77,7 +77,7 @@ namespace MeteorGame
 
         private void StepComplete()
         {
-            print("step");
+            //print("step");
             mat.SetFloat("_percentage", percentageTweening);
         }
 
