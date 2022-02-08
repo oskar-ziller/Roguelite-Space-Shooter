@@ -15,7 +15,7 @@ MonoBehaviour:
   modifiers:
   - modifier: {fileID: 11400000, guid: 08360bf6181549e4faa3242629f93f2a, type: 2}
     min: 20
-    max: 39
+    max: 50
   name: Faster Casting
   gemColor: {r: 0.15272339, g: 0.6132076, b: 0.17264958, a: 1}
   spellSO: {fileID: 0}

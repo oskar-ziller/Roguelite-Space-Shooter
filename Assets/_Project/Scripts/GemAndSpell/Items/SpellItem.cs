@@ -11,12 +11,13 @@ namespace MeteorGame
         [NonSerialized] private GemItem gemItem;
 
         private string prettyName;
-        private int msBetweenCasts;
-        private float castTimeMs;
+        private float timeBetweenCasts;
+        private float castTime;
 
         private float projectileSpeed;
         private float projectileLifetimeSeconds;
-        private float lastCastTime;
+        private float nextCastTime = 0;
+        private float lastCastTime = 0;
         private int projectileCount;
 
         private SpellSlot slottedAt;
@@ -24,12 +25,13 @@ namespace MeteorGame
         public GemItem Gem => gemItem;
 
         public string Name { get; private set; }
-        public float CastTimeMs => castTimeMs;
-        public int MsBetweenCasts => msBetweenCasts;
+        //public float CastTime => castTime;
+        //public int TimeBetweenCasts => timeBetweenCasts;
         public float ProjectileSpeed => projectileSpeed;
         public int ProjectileCount => projectileCount;
         public float LifeTime => projectileLifetimeSeconds;
 
+        public float TotalCastTime => timeBetweenCasts + (castTime * (1 - (slottedAt.IncreasedCastSpeed / 100f)));
 
         public ProjectileBase projPrefab;
         public ProjectileDummy dummyPrefab;
@@ -50,14 +52,13 @@ namespace MeteorGame
             Name = spellSO.internalName;
             prettyName = spellSO.prettyName;
 
-            msBetweenCasts = spellSO.msBetweenCasts;
-            castTimeMs = spellSO.castTimeMs;
+            timeBetweenCasts = spellSO.timeBetweenCasts;
+            castTime = spellSO.castTime;
 
             projectileSpeed = spellSO.projectileSpeed;
             projectileCount = spellSO.projectileCount;
 
             projectileLifetimeSeconds = spellSO.projectileLifetimeSeconds;
-            lastCastTime = spellSO.lastCastTime;
         }
 
         //private int CalculateProjectileCount()
@@ -94,7 +95,7 @@ namespace MeteorGame
 
         public bool CanCast()
         {
-            return Time.time - lastCastTime >= msBetweenCasts / 1000f;
+            return Time.time > nextCastTime;
         }
 
         //public int CalculateExplosionRadius()
@@ -108,7 +109,8 @@ namespace MeteorGame
 
         public void Cast()
         {
-            lastCastTime = Time.time + castTimeMs / 1000f;
+            lastCastTime = Time.time;
+            nextCastTime = lastCastTime + TotalCastTime;
         }
 
 

@@ -12,19 +12,14 @@ namespace MeteorGame
 
         public string internalName;
         public string prettyName;
-        public int msBetweenCasts;
-        public float castTimeMs;
+        public float timeBetweenCasts;
+        public float castTime;
         public float projectileSpeed;
         public float projectileLifetimeSeconds;
-        internal float lastCastTime;
         public int projectileCount;
 
         public ProjectileBase projectilePrefab;
         public ProjectileDummy dummyPrefab;
 
-        private void OnEnable()
-        {
-            lastCastTime = 0;
-        }
     }
 }

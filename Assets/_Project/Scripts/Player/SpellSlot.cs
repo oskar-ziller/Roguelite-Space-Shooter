@@ -68,6 +68,9 @@ namespace MeteorGame
         [SerializeField] private int chainAdditionalTimes;
         [SerializeField] private int forkAdditionalTimes;
 
+        [SerializeField] private int increasedCastSpeed;
+
+
 
 
 
@@ -87,9 +90,9 @@ namespace MeteorGame
 
 
 
-        public int FireEffectiveDamage => (int)(fireDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f));
-        public int ColdEffectiveDamage => (int)(coldDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f));
-        public int LightningEffectiveDamage => (int)(lightningDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f));
+        public int FireEffectiveDamage => (int)Math.Ceiling((fireDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
+        public int ColdEffectiveDamage => (int)Math.Ceiling((coldDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
+        public int LightningEffectiveDamage => (int)Math.Ceiling((lightningDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
 
 
 
@@ -113,6 +116,9 @@ namespace MeteorGame
         public int ChainAdditionalTimes => chainAdditionalTimes;
 
         public int ForkAdditionalTimes => forkAdditionalTimes;
+
+
+        public int IncreasedCastSpeed => increasedCastSpeed;
 
         private float CalculateProjSpeed()
         {
@@ -229,7 +235,11 @@ namespace MeteorGame
             chainAdditionalTimes = (int)GetTotal("ChainAdditionalTimes");
             forkAdditionalTimes = (int)GetTotal("ForkAdditionalTimes");
 
+            increasedCastSpeed = (int)GetTotal("IncreasedCastSpeed");
+
+
             damageOverTime = CalculateDoT();
+
         }
 
 
