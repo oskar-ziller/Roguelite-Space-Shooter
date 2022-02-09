@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MeteorGame
 {
@@ -21,24 +22,32 @@ namespace MeteorGame
         private int castID = 0;
 
         // have a list for 2 slots and combine into dictionary
-        private Dictionary<int, List<ProjectileDummy>> dummyDict = new Dictionary<int, List<ProjectileDummy>>();
+        private Dictionary<SpellSlot, List<ProjectileDummy>> dummyDict = new Dictionary<SpellSlot, List<ProjectileDummy>>();
+        private Dictionary<SpellSlot, List<ProjectileBase>> projDict = new Dictionary<SpellSlot, List<ProjectileBase>>();
+        private Dictionary<SpellSlot, Transform> holderDict = new Dictionary<SpellSlot, Transform>();
 
-        private Dictionary<int, List<ProjectileBase>> projDict = new Dictionary<int, List<ProjectileBase>>();
 
-        private Dictionary<int, Transform> holderDict = new Dictionary<int, Transform>();
+        public Dictionary<SpellSO, ObjectPool<ProjectileBase>> projPool = new Dictionary<SpellSO, ObjectPool<ProjectileBase>>();
+        public Dictionary<SpellSO, ObjectPool<ProjectileDummy>> dummyPool = new Dictionary<SpellSO, ObjectPool<ProjectileDummy>>();
+        public Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new Dictionary<SpellSO, ObjectPool<Explosion>>();
 
-        //public float scaleDur = 0.4f;
+
 
 
         WandAnim wandAnim1, wandAnim2;
 
         private void Awake()
         {
-            Player.Instance.SpellSlot(1).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(1).GemLinkedOrRemoved += OnGemAddedRemoved;
 
-            Player.Instance.SpellSlot(2).SpellChanged += OnSpellChanged;
-            Player.Instance.SpellSlot(2).GemLinkedOrRemoved += OnGemAddedRemoved;
+            SpellSlot slot1 = Player.Instance.SpellSlot(1);
+            SpellSlot slot2 = Player.Instance.SpellSlot(2);
+
+
+            slot1.SpellChanged += OnSpellChanged;
+            slot1.GemLinkedOrRemoved += OnGemAddedRemoved;
+
+            slot2.SpellChanged += OnSpellChanged;
+            slot2.GemLinkedOrRemoved += OnGemAddedRemoved;
 
 
             var wandAnims = Player.Instance.GetComponentsInChildren<WandAnim>().ToList();
@@ -46,17 +55,14 @@ namespace MeteorGame
             wandAnim1 = wandAnims.First(w => w.belongsToSlot == 1);
             wandAnim2 = wandAnims.First(w => w.belongsToSlot == 2);
 
-            dummyDict.Add(1, new List<ProjectileDummy>());
-            dummyDict.Add(2, new List<ProjectileDummy>());
+            dummyDict.Add(slot1, new List<ProjectileDummy>());
+            dummyDict.Add(slot2, new List<ProjectileDummy>());
 
+            projDict.Add(slot1, new List<ProjectileBase>());
+            projDict.Add(slot2, new List<ProjectileBase>());
 
-            projDict.Add(1, new List<ProjectileBase>());
-            projDict.Add(2, new List<ProjectileBase>());
-
-
-            holderDict.Add(1, dummyHolder1);
-            holderDict.Add(2, dummyHolder2);
-
+            holderDict.Add(slot1, dummyHolder1);
+            holderDict.Add(slot2, dummyHolder2);
 
             Instance = this;
         }
@@ -67,19 +73,19 @@ namespace MeteorGame
         }
 
 
-        private static void ClearDummyDict(int slotNo)
+        private static void ClearDummyDict(SpellSlot slot)
         {
-            for (int i = Instance.dummyDict[slotNo].Count - 1; i >= 0; i--)
+            for (int i = Instance.dummyDict[slot].Count - 1; i >= 0; i--)
             {
-                Destroy(Instance.dummyDict[slotNo][i].gameObject);
+                Destroy(Instance.dummyDict[slot][i].gameObject);
             }
 
-            Instance.dummyDict[slotNo].Clear();
+            Instance.dummyDict[slot].Clear();
         }
 
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
         {
-            ClearDummyDict(slot.slotNo);
+            ClearDummyDict(slot);
             
 
             if (spell != null)
@@ -92,7 +98,7 @@ namespace MeteorGame
 
         private static void SpawnDummies(SpellSlot slot)
         {
-            List<ProjectileDummy> dummies = Instance.dummyDict[slot.slotNo];
+            List<ProjectileDummy> dummies = Instance.dummyDict[slot];
 
             // starts at this and rotates counter clockwise as a whole group
             float randomStartDeg = Random.Range(0, 350);
@@ -114,8 +120,7 @@ namespace MeteorGame
         /// <param name="slot"></param>
         private static void ScaleDummies(SpellSlot slot, float dur)
         {
-
-            var dummies = Instance.dummyDict[slot.slotNo];
+            var dummies = Instance.dummyDict[slot];
 
             var calculatedScale = Helper.Map(dummies.Count, 1, Instance.dummyHalfScaleProjectileCount, 1, 0.5f);
 
@@ -128,7 +133,7 @@ namespace MeteorGame
 
         private static ProjectileDummy SpawnDummy(SpellSlot slot)
         {
-            var parent = Instance.holderDict[slot.slotNo];
+            var parent = Instance.holderDict[slot];
             var d = Instantiate(slot.Spell.dummyPrefab);
             d.transform.SetParent(parent);
             d.transform.localPosition = Vector3.zero;
@@ -165,13 +170,13 @@ namespace MeteorGame
 
             SpawnProjectilesFromDummes(slot);
 
-            MoveProjectiles(slot.slotNo);
-            ClearProjectilesDict(slot.slotNo);
+            MoveProjectiles(slot);
+            ClearProjectilesDict(slot);
 
             spell.Cast();
             Instance.castID++;
 
-            ClearDummyDict(slot.slotNo);
+            ClearDummyDict(slot);
             SpawnDummies(slot);
             ScaleDummies(slot, dur);
         }
@@ -179,14 +184,14 @@ namespace MeteorGame
 
 
 
-        private static void ClearProjectilesDict(int slotNo)
+        private static void ClearProjectilesDict(SpellSlot slot)
         {
-            Instance.projDict[slotNo].Clear();
+            Instance.projDict[slot].Clear();
         }
 
-        private static void MoveProjectiles(int slotNo)
+        private static void MoveProjectiles(SpellSlot slot)
         {
-            var list = Instance.projDict[slotNo];
+            var list = Instance.projDict[slot];
 
             foreach (var proj in list)
             {
@@ -206,14 +211,14 @@ namespace MeteorGame
 
         private static void SpawnProjectilesFromDummes(SpellSlot slot)
         {
-            List<ProjectileDummy> dummies = Instance.dummyDict[slot.slotNo];
+            List<ProjectileDummy> dummies = Instance.dummyDict[slot];
 
             if (dummies.Count == 0)
             {
                 return;
             }
 
-            var projList = Instance.projDict[slot.slotNo];
+            var projList = Instance.projDict[slot];
             var aimingAt = Player.Instance.AimingAt(out var hitEnemy);
 
             for (int i = 0; i < dummies.Count; i++)
@@ -224,7 +229,7 @@ namespace MeteorGame
                 p.transform.position = dummy.transform.position;
                 p.transform.localScale = dummy.transform.localScale;
                 //p.ScaleDur = Instance.scaleDur;
-                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i, Instance.holderDict[slot.slotNo].position);
+                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i, Instance.holderDict[slot].position);
                 //p.ScaleDur = (50f * 8f) / p.StartingSpeed;
                 //p.ScaleDur = 4f;
                 projList.Add(p);

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Tier1
   HealthMultiplier: 1
-  SpeedMultiplier: 0
-  Prefab: {fileID: 1073891619112656221, guid: a085ac1065c0177478589268bfb37186, type: 3}
+  SpeedMultiplier: 1
   ShapeRadi: 0.5
+  Prefab: {fileID: 1073891619112656221, guid: a085ac1065c0177478589268bfb37186, type: 3}
   SpawnEntry:
-    weight: 9400
+    weight: 9000
     cost: 1
   IsEnabled: 1

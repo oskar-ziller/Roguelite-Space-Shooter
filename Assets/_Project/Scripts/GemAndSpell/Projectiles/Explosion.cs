@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MeteorGame
 {
-    public class ExplosionHandler : MonoBehaviour
+    public class Explosion : MonoBehaviour
     {
 
         private SphereCollider col;
@@ -14,13 +14,13 @@ namespace MeteorGame
         private SpellSlot castBy;
         
 
-        ParticleSystem.Particle[] m_Particles;
+        ParticleSystem.Particle[] particlesArray;
 
         private void Awake()
         {
             ps = GetComponentInChildren<ParticleSystem>();
             col = GetComponentInChildren<SphereCollider>();
-            m_Particles = new ParticleSystem.Particle[ps.main.maxParticles];
+            particlesArray = new ParticleSystem.Particle[ps.main.maxParticles];
         }
 
         private void Start()
@@ -43,11 +43,11 @@ namespace MeteorGame
         {
             if (ps.isPlaying)
             {
-                int numParticlesAlive = ps.GetParticles(m_Particles);
+                int numParticlesAlive = ps.GetParticles(particlesArray);
 
                 if (numParticlesAlive > 0)
                 {
-                    var particle = m_Particles[0];
+                    var particle = particlesArray[0];
                     var size = particle.GetCurrentSize(ps);
                     col.radius = size / 2f;
                 }

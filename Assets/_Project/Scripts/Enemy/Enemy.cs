@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace MeteorGame
@@ -19,6 +20,47 @@ namespace MeteorGame
         private float currentSpeed;
 
         private EnemySO enemySO;
+
+
+        ObjectPool<Enemy> pool;
+
+
+
+
+        internal void SetPool(ObjectPool<Enemy> p)
+        {
+            pool = p;
+        }
+
+        private void Die()
+        {
+            //OnEnemyDeath?.Invoke(this);
+            print("trying to die");
+            pool.Release(this);
+        }
+
+
+
+        public void ForceDie()
+        {
+            Die();
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                Die();
+            }
+        }
+
+
+
+
+
+
+
+
 
         //private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
 
@@ -60,6 +102,11 @@ namespace MeteorGame
             //    }
 
             //}
+        }
+
+        internal void Reset(EnemySO enemySO, Vector3 pos)
+        {
+            transform.position = pos;
         }
 
 
@@ -113,7 +160,7 @@ namespace MeteorGame
 
 
 
-        public event Action<Enemy> OnDeath;
+        public event Action<Enemy> OnEnemyDeath;
 
         private AilmentManager ailmentManager;
 
@@ -205,6 +252,8 @@ namespace MeteorGame
             StartCoroutine(CheckIgniteTickCoroutine());
         }
 
+
+
         //private void MoveToEndPos()
         //{
         //    //List<Vector3> path = new List<Vector3>();
@@ -221,14 +270,14 @@ namespace MeteorGame
         //    //// rotate transform.right randomly and get a random direction on that plane
         //    //Vector3 customAxis = Quaternion.AngleAxis(angle, left) * dir;
 
-          
+
         //    //Vector3 pos = transform.position + len * customAxis;
         //    //path.Add(pos);
         //    //path.Add(endPos);
 
 
         //    //transform.DOPath(path.ToArray(), moveDuration, PathType.CatmullRom, PathMode.Ignore).SetEase(moveEasing).onComplete += OnMoveToSpawnEnded;
-        
+
         //}
 
 
@@ -504,16 +553,8 @@ namespace MeteorGame
         }
 
 
-        public void ForceDie()
-        {
-            Die();
-        }
 
-        private void Die()
-        {
-            OnDeath?.Invoke(this);
-            Destroy(gameObject);
-        }
+
 
         public void StartMoving(Vector3 dir)
         {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MeteorGame
 {
@@ -20,6 +21,9 @@ namespace MeteorGame
 
         public Transform goldDropHolder;
 
+        [SerializeField] private EnemySpawner enemySpawner;
+
+
 
         [SerializeField] private int maxEnemyLevel;
 
@@ -36,12 +40,110 @@ namespace MeteorGame
         [SerializeField] private int baseHP;
 
 
+
+
+
+
+
+        public Dictionary<EnemySO, ObjectPool<Enemy>> poolDict = new Dictionary<EnemySO, ObjectPool<Enemy>>();
+
+        public Dictionary<EnemySO, EnemyCreator> creatorDict = new Dictionary<EnemySO, EnemyCreator>();
+
+
+
+
+        void OnGUI()
+        {
+            var startY = 10;
+            var margin = 12;
+
+            foreach (var item in poolDict)
+            {
+                GUI.Label(new Rect(10, startY + margin * 0, 200, 20), $"Enemy: {item.Key.name}");
+                GUI.Label(new Rect(10, startY + margin * 1, 200, 20), $"CountActive: {item.Value.CountActive}");
+                GUI.Label(new Rect(10, startY + margin * 2, 200, 20), $"CountInactive: {item.Value.CountInactive}");
+                GUI.Label(new Rect(10, startY + margin * 3, 200, 20), $"CountAll: {item.Value.CountAll}");
+                GUI.Label(new Rect(10, startY + margin * 4, 200, 20), "--------------------------------");
+
+                startY += margin * 7;
+            }
+
+        }
+
+
+
+
+        public ObjectPool<Enemy> GetPoolForTypeOfEnemy(EnemySO enemySO)
+        {
+            return poolDict[enemySO];
+        }
+
+
+        /// <summary>
+        /// For each type of enemy, setup an EnemyCreator and point the pool to that.
+        /// Have a pool for each type of enemy.
+        /// </summary>
+        private void CreatePools()
+        {
+            foreach (EnemySO enemySO in GameManager.Instance.ScriptableObjects.Enemies)
+            {
+                // setup a creator
+                var creator = new EnemyCreator();
+
+                // create a new pool which gets its objects from the newly setup EnemyCreator 
+                var p = new ObjectPool<Enemy>(creator.CreatePooledEnemy, OnTakeFromPool, OnReturnToPool);
+                poolDict.Add(enemySO, p);
+
+
+                // fill the EnemyCreator with relevant info.
+                creator.enemySO = enemySO;
+                creator.spawner = enemySpawner;
+                creator.pool = p;
+                creatorDict.Add(enemySO, creator);
+            }
+        }
+
+
+        public void Setup()
+        {
+            CreatePools();
+        }
+
+
+        private void OnTakeFromPool(Enemy e)
+        {
+            print("OnTakeFromPool");
+            e.gameObject.SetActive(true);
+        }
+
+        private void OnReturnToPool(Enemy e)
+        {
+            print("OnReturnToPool");
+            e.gameObject.SetActive(false);
+        }
+
+        internal void SpawnPack()
+        {
+            enemySpawner.SpawnPack();
+        }
+
+
+
+
+
+
         //private DropManager dropManager = new DropManager();
 
 
         #region Variables
 
         public AnimationCurve EnemyHealthCurve => enemyHealthCurve;
+
+        internal void BeginSpawning()
+        {
+            enemySpawner.BeginSpawning();
+        }
+
         public int MaxEnemyLevel => maxEnemyLevel;
 
 
@@ -58,29 +160,20 @@ namespace MeteorGame
         {
             aliveEnemies = new List<Enemy>();
             Instance = this;
+
+
         }
 
-        private void OnEnable()
-        {
-            Instance = this;
-        }
 
-       
-
-        private void Start()
-        {
-            
-        }
-
-        private void Update()
-        {
-
-        
-        }
 
         #endregion
 
         #region Methods
+
+
+
+
+
 
         private void SpawnGoldDrop(CoinSize whichCoin, Vector3 pos)
         {
@@ -199,18 +292,13 @@ namespace MeteorGame
 
         internal void DestroyAllEnemies()
         {
-            var copy = new List<Enemy>(aliveEnemies);
-
-            foreach (var e in copy)
-            {
-                e.ForceDie();
-            }
+            
 
 
-            foreach (Transform child in enemiesHolder)
-            {
-                Destroy(child.gameObject);
-            }
+            //foreach (Transform child in enemiesHolder)
+            //{
+            //    Destroy(child.gameObject);
+            //}
         }
 
         //internal Enemy PickEnemyToChainTo(Enemy from, Enemy except = null)
@@ -231,6 +319,7 @@ namespace MeteorGame
 
         //    return refined.ElementAt(UnityEngine.Random.Range(0, refined.Count()));
         //}
+
 
 
 

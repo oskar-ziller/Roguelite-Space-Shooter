@@ -12,14 +12,21 @@ namespace MeteorGame
 
         public string internalName;
         public string prettyName;
-        public float timeBetweenCasts;
+        //public float timeBetweenCasts;
         public float castTime;
         public float projectileSpeed;
-        public float projectileLifetimeSeconds;
+        public float projectileLifetime;
         public int projectileCount;
 
+
+        [Header("Prefabs")]
+
+        [Tooltip("Actual object that travels")]
         public ProjectileBase projectilePrefab;
+        [Tooltip("Dummy object that shows up (at wand etc.) before travel")]
         public ProjectileDummy dummyPrefab;
+        [Tooltip("Explosion object to spawn when proj explodes")]
+        public Explosion explosionPrefab;
 
 
         [Tooltip("Uncheck to disable from loading")]

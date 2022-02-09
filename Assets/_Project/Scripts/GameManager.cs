@@ -45,7 +45,6 @@ namespace MeteorGame
 
 
         [Header("References")]
-        [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private TabMenuManager tabMenuManager;
 
         public float MaxGameLevel => maxGameLevel;
@@ -106,8 +105,9 @@ namespace MeteorGame
             Cursor.lockState = CursorLockMode.Locked;
             //TabMenuManager.RebuildTabMenu();
 
-            enemySpawner.Setup();
-            enemySpawner.BeginSpawning();
+            EnemyManager.Instance.Setup();
+
+            EnemyManager.Instance.BeginSpawning();
 
             tabMenuManager.Setup();
 
@@ -132,14 +132,13 @@ namespace MeteorGame
 
             if (Input.GetKeyDown(KeyCode.KeypadMinus))
             {
-                //debugElapsed += TimeSpan.FromSeconds(120);
-                StartCoroutine(enemySpawner.PackSpawnStart());
+                EnemyManager.Instance.SpawnPack();
             }
 
-            if (Input.GetKeyDown(KeyCode.Backspace))
-            {
-                EnemyManager.Instance.DestroyAllEnemies();
-            }
+            //if (Input.GetKeyDown(KeyCode.Backspace))
+            //{
+            //    EnemyManager.Instance.DestroyAllEnemies();
+            //}
 
             var secondsToMax = minutesToHitMaxGameLevel * 60;
             var val = HowFarIntoDifficulty().TotalSeconds / secondsToMax;

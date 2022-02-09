@@ -5,10 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using UnityEngine.Pool;
 
 namespace MeteorGame
 {
+
+    [RequireComponent(typeof(PackSpawner))]
     public class EnemySpawner : MonoBehaviour
     {
         #region Variables
@@ -23,7 +25,6 @@ namespace MeteorGame
         [Tooltip("How much further should max level enemies spawn on top of startPosMinHeight")]
         [SerializeField] private int startPosVariance;
 
-        private WeightedRandomEnemy spawnDirector;
 
 
         [Tooltip("Min delay between two pack spawns in seconds")]
@@ -57,6 +58,25 @@ namespace MeteorGame
 
 
 
+        public Enemy testPrefab;
+
+        private PackSpawner packSpawner;
+
+
+
+        //public ObjectPool<Enemy> pooledEnemies;
+
+
+
+
+
+
+        private void Awake()
+        {
+            //pooledEnemies = new ObjectPool<Enemy>(CreatePooledEnemy, OnTakeFromPool, OnReturnToPool);
+            packSpawner = GetComponent<PackSpawner>();
+        }
+
 
 
 
@@ -86,6 +106,11 @@ namespace MeteorGame
             }
         }
 
+        private void Update()
+        {
+
+        }
+
 
 
 
@@ -95,13 +120,13 @@ namespace MeteorGame
 
         #endregion
 
+
         #region Unity Methods
 
 
-        public void Setup()
-        {
-            spawnDirector = new WeightedRandomEnemy();
-        }
+
+
+
 
         private float CalculateNextWaveDelay()
         {
@@ -114,11 +139,31 @@ namespace MeteorGame
         }
 
 
+
+        public void SpawnPack()
+        {
+            StartCoroutine(SpawnPackCoroutine());
+        }
+
+
+        private IEnumerator SpawnPackCoroutine()
+        {
+            var info = new PackSpawnInfo();
+
+            info.enemyHolder = enemyHolder;
+            info.enemySpacing = spacingBetweenEnemies;
+            info.packHeight = PackHeightAtCurrentGameLevel;
+            info.spawnerMoney = PackMoneyAtCurrentGameLevel;
+            info.packShape = PackShape.Sphere;
+
+            yield return packSpawner.SpawnPack(info);
+        }
+
         private IEnumerator SpawnLoop()
         {
             while (true)
             {
-                yield return PackSpawnStart();
+                yield return SpawnPackCoroutine();
                 yield return new WaitForSeconds(CalculateNextWaveDelay());
             }
         }
@@ -130,66 +175,6 @@ namespace MeteorGame
         }
 
 
-        private IEnumerator GeneratePositions(List<EnemySO> enemiesToSpawn)
-        {
-            bool cointoss = Random.value < 0.5f;
-            PackShape randShape = PackShape.Sphere;
-
-            if (cointoss)
-            {
-                randShape = PackShape.Cube;
-            }
-
-            var randomSpacingRange = Random.Range(-spacingBetweenEnemies / 2, spacingBetweenEnemies / 2);
-
-            var generator = new PositionGenerator(packShape: randShape,
-                                                  spacing: spacingBetweenEnemies + randomSpacingRange,
-                                                  spawnList: enemiesToSpawn);
-
-            yield return generator.Generate();
-        }
-
-
-
-        public IEnumerator PackSpawnStart()
-        {
-
-            print($"PackSpawnStart");
-
-
-            spawnDirector.totalMoney = PackMoneyAtCurrentGameLevel;
-            List<EnemySO> enemiesToSpawn = spawnDirector.CreateSpawnList();
-
-            print($"Total enemies to spawn {enemiesToSpawn.Count}");
-           
-            yield return GeneratePositions(enemiesToSpawn);
-
-
-            var height = PackHeightAtCurrentGameLevel;
-            var pos = Random.onUnitSphere * height;
-
-            var holder = new GameObject("Pack");
-            holder.transform.parent = enemyHolder;
-
-            Transform packTest;
-
-            if (randShape == PackShape.Cube)
-            {
-                packTest = Instantiate(packTestCube);
-            }
-            else
-            {
-                packTest = Instantiate(packTestSphere);
-            }
-
-            packTest.localScale = Vector3.one * generator.regionExtends * 2;
-
-            packTest.SetParent(holder.transform);
-            packTest.position = pos;
-
-            yield return SpawnCandidatesAroundPoint(pos, generator.spawnPositions, holder.transform);
-        }
-
         public void BeginSpawning()
         {
             if (spawnLoop_Co != null)
@@ -200,50 +185,22 @@ namespace MeteorGame
             spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
 
-        void Update()
-        {
-
-            if (Input.GetKeyDown(KeyCode.Backspace))
-            {
-
-            }
-
-            if (Input.GetKeyDown(KeyCode.Insert))
-            {
-                EnemyManager.Instance.DestroyAllEnemies();
-            }
-
-        }
 
         #endregion
 
         #region Methods
 
 
-        private Enemy SpawnEnemy(EnemySO enemySO)
+        public Enemy SpawnEnemy(EnemySO kind, ObjectPool<Enemy> p)
         {
-            Enemy e = Instantiate(enemySO.Prefab, Vector3.zero, Quaternion.identity);
-            e.gameObject.layer = LayerMask.NameToLayer("Enemies");
+            Enemy e = Instantiate(kind.Prefab);
+            e.SetPool(p);
             return e;
         }
 
-        private IEnumerator SpawnCandidatesAroundPoint(Vector3 point, List<FindSpawnPosResult> candidates, Transform parent)
-        {
-            print("SpawnCandidatesAroundPoint");
 
-            Vector3 spawnPos;
 
-            foreach (FindSpawnPosResult result in candidates)
-            {
-                spawnPos = point + result.SpawnPos;
 
-                Enemy e = SpawnEnemy(result.EnemySO);
-
-                yield return new WaitForSeconds(0.02f);
-            }
-
-            yield return null;
-        }
 
 
         #endregion

@@ -11,7 +11,6 @@ namespace MeteorGame
         [NonSerialized] private GemItem gemItem;
 
         private string prettyName;
-        private float timeBetweenCasts;
         private float castTime;
 
         private float projectileSpeed;
@@ -52,13 +51,12 @@ namespace MeteorGame
             Name = spellSO.internalName;
             prettyName = spellSO.prettyName;
 
-            timeBetweenCasts = spellSO.timeBetweenCasts;
             castTime = spellSO.castTime;
 
             projectileSpeed = spellSO.projectileSpeed;
             projectileCount = spellSO.projectileCount;
 
-            projectileLifetimeSeconds = spellSO.projectileLifetimeSeconds;
+            projectileLifetimeSeconds = spellSO.projectileLifetime;
         }
 
         //private int CalculateProjectileCount()

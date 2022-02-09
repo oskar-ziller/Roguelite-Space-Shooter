@@ -15,8 +15,6 @@ namespace MeteorGame
         public List<EnemySO> Enemies = new List<EnemySO>();
 
 
-        private bool isLoaded = false;
-
         public void Load()
         {
             List<ModifierSO> modifierSOs = Resources.LoadAll<ModifierSO>("ScriptableObjects/Shooting/Modifiers").ToList();
@@ -55,8 +53,6 @@ namespace MeteorGame
                     Enemies.Add(item);
                 }
             }
-
-            isLoaded = true;
         }
 
 

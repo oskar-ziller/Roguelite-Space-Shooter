@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 4
+  version: 5
 --- !u!21 &2100000
 Material:
   serializedVersion: 6
@@ -89,6 +89,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - Vector1_2f0ce5f1ae0e44f0a87c5d1a9dc86cf6: 82.55
     - Vector1_308d54380db3421d8d16a1995a3adb8c: 1.45
@@ -130,7 +131,7 @@ Material:
     - Vector2_2e78fa75ac834bd9a3191abacc9e3e93: {r: 0.02, g: 0.1, b: 0.02, a: 0}
     - Vector2_321b5cbc031843cebb992e8987a307ca: {r: 0.06, g: 0.04, b: 0.04, a: 0}
     - _BaseColor: {r: 0.745283, g: 0.5855795, b: 0, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.745283, g: 0.5855795, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

@@ -8,7 +8,7 @@ namespace MeteorGame
     public class FireBallProjectile : ProjectileBase
     {
 
-        [SerializeField] private ExplosionHandler explosionPrefab;
+        [SerializeField] private Explosion explosionPrefab;
 
 
 
