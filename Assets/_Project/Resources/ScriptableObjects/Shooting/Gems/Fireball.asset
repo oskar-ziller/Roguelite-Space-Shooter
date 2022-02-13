@@ -13,20 +13,18 @@ MonoBehaviour:
   m_Name: Fireball
   m_EditorClassIdentifier: 
   modifiers:
-  - modifier: {fileID: 11400000, guid: 559c0136b503b174db6423f72defb87c, type: 2}
-    min: 80
+  - modifierSO: {fileID: 11400000, guid: 559c0136b503b174db6423f72defb87c, type: 2}
+    min: 200
     max: 1095
-  - modifier: {fileID: 11400000, guid: e71cf720cf27e4b4296f190dda0f7dd0, type: 2}
-    min: 100
-    max: 100
-  - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
-    min: 80
-    max: 80
-  - modifier: {fileID: 11400000, guid: 931d8f259a2e1af439a68ee87fac0709, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
+    min: 18
+    max: 24
+  - modifierSO: {fileID: 11400000, guid: e71cf720cf27e4b4296f190dda0f7dd0, type: 2}
     min: 10
     max: 80
   name: Fireball
   gemColor: {r: 0.8018868, g: 0.12655279, b: 0.055980746, a: 1}
   spellSO: {fileID: 11400000, guid: 5c81a95ece82fa24a8a6a535808fcb82, type: 2}
+  isEnabled: 1
   description: Unleashes a ball of fire towards a target which explodes, damaging
     nearby foes

@@ -11,7 +11,7 @@ namespace MeteorGame
         Chill,
         ChillingArea,
         Freeze,
-        Shock,
-        Ignite,
+        Weaken,
+        Burn,
     }
 }

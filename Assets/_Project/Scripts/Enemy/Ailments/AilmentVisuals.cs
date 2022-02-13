@@ -10,13 +10,13 @@ namespace MeteorGame
         #region Variables
 
         [SerializeField]
-        private GameObject igniteVisuals;
+        private GameObject burningVisuals;
 
         [SerializeField]
         private GameObject chillAndFreezeVisuals;
 
         [SerializeField]
-        private GameObject shockVisuals;
+        private GameObject weakenVisuals;
 
         private AilmentManager ailmentManager;
 
@@ -64,34 +64,34 @@ namespace MeteorGame
                 }
             }
 
-            if (ailmentManager.IgniteStacks.Count > 0)
+            if (ailmentManager.BurnStacks.Count > 0)
             {
-                if (!igniteVisuals.activeInHierarchy)
+                if (!burningVisuals.activeInHierarchy)
                 {
-                    igniteVisuals.SetActive(true);
+                    burningVisuals.SetActive(true);
                 }
             }
             else
             {
-                if (igniteVisuals.activeInHierarchy)
+                if (burningVisuals.activeInHierarchy)
                 {
-                    igniteVisuals.SetActive(false);
+                    burningVisuals.SetActive(false);
                 }
             }
 
 
-            if (ailmentManager.Shock != null)
+            if (ailmentManager.Weaken != null)
             {
-                if (!shockVisuals.activeInHierarchy)
+                if (!weakenVisuals.activeInHierarchy)
                 {
-                    shockVisuals.SetActive(true);
+                    weakenVisuals.SetActive(true);
                 }
             }
             else
             {
-                if (shockVisuals.activeInHierarchy)
+                if (weakenVisuals.activeInHierarchy)
                 {
-                    shockVisuals.SetActive(false);
+                    weakenVisuals.SetActive(false);
                 }
             }
 

@@ -47,14 +47,14 @@ namespace MeteorGame
             transform.parent = null;
             gameObject.SetActive(true);
             SpellCaster.AddCreepingFrostChillingArea(this);
-            transform.DOScale(castBy.ExpRadi * 2, expandDur).SetEase(easingExpand);
+            transform.DOScale(castBy.Modifiers.ExplosionRadi * 2, expandDur).SetEase(easingExpand);
 
             // setup destruction
             
-            StartCoroutine(DestroyWithDelay(castBy.ProjLifetime));
+            //StartCoroutine(DestroyWithDelay(castBy.Modifiers.ProjectileLifetime));
 
             // if have too many, destroy oldest
-            var countLimit = castBy.ChillingAreaLimit;
+            var countLimit = castBy.GetTotal("ChillingAreaLimit");
 
             if (SpellCaster.CreepingFrostChillingAreaCount() > countLimit)
             {

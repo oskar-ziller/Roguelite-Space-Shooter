@@ -9,7 +9,12 @@ namespace MeteorGame
     public class ModifierSO : ScriptableObject
     {
         public string internalName;
-        public bool hasValues = true;
+
+        public bool hasNumericalValue = true;
+
+        public bool multiplicative = false;
+
+        public bool isReduction;
 
         [TextArea]
         public string description;

@@ -19,23 +19,24 @@ namespace MeteorGame
         private const float minFreezeDur = 0.3f; // 0.3 seconds
         private const float maxFreezeDur = 3f; // 3 seconds
 
-        private const float minShockEffect = 0.05f; // 5%
-        private const float maxShockEffect = 0.50f; // 50%
-        private const float baseShockDurationSeconds = 2;
+        private const float minWeakenEffect = 0.05f; // 5%
+        private const float maxWeakenEffect = 0.50f; // 50%
+        private const float baseWeakenDurationSeconds = 2;
 
-        const float baseIgniteDPSMultip = 0.5f; // 50% of the base damage of the hit 
-        const float baseIgniteDurationSeconds = 4;
+        const float baseBurnDPSMultip = 0.5f; // 50% of the base damage of the hit 
+        const float baseBurnDurationSeconds = 4;
+        public const float BurnTickInterval = 0.5f;
 
         public const float ChillingAreaEffect = 0.1f;
-        public const float IgniteTickInterval = 0.5f;
 
         public bool InChillingArea { get; private set; } = false;
 
         public Ailment Chill { get; private set; } = null;
-        public Ailment Shock { get; private set; } = null;
+        public Ailment Weaken { get; private set; } = null;
         public Ailment Freeze { get; private set; } = null;
 
-        public List<Ailment> IgniteStacks { get; private set; } = new List<Ailment>();
+        public List<Ailment> BurnStacks { get; private set; } = new List<Ailment>();
+
 
 
         private void Awake()
@@ -45,8 +46,21 @@ namespace MeteorGame
 
         private float Formula(float damage, float hp, float increasedBy)
         {
-            return 0.5f * (float)Math.Pow(damage / hp, 0.4) * ((increasedBy/100) + 1);
+            return 0.5f * (float)Math.Pow(damage / hp, 0.4) * (increasedBy + 1);
         }
+
+
+
+        internal void Reset()
+        {
+            Chill = null;
+            Freeze = null;
+            Weaken = null;
+            BurnStacks.Clear();
+            InChillingArea = false;
+        }
+
+
 
 
         private IEnumerator RemoveAilmentWhenExpired(Ailment a)
@@ -69,23 +83,24 @@ namespace MeteorGame
                 Freeze = null;
             }
 
-            if (a.type == Ailments.Shock)
+            if (a.type == Ailments.Weaken)
             {
-                Shock = null;
+                Weaken = null;
             }
 
-            if (a.type == Ailments.Ignite)
+            if (a.type == Ailments.Burn)
             {
-                IgniteStacks.Remove(a);
+                BurnStacks.Remove(a);
             }
         }
+
 
         private void AddAilment(Ailment a)
         {
 
-            if (a.type == Ailments.Ignite)
+            if (a.type == Ailments.Burn)
             {
-                IgniteStacks.Add(a);
+                BurnStacks.Add(a);
                 StartCoroutine(RemoveAilmentWhenExpired(a));
                 return;
             }
@@ -110,12 +125,12 @@ namespace MeteorGame
                 }
             }
 
-            if (a.type == Ailments.Shock)
+            if (a.type == Ailments.Weaken)
             {
-                if (Shock == null || a.magnitude > Shock.magnitude)
+                if (Weaken == null || a.magnitude > Weaken.magnitude)
                 {
                     //print($"Adding ailment {a.type} - magnitude: {a.magnitude} - duration: {a.duration}");
-                    Shock = a;
+                    Weaken = a;
                     StartCoroutine(RemoveAilmentWhenExpired(a));
                     return;
                 }
@@ -125,12 +140,12 @@ namespace MeteorGame
 
         internal void CheckIfDamageAppliesAilment(SpellSlot from, int fireFinal, int coldFinal, int lightFinal)
         {
-            CheckForIgnite(from, fireFinal);
+            CheckForBurn(from, fireFinal);
             CheckForFeezeAndChill(from, coldFinal);
-            CheckForShock(from, lightFinal);
+            CheckForWeaken(from, lightFinal);
         }
 
-        private void CheckForShock(SpellSlot from, float damageAmount)
+        private void CheckForWeaken(SpellSlot from, float damageAmount)
         {
             // chance based
 
@@ -139,10 +154,10 @@ namespace MeteorGame
                 return;
             }
 
-            var shockChance = from.GetTotal("ChanceToShock") / 100f;
-            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToShock");
+            var weakenChance = from.GetTotal("ChanceToWeaken")/100f;
+            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToWeaken");
 
-            var totalChance = shockChance * (1 + chanceIncreasedBy);
+            var totalChance = weakenChance * chanceIncreasedBy;
 
             var cointoss = UnityEngine.Random.value;
 
@@ -151,28 +166,27 @@ namespace MeteorGame
                 return;
             }
 
-            float effectIncreasedBy = from.GetTotal("IncreasedEffectOfShock") / 100f;
-            effectIncreasedBy += from.GetTotal("IncreasedEffectOfLightningAilments") / 100f;
+            float effectIncreasedBy = from.GetTotal("IncreasedEffectOfWeaken");
             var effect = Formula(damageAmount, owner.totalHealth, effectIncreasedBy);
 
-            if (effect < minShockEffect)
+            if (effect < minWeakenEffect)
             {
                 // do nothing
                 return;
             }
 
-            if (effect > maxShockEffect)
+            if (effect > maxWeakenEffect)
             {
-                effect = maxShockEffect;
+                effect = maxWeakenEffect;
             }
 
-            var duration = baseShockDurationSeconds;
-            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfLigtningAilments") / 100f;
+            var duration = baseWeakenDurationSeconds;
+            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfWeaken");
 
-            duration *= 1 + durationIncreasedBy;
+            duration *= durationIncreasedBy;
 
             Ailment a = new Ailment();
-            a.type = Ailments.Shock;
+            a.type = Ailments.Weaken;
             a.duration = duration;
             a.magnitude = effect;
 
@@ -207,10 +221,10 @@ namespace MeteorGame
                 return;
             }
 
-            var freezeChance = from.GetTotal("ChanceToFreeze") / 100f;
-            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToFreeze") / 100f;
+            var freezeChance = from.GetTotal("ChanceToFreeze")/100f;
+            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToFreeze");
 
-            var totalChance = freezeChance * (1 + chanceIncreasedBy);
+            var totalChance = freezeChance * chanceIncreasedBy;
 
             var cointoss = UnityEngine.Random.value;
 
@@ -226,12 +240,11 @@ namespace MeteorGame
             float dur = damagePercentage * 0.06f;
 
 
-            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfFreeze") / 100f;
-            durationIncreasedBy += from.GetTotal("IncreasedDurationOfColdAilments") / 100f;
+            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfFreeze");
+            float increasedDurationOfColdAilments = from.GetTotal("IncreasedDurationOfColdAilments");
+            float durationReducedBy = from.GetTotal("ReducedDurationOfFreeze");
 
-            float durationReducedBy = from.GetTotal("ReducedDurationOfFreeze") / 100f;
-
-            dur = dur * (1 + durationIncreasedBy) * (1 - durationReducedBy);
+            dur = dur * durationIncreasedBy * increasedDurationOfColdAilments * durationReducedBy;
 
             if (dur < minFreezeDur)
             {
@@ -259,8 +272,8 @@ namespace MeteorGame
                 return;
             }
 
-            float increasedBy = from.GetTotal("IncreasedEffectOfChill") / 100f;
-            increasedBy += from.GetTotal("IncreasedEffectOfColdAilments") / 100f;
+            float increasedBy = from.GetTotal("IncreasedEffectOfChill");
+            var increasedEffectOfColdAilments = from.GetTotal("IncreasedEffectOfColdAilments");
 
             var effect = Formula(damageAmount, owner.totalHealth, increasedBy);
 
@@ -276,9 +289,9 @@ namespace MeteorGame
             }
 
             var duration = baseChillDurationSeconds;
-            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfColdAilments") / 100f;
+            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfColdAilments");
 
-            duration *= 1 + durationIncreasedBy;
+            duration *= durationIncreasedBy;
 
             Ailment a = new Ailment();
             a.type = Ailments.Chill;
@@ -303,17 +316,17 @@ namespace MeteorGame
         }
 
 
-        private void CheckForIgnite(SpellSlot from, float damageAmount)
+        private void CheckForBurn(SpellSlot from, float damageAmount)
         {
             if (damageAmount <= 0)
             {
                 return;
             }
 
-            var igniteChance = from.GetTotal("ChanceToIgnite") / 100f;
-            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToIgnite") / 100f;
+            var burnChance = from.GetTotal("ChanceToBurn")/100f;
+            float chanceIncreasedBy = from.GetTotal("IncreasedChanceToBurn");
 
-            var totalChance = igniteChance * (1 + chanceIncreasedBy);
+            var totalChance = burnChance * chanceIncreasedBy;
 
             var cointoss = UnityEngine.Random.value;
 
@@ -322,21 +335,20 @@ namespace MeteorGame
                 return;
             }
 
-            var duration = baseIgniteDurationSeconds;
-            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfFireAilments") / 100f;
+            var duration = baseBurnDurationSeconds;
+            float durationIncreasedBy = from.GetTotal("IncreasedDurationOfBurn");
 
-            duration *= 1 + durationIncreasedBy;
+            duration *= durationIncreasedBy;
 
 
-            var increasedDamage = from.GetTotal("IncreasedIgniteDamage") / 100f;
-            var damageMultip = 1 + increasedDamage;
+            var increasedDamage = from.GetTotal("IncreasedDamageWithBurn");
 
             // The burning damage over time is 50% of the base damage of the hit
-            int totalDamage = (int)(damageAmount * damageMultip * baseIgniteDPSMultip);
+            int totalDamage = (int)(damageAmount * increasedDamage * baseBurnDPSMultip);
 
 
             Ailment a = new Ailment();
-            a.type = Ailments.Ignite;
+            a.type = Ailments.Burn;
             a.duration = duration;
             a.magnitude = totalDamage;
 

@@ -13,7 +13,7 @@ namespace MeteorGame
         public string internalName;
         public string prettyName;
         //public float timeBetweenCasts;
-        public float castTime;
+        public float shootTime;
         public float projectileSpeed;
         public float projectileLifetime;
         public int projectileCount;

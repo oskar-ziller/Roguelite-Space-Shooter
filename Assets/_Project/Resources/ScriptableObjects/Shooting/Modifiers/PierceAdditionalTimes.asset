@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc9ad23a3a9bcb94291c67beba889b6d, type: 3}
   m_Name: PierceAdditionalTimes
   m_EditorClassIdentifier: 
-  internalName: 
-  hasValues: 1
-  description: 
+  internalName: PierceAdditionalTimes
+  hasNumericalValue: 1
+  multiplicative: 0
+  isReduction: 0
+  description: Projectles pierce and pass through XXX additional enemies
   isEnabled: 1

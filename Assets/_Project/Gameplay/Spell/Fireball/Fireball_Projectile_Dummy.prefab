@@ -97,7 +97,7 @@ MonoBehaviour:
   maxRange: 0.012
   speed: 0
   range: 0
-  distFromCenter: 0.1
+  distFromCenter: 0.06
   rotateSpeed: 45
   startDeg: 0
 --- !u!1 &8715521394957105094
@@ -128,8 +128,8 @@ Transform:
   m_GameObject: {fileID: 8715521394957105094}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.14, y: 0.14, z: 0.14}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2834684555898613996}
   m_RootOrder: 0

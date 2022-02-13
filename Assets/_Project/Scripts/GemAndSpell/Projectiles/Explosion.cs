@@ -69,7 +69,7 @@ namespace MeteorGame
             // Particle uses vertex streams to communicate with the shader
             // to fade out over time
             ParticleSystem.MainModule main = ps.main;
-            main.startSize = castBy.ExpRadi;
+            main.startSize = castBy.Modifiers.ExplosionRadi;
 
             ps.Play();
         }

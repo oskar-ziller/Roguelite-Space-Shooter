@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d062e009af055c54385329c8f2095fa3, type: 3}
+  m_Name: Tier4
+  m_EditorClassIdentifier: 
+  Name: Tier4
+  HealthMultiplier: 16
+  SpeedMultiplier: 0.4
+  ShapeRadi: 12
+  SpawnEntry:
+    weight: 10
+    cost: 10
+  IsEnabled: 1
+  BodyMat: {fileID: 2100000, guid: 77926865e504b9c41abd51fbd223f185, type: 2}
+  BodyMesh: {fileID: 4300000, guid: df03fd430b12db74c87caa0b9332d3fe, type: 2}

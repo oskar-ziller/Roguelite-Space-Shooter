@@ -13,23 +13,24 @@ MonoBehaviour:
   m_Name: CreepingFrost
   m_EditorClassIdentifier: 
   modifiers:
-  - modifier: {fileID: 11400000, guid: 485888f690f0943498ea02e8ec223e89, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 485888f690f0943498ea02e8ec223e89, type: 2}
     min: 16
     max: 570
-  - modifier: {fileID: 11400000, guid: f287a39cac42b7345836095102541341, type: 2}
+  - modifierSO: {fileID: 11400000, guid: f287a39cac42b7345836095102541341, type: 2}
     min: 4
     max: 12
-  - modifier: {fileID: 11400000, guid: 9e346463b3f01314290dc665be30b9a7, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 9e346463b3f01314290dc665be30b9a7, type: 2}
     min: 20
     max: 1490
-  - modifier: {fileID: 11400000, guid: 6f610086f72adba44834d7b702207634, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
     min: 4
     max: 12
-  - modifier: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
-    min: 8
-    max: 10
+  - modifierSO: {fileID: 11400000, guid: 6f610086f72adba44834d7b702207634, type: 2}
+    min: 4
+    max: 12
   name: Creeping Frost
   gemColor: {r: 0, g: 0.7392225, b: 1, a: 1}
   spellSO: {fileID: 11400000, guid: f34051d563bba1b4794c1f97c1db879a, type: 2}
+  isEnabled: 1
   description: 'Fire an icy projectile that bursts on impact, dealing area damage
     and creating a chilling area that deals cold damage over time. '

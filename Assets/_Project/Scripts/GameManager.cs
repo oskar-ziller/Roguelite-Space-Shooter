@@ -26,7 +26,7 @@ namespace MeteorGame
         [Tooltip("Curve of Min-Max level in Min-Max minutes")]
         [SerializeField] private AnimationCurve difficultyCurve;
 
-        [SerializeField] private float maxGameLevel = 100;
+        [SerializeField] private int maxGameLevel = 100;
 
 
 
@@ -49,19 +49,22 @@ namespace MeteorGame
 
         public float MaxGameLevel => maxGameLevel;
         public AnimationCurve DifficultyCurve => difficultyCurve;
-        public float GameLevel => gameLevel;
+        public int GameLevel => gameLevel;
         public TabMenuManager TabMenuManager => tabMenuManager;
         public bool IsGamePaused { get; private set; }
 
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
 
-        private Stopwatch gameStartSW = Stopwatch.StartNew();
-        private TimeSpan debugElapsed;
-        private float debugGameLevel = 0;
-        private float gameLevel = 0; // derived from minutes since start and difficultyCurve
+        //private Stopwatch gameStartSW = Stopwatch.StartNew();
 
-        public Stopwatch gamePlaySW = Stopwatch.StartNew();
+        private float gameLaunchTime;
+        private float gamePlayTime;
+        private float debugElapsedSeconds;
+        private float debugGameLevel = 0;
+        private int gameLevel = 1; // derived from minutes since start and difficultyCurve
+
+        //public Stopwatch gamePlaySW = Stopwatch.StartNew();
 
 
         private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
@@ -73,17 +76,27 @@ namespace MeteorGame
 
         #region Unity Methods
 
+        private void KeepGameTime()
+        {
+            gameLaunchTime += Time.deltaTime;
+
+            if (!IsGamePaused)
+            {
+                gamePlayTime += Time.deltaTime;
+            }
+        }
+
+
+
 
         public void PauseGame()
         {
-            gameStartSW.Stop();
             Time.timeScale = 0;
             IsGamePaused = true;
         }
 
         public void ResumeGame()
         {
-            gameStartSW.Start();
             Time.timeScale = 1;
             IsGamePaused = false;
         }
@@ -92,6 +105,7 @@ namespace MeteorGame
         private void Awake()
         {
             Instance = this;
+            gameLaunchTime = Time.time;
         }
 
         private void Start()
@@ -99,9 +113,8 @@ namespace MeteorGame
 
             // load scriptable objects
             scriptableObjects.Load();
+            gamePlayTime = Time.time;
 
-
-            gameStartSW.Restart();
             Cursor.lockState = CursorLockMode.Locked;
             //TabMenuManager.RebuildTabMenu();
 
@@ -111,6 +124,10 @@ namespace MeteorGame
 
             tabMenuManager.Setup();
 
+
+            Player.Instance.Setup();
+
+            SpellCaster.Instance.Setup();
 
             Player.Instance.DebugAddStuff();
         }
@@ -135,29 +152,36 @@ namespace MeteorGame
                 EnemyManager.Instance.SpawnPack();
             }
 
-            //if (Input.GetKeyDown(KeyCode.Backspace))
-            //{
-            //    EnemyManager.Instance.DestroyAllEnemies();
-            //}
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                EnemyManager.Instance.DestroyAllEnemies();
+            }
 
             var secondsToMax = minutesToHitMaxGameLevel * 60;
-            var val = HowFarIntoDifficulty().TotalSeconds / secondsToMax;
+            var val = HowFarIntoDifficulty() / secondsToMax;
             var rounded = Math.Round(val, 6);
             var secondsPercentage = (float)rounded;
             var eval = difficultyCurve.Evaluate(secondsPercentage);
-            var res = Mathf.Floor(eval * maxGameLevel);
+            var res = Mathf.Floor(eval * maxGameLevel) + 1;
 
-            gameLevel = res + debugGameLevel;
+            gameLevel = (int)res + (int)debugGameLevel;
 
             if (gameLevel > maxGameLevel)
             {
                 gameLevel = maxGameLevel;
             }
+
+
+
+
+
+
+            KeepGameTime();
         }
 
-        public TimeSpan HowFarIntoDifficulty()
+        public float HowFarIntoDifficulty()
         {
-            return gameStartSW.Elapsed + debugElapsed;
+            return gamePlayTime + debugElapsedSeconds;
         }
 
         #endregion

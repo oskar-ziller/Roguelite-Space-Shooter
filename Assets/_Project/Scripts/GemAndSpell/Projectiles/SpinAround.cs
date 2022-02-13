@@ -44,7 +44,7 @@ namespace MeteorGame
 
         private void CalculateOffset()
         {
-            if (totalCount == 1)
+            if (totalCount == 1 || projID == 0)
             {
                 offset = Vector3.zero;
                 return;

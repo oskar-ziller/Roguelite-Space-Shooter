@@ -28,8 +28,7 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
-  disabledShaderPasses:
-  - SHADOWCASTER
+  disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -53,6 +52,8 @@ Material:
     - Vector1_92e995d9f55d48a39a9b165a59ae9117: 1.2
     - Vector1_bc7f305cd7544b42baffce828db49bfa: 85.23
     - Vector1_f86753b3081c4b50b92868546206940d: 0.086
+    - _QueueControl: 0
+    - _QueueOffset: 0
     m_Colors:
     - Color_3ab97b5cd00a4714b67dc91342b21fc0: {r: 0.5660378, g: 0.086276345, b: 0, a: 0.9647059}
     - Color_9dbe0583660844fd83494c072f17b52d: {r: 0.4811321, g: 0.29150492, b: 0, a: 1}

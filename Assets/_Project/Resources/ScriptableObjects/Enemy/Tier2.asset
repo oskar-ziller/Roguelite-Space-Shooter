@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d062e009af055c54385329c8f2095fa3, type: 3}
   m_Name: Tier2
   m_EditorClassIdentifier: 
-  name: Tier2
+  Name: Tier2
   HealthMultiplier: 4
-  SpeedMultiplier: 1
-  ShapeRadi: 0.5
-  Prefab: {fileID: 1073891619112656221, guid: 338c3e64436f2b843ba086b5f16f971b, type: 3}
+  SpeedMultiplier: 0.8
+  ShapeRadi: 3
   SpawnEntry:
-    weight: 1000
-    cost: 1
+    weight: 300
+    cost: 2
   IsEnabled: 1
+  BodyMat: {fileID: 2100000, guid: c841ac97d22d7e24bb0105d457f695be, type: 2}
+  BodyMesh: {fileID: 4300000, guid: 502caac999291ec4d9bf54a7abf87425, type: 2}

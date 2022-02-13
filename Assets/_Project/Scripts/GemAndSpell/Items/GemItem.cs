@@ -40,7 +40,7 @@ namespace MeteorGame
         private string statColorDark = "#969494";
         private string statColorCold = "#58c4f4";
         private string statColorFire = "#ff4d07";
-        private string statColorLightning = "#85fa46";
+        private string statColorRadiation = "#85fa46";
         private string statColorDoT = "#00ff9c";
 
         private int smallStatSize = 80;
@@ -74,7 +74,7 @@ namespace MeteorGame
 
         public int GetModifierValueForCurrentLevel(ModifierSO m)
         {
-            var gemMod = modifiers.FirstOrDefault(mod => mod.modifier == m);
+            var gemMod = modifiers.FirstOrDefault(mod => mod.modifierSO == m);
 
             if (gemMod == null) // mod doesnt exist
             {
@@ -116,10 +116,10 @@ namespace MeteorGame
             input = input.Replace("chill", $"<b><color={statColorCold}>chill</color></b>");
 
             input = input.Replace("fire", $"<b><color={statColorFire}>fire</color></b>");
-            input = input.Replace("ignite", $"<b><color={statColorFire}>ignite</color></b>");
+            input = input.Replace("burn", $"<b><color={statColorFire}>burn</color></b>");
 
-            input = input.Replace("lightning", $"<b><color={statColorLightning}>lightning</color></b>");
-            input = input.Replace("shock", $"<b><color={statColorLightning}>shock</color></b>");
+            input = input.Replace("radiation", $"<b><color={statColorRadiation}>radiation</color></b>");
+            input = input.Replace("weaken", $"<b><color={statColorRadiation}>weaken</color></b>");
 
             input = input.Replace("damage per second", $"<b><color={statColorDoT}>damage per second</color></b>");
 
@@ -127,6 +127,11 @@ namespace MeteorGame
             return input;
         }
 
+
+        /// <summary>
+        /// Using the description gets a colorized string for tooltip UI
+        /// </summary>
+        /// <returns></returns>
         public string GetStatsStringForUI()
         {
             if (uiString == "")
@@ -135,8 +140,8 @@ namespace MeteorGame
 
                 foreach (ModifierWithValue m in mods)
                 {
-                    var curr = GetModifierValueForCurrentLevel(m.modifier);
-                    string modifierDesc = ColorizeDamageTypes(m.modifier.description);
+                    var curr = GetModifierValueForCurrentLevel(m.modifierSO);
+                    string modifierDesc = ColorizeDamageTypes(m.modifierSO.description);
                     var percentage = "";
 
                     if (modifierDesc.Contains("%"))
@@ -164,7 +169,7 @@ namespace MeteorGame
 
                         uiString += $"<b><color={statColorBright}>";
                         uiString += curr;
-                        uiString += percentage; // percentage = "" if no % character exists in this description
+                        uiString += percentage; // percentage is empty if no '%' character exists in this description
                         uiString += @"</color></b>"; // Skills have 28% 
 
                         uiString += modifierDesc.Substring(indexOf, modifierDesc.Length - indexOf);

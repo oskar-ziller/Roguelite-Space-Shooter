@@ -7,6 +7,19 @@ using UnityEngine.Pool;
 
 namespace MeteorGame
 {
+
+    public class ProjectileSpawnInfo
+    {
+        //public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
+        public SpellSlot CastBy;
+        public Vector3 AimingAt;
+        public Enemy HitEnemy;
+        public int CastID;
+        public int ProjID;
+        public Vector3 CastPos;
+
+    }
+
     public class SpellCaster : MonoBehaviour
     {
         public static SpellCaster Instance { get; private set; }
@@ -32,16 +45,20 @@ namespace MeteorGame
         public Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new Dictionary<SpellSO, ObjectPool<Explosion>>();
 
 
-
-
         WandAnim wandAnim1, wandAnim2;
 
         private void Awake()
         {
 
+
+            Instance = this;
+        }
+
+
+        public void Setup()
+        {
             SpellSlot slot1 = Player.Instance.SpellSlot(1);
             SpellSlot slot2 = Player.Instance.SpellSlot(2);
-
 
             slot1.SpellChanged += OnSpellChanged;
             slot1.GemLinkedOrRemoved += OnGemAddedRemoved;
@@ -63,8 +80,6 @@ namespace MeteorGame
 
             holderDict.Add(slot1, dummyHolder1);
             holderDict.Add(slot2, dummyHolder2);
-
-            Instance = this;
         }
 
         private void OnGemAddedRemoved(SpellSlot slot, GemItem gem)
@@ -156,7 +171,7 @@ namespace MeteorGame
                 return;
             }
 
-            var dur = spell.CastTimeModified;
+            var dur = slot.Modifiers.CastTimeCalcd;
 
             if (slot.slotNo == 1)
             {
@@ -169,7 +184,6 @@ namespace MeteorGame
 
 
             SpawnProjectilesFromDummes(slot);
-
             MoveProjectiles(slot);
             ClearProjectilesDict(slot);
 
@@ -209,6 +223,7 @@ namespace MeteorGame
             return p;
         }
 
+
         private static void SpawnProjectilesFromDummes(SpellSlot slot)
         {
             List<ProjectileDummy> dummies = Instance.dummyDict[slot];
@@ -228,10 +243,20 @@ namespace MeteorGame
                 var p = Instance.SpawnProjectile(slot);
                 p.transform.position = dummy.transform.position;
                 p.transform.localScale = dummy.transform.localScale;
-                //p.ScaleDur = Instance.scaleDur;
-                p.Setup(slot, aimingAt, hitEnemy, Instance.castID, i, Instance.holderDict[slot].position);
-                //p.ScaleDur = (50f * 8f) / p.StartingSpeed;
-                //p.ScaleDur = 4f;
+
+                var info = new ProjectileSpawnInfo();
+                info.CastBy = slot;
+
+                info.AimingAt = aimingAt;
+                info.HitEnemy = hitEnemy;
+
+                info.CastID = Instance.castID;
+                info.ProjID = i;
+
+                info.CastPos = Instance.holderDict[slot].position;
+
+                p.Setup(info);
+
                 projList.Add(p);
             }
         }

@@ -7,114 +7,64 @@ using UnityEngine;
 
 namespace MeteorGame
 {
+    [Serializable]
     public class Modifiers
     {
-        //[SerializeField] private List<ModifierFromEquipped> allModifiers = new List<ModifierFromEquipped>();
+        public float ProjectileSpeedCalcd => projSpeedCalcd;
+        public float ProjectileLifetimeCalcd => projLifetimeCalcd;
+        public float ExplosionRadi => expRadiusCalcd;
+        public int CombinedDoT => damageOverTimeCalcd;
 
-        //[SerializeField] private int fireDamage;
-        //[SerializeField] private int lightningDamage;
-        //[SerializeField] private int coldDamage;
-        //[SerializeField] private int totalIncreased;
-        //[SerializeField] private int totalReduced;
-        //[SerializeField] private float projLifetime;
-        //[SerializeField] private float expRadius;
-        //[SerializeField] private int chillingAreaLimit;
-        //[SerializeField] private int damageOverTime;
-        //[SerializeField] private float projSpeed;
-        //[SerializeField] private int projCount;
-        //[SerializeField] private int chainAdditionalTimes;
-        //[SerializeField] private int forkAdditionalTimes;
-        //[SerializeField] private int increasedCastSpeed;
+        public int FireDoT { get => fireDoT; }
+        public int LightDoT { get => lightDoT; }
+        public int ColdDoT { get => coldDoT; }
 
-        //private int fireDoT;
-        //private int coldDoT;
-        //private int lightDoT;
+        public int FireEffectiveDamage { get => fireEffectiveDamageCalcd; }
+        public int ColdEffectiveDamage { get => coldEffectiveDamageCalcd; }
+        public int RadiationEffectiveDamage { get => radiationEffectiveDamageCalcd; }
+        public float CastTimeCalcd { get => castTimeCalcd; }
 
-        //public int FireBaseDamage => fireDamage;
+        [SerializeField] private float projSpeedCalcd;
+        [SerializeField] private float castTimeCalcd;
+        [SerializeField] private float projLifetimeCalcd;
+        [SerializeField] private float expRadiusCalcd;
 
-        //internal void Add(GemItem gem)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        [SerializeField] private int damageOverTimeCalcd;
+        [SerializeField] private int fireDoT;
+        [SerializeField] private int lightDoT;
+        [SerializeField] private int coldDoT;
 
-        //public int LightningBaseDamage => lightningDamage;
-        //public int ColdBaseDamage => coldDamage;
-        //public int TotalIncreasedDamage => totalIncreased;
-        //public int TotalReducedDamage => totalReduced;
+        [SerializeField] private int fireEffectiveDamageCalcd;
+        [SerializeField] private int coldEffectiveDamageCalcd;
+        [SerializeField] private int radiationEffectiveDamageCalcd;
 
 
+        private SpellSlot ownerSlot;
+        private Dictionary<string, float> all;
+        //private Dictionary<ModifierWithValue, float> all;
 
-        //public int FireEffectiveDamage => (int)Math.Ceiling((fireDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
-        //public int ColdEffectiveDamage => (int)Math.Ceiling((coldDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
-        //public int LightningEffectiveDamage => (int)Math.Ceiling((lightningDamage * (1 + totalIncreased / 100f) * (1 - totalReduced / 100f)));
-
-
-
-        //public int EffectiveDamage => (fireDamage + lightningDamage + coldDamage) * (1 + totalIncreased) * (1 - totalReduced);
-
-
-        //public float ProjLifetime => projLifetime;
-        //public float ExpRadi => expRadius;
-
-        //public int ChillingAreaLimit => chillingAreaLimit;
-
-        //public int DamageOverTime => damageOverTime;
-        //public int FireDoT => fireDoT;
-        //public int ColdDoT => coldDoT;
-        //public int LightDoT => lightDoT;
-
-        //public float ProjectileSpeed => projSpeed;
-        //public int ProjectileCount => projCount;
-
-
-        //public int ChainAdditionalTimes => chainAdditionalTimes;
-
-        //public int ForkAdditionalTimes => forkAdditionalTimes;
-
-
-        //public int IncreasedCastSpeed => increasedCastSpeed;
-
-
-
-
-
-
-
-
-
-        private SpellItem spell;
-        [SerializeField] private float projSpeed;
-
-
-
-
-
-
-
-
-
-        public float ProjectileSpeed => projSpeed;
-
-
-
-
-
-
-
-
-
-        private Dictionary<ModifierSO, float> all;
-
-
-
-        private void Setup()
+        public Modifiers(SpellSlot slot)
         {
             var allSOs = GameManager.Instance.ScriptableObjects.Modifiers;
+            all = new Dictionary<string, float>();
 
-            foreach (var mod in allSOs)
+
+            foreach (var dictEntry in allSOs)
             {
-                all.Add(mod, float.MinValue);
+                var internalName = dictEntry.Key;
+                var modSO = dictEntry.Value;
+                
+                if (dictEntry.Value.multiplicative)
+                {
+                    all.Add(dictEntry.Key, 1);
+                }
+                else
+                {
+                    all.Add(dictEntry.Key, 0);
+                }
             }
+
+            this.ownerSlot = slot;
         }
 
 
@@ -122,193 +72,185 @@ namespace MeteorGame
 
         private float CalculateProjSpeed()
         {
-            float baseSpeed = spell.ProjectileSpeed;
+            float baseSpeed = ownerSlot.Spell.ProjectileSpeed;
 
-            float increasedBy = GetTotal("IncreasedProjectileSpeed") / 100f;
-            float reducedBy = GetTotal("ReducedProjectileSpeed") / 100f;
+            float increasedBy = all["IncreasedProjectileSpeed"];
+            float reducedBy = all["ReducedProjectileSpeed"];
 
-            return baseSpeed * (1 + increasedBy) * (1 - reducedBy);
+            return baseSpeed * increasedBy * reducedBy;
         }
-
-        private int CalculateProjCount()
-        {
-            float baseCount = Spell.ProjectileCount;
-
-            float increasedBy = GetTotal("AdditionalProjectiles");
-
-            return (int)(baseCount + increasedBy);
-        }
-
-
-
 
 
         private float CalculateProjLifetime()
         {
-            // setup destruction
-            float baseDur = GetTotal("BaseDuration");
-            float increasedBy = GetTotal("IncreasedSkillEffectDuration") / 100f;
-            float reducedBy = GetTotal("ReducedSkillEffectDuration") / 100f;
+            float baseDur = ownerSlot.Spell.ProjectileLifetime;
+            float increasedBy = all["IncreasedEffectDuration"] / 100f;
+            float reducedBy = all["ReducedEffectDuration"] / 100f;
             return baseDur * (1 + increasedBy) * (1 - reducedBy);
         }
 
 
         private int CalculateDoT()
         {
-            var inc = GetTotal("IncreasedDamageOverTime") / 100f;
-            var red = GetTotal("ReducedDamageOverTime") / 100f;
+            var inc = all["IncreasedDamageOverTime"] / 100f;
+            var red = all["ReducedDamageOverTime"] / 100f;
 
-            float fireBase = GetTotal("FireDamagePerSecond");
-            float coldBase = GetTotal("ColdDamagePerSecond");
-            float lightningBase = GetTotal("LightningDamagePerSecond");
+            float fireBase = all["FireDamagePerSecond"];
+            float coldBase = all["ColdDamagePerSecond"];
+            float radiBase = all["RadiationDamagePerSecond"];
 
-            inc += TotalIncreasedDamage / 100f;
-            red += TotalReducedDamage / 100f;
+            inc += all["IncreasedDamage"] / 100f;
+            red += all["ReducedDamage"] / 100f;
 
             fireDoT = (int)(fireBase * (1 + inc) * (1 - red));
+            lightDoT = (int)(radiBase * (1 + inc) * (1 - red));
             coldDoT = (int)(coldBase * (1 + inc) * (1 - red));
-            lightDoT = (int)(lightningBase * (1 + inc) * (1 - red));
 
             return (int)(fireDoT + coldDoT + lightDoT);
         }
 
+        internal float Get(string s)
+        {
+            return all[s];
+        }
+
         private float CalculateExpolisonRadius()
         {
-            float baseRadius = GetTotal("ExplosionRadius");
+            float baseRadius = all["ExplosionRadius"];
 
             if (baseRadius > 0)
             {
-                float inc = GetTotal("IncreasedAoe") / 100f;
-                float red = GetTotal("ReducedAoE") / 100f;
-                return baseRadius * (1 + inc) * (1 - red);
+                float inc = all["IncreasedAoe"];
+                float red = all["ReducedAoE"];
+                return baseRadius * inc * red;
             }
 
             return 0;
         }
 
 
+        internal void Add(GemItem gem)
+        {
+            UpdateModifierDict(gem, add: true);
+        }
+
 
         internal void Remove(GemItem gem)
         {
-            throw new NotImplementedException();
+            UpdateModifierDict(gem, remove: true);
         }
 
 
 
-
-        public float GetTotal(string s)
+        public float CalculateCastTime()
         {
-            var m = all.FirstOrDefault(dictEntry => dictEntry.Key.internalName == s);
 
-            return m.Value != default ? m.Value : 0;
+            /*
+
+
+
+
+           player is using a skill with a base cast time of 0.8 seconds,
+            and the player has a total of 50% increased Cast Speed,
+            then the modified cast time can be calculated as follows: 
+
+            1/0.8 = 1.25 casts per second -> base
+            1.25 * (1 + 0.5) = 1.88 casts per second -> modified
+            1/1.88 = 0.53 seconds -> new cast time
+
+
+            */
+
+
+            var shotsPerSecond = 1 / ownerSlot.Spell.ShootTime;
+            var modified = shotsPerSecond * all["IncreasedShootingSpeed"];
+            var newCastTime = 1 / modified;
+
+            return newCastTime;
         }
-
         private void UpdateDamageValues()
         {
-            var increasedDamage = GetTotal("IncreasedDamage");
-            var increased = increasedDamage;
+            var incDmg = all["IncreasedDamage"];
+            var redDmg = all["ReducedDamage"];
 
-            var reducedDamage = GetTotal("ReducedDamage");
-            var reduced = reducedDamage;
-
-            float fire = GetTotal("DealFireDamage");
-            float lightning = GetTotal("DealLightningDamage");
-            float cold = GetTotal("DealColdDamage");
-
-            fireDamage = (int)fire;
-            lightningDamage = (int)lightning;
-            coldDamage = (int)cold;
-            totalIncreased = (int)increased;
-            totalReduced = (int)reduced;
+            var fireDmg = all["DealFireDamage"];
+            var coldDmg = all["DealColdDamage"];
+            var lightDmg = all["DealRadiationDamage"];
 
 
-            projLifetime = CalculateProjLifetime();
-            projSpeed = CalculateProjSpeed();
-            projCount = CalculateProjCount();
+            castTimeCalcd = CalculateCastTime();
+            projLifetimeCalcd = CalculateProjLifetime();
+            projSpeedCalcd = CalculateProjSpeed();
+            expRadiusCalcd = CalculateExpolisonRadius();
+            damageOverTimeCalcd = CalculateDoT();
 
-            expRadius = CalculateExpolisonRadius();
-
-            chillingAreaLimit = (int)GetTotal("ChillingAreaLimit");
-
-            chainAdditionalTimes = (int)GetTotal("ChainAdditionalTimes");
-            forkAdditionalTimes = (int)GetTotal("ForkAdditionalTimes");
-
-            increasedCastSpeed = (int)GetTotal("IncreasedCastSpeed");
-
-
-            damageOverTime = CalculateDoT();
-
+            fireEffectiveDamageCalcd = Mathf.CeilToInt(fireDmg * incDmg * redDmg);
+            coldEffectiveDamageCalcd = Mathf.CeilToInt(coldDmg * incDmg * redDmg);
+            radiationEffectiveDamageCalcd = Mathf.CeilToInt(lightDmg * incDmg * redDmg);
         }
 
 
-
-
-
-
-
-        // Keep track of all modifiers in a dictionary
-        // And update it accordingly when gem is added or removed
-        private void SaveToModifierDict(GemItem gem)
+        private void UpdateModifierDict(GemItem gem, bool add = false, bool remove = false)
         {
             foreach (ModifierWithValue m in gem.Modifiers)
             {
-                if (!allModifiers.Any(mod => mod.m == m.modifier))
-                {
-                    if (m.modifier.hasValues)
-                    {
-                        float val = gem.GetModifierValueForCurrentLevel(m.modifier);
-                        allModifiers.Add(new ModifierFromEquipped(m.modifier, val));
-                    }
-                    else
-                    {
-                        // if it has no value, increase count by 1 for each instance
-                        allModifiers.Add(new ModifierFromEquipped(m.modifier, 1));
-                    }
-                }
-                else
-                {
-                    if (m.modifier.hasValues)
-                    {
-                        float val = gem.GetModifierValueForCurrentLevel(m.modifier);
-                        allModifiers.First(mod => mod.m == m.modifier).val += val;
-                    }
-                    else
-                    {
-                        // if it has no value, increase count by 1 for each instance
-                        allModifiers.First(mod => mod.m == m.modifier).val += 1;
-                    }
-                }
-            }
+                float val;
 
-            UpdateDamageValues();
-        }
-
-        private void RemoveFromModifierDict(GemItem gem)
-        {
-            foreach (ModifierWithValue m in gem.Modifiers)
-            {
-                var modifierObj = allModifiers.First(mod => mod.m == m.modifier);
-
-                if (m.modifier.hasValues)
+                if (m.modifierSO.hasNumericalValue)
                 {
-                    float val = gem.GetModifierValueForCurrentLevel(m.modifier);
-                    modifierObj.val -= val;
+                    val = gem.GetModifierValueForCurrentLevel(m.modifierSO);
+
+                    if (m.modifierSO.multiplicative)
+                    {
+                        val /= 100f;
+                    }
                 }
                 else
                 {
                     // if it has no value, increase count by 1 for each instance
-                    modifierObj.val -= 1;
+                    val = 1;
                 }
 
-                if (allModifiers.First(mod => mod.m == m.modifier).val <= 0)
+                if (m.modifierSO.multiplicative)
                 {
-                    allModifiers.Remove(modifierObj);
+                    if (m.modifierSO.isReduction)
+                    {
+                        if (add)
+                        {
+                            all[m.modifierSO.internalName] *= 1 - val;
+                        }
+                        if (remove)
+                        {
+                            all[m.modifierSO.internalName] /= 1 - val;
+                        }
+                    }
+                    else
+                    {
+                        if (add)
+                        {
+                            all[m.modifierSO.internalName] *= 1 + val;
+                        }
+                        if (remove)
+                        {
+                            all[m.modifierSO.internalName] /= 1 + val;
+                        }
+                    }
+                }
+                else
+                {
+                    if (add)
+                    {
+                        all[m.modifierSO.internalName] += val;
+                    }
+                    else
+                    {
+                        all[m.modifierSO.internalName] -= val;
+                    }
                 }
             }
 
             UpdateDamageValues();
         }
-
 
 
 

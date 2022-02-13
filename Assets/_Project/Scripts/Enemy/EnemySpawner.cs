@@ -67,7 +67,8 @@ namespace MeteorGame
         //public ObjectPool<Enemy> pooledEnemies;
 
 
-
+        [Tooltip("Multiplier of enemy HP as level goes from 0->maxGameLevel")]
+        [SerializeField] private AnimationCurve enemyHPMultipCurve;
 
 
 
@@ -79,6 +80,23 @@ namespace MeteorGame
 
 
 
+
+        public float CalculateEnemyHPMultip()
+        {
+            var currLevel = GameManager.Instance.GameLevel;
+            var maxLevel = GameManager.Instance.MaxGameLevel;
+
+            var maxMultip = EnemyManager.Instance.MaxHpMultiplier;
+
+            //var currentMultip = Helper.Map(currLevel, 0, maxMultip, 1, maxMultip);
+
+            var curveVal = enemyHPMultipCurve.Evaluate(currLevel / maxLevel);
+
+
+            var currentMultip = curveVal * maxMultip;
+
+            return currentMultip;
+        }
 
 
 
@@ -191,11 +209,22 @@ namespace MeteorGame
         #region Methods
 
 
-        public Enemy SpawnEnemy(EnemySO kind, ObjectPool<Enemy> p)
+        public Enemy SpawnEnemyFromPool()
         {
-            Enemy e = Instantiate(kind.Prefab);
-            e.SetPool(p);
+            var e = EnemyManager.Instance.EnemyPool.Get();
+            EnemyManager.Instance.AddEnemy(e);
             return e;
+        }
+
+        /// <summary>
+        /// Parse enemy holder and destroy all child holders
+        /// </summary>
+        internal void DestroyPackHolders()
+        {
+            foreach (Transform child in enemyHolder)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
 

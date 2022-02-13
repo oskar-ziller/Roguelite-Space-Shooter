@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Chain
   m_EditorClassIdentifier: 
   modifiers:
-  - modifier: {fileID: 11400000, guid: c5be0c0b27e9cfe428d9a77e393727ed, type: 2}
+  - modifierSO: {fileID: 11400000, guid: c5be0c0b27e9cfe428d9a77e393727ed, type: 2}
     min: 2
     max: 2
-  - modifier: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
     min: 30
-    max: 11
+    max: 20
   name: Chain
   gemColor: {r: 0, g: 0.6037736, b: 0.21248311, a: 1}
   spellSO: {fileID: 0}
+  isEnabled: 1
   description: After hitting, projectiles target another nearby enemy

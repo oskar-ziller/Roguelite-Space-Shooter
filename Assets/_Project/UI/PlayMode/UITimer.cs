@@ -36,7 +36,7 @@ namespace MeteorGame
                 return;
             }
 
-            float t = (float)Math.Round(GameManager.Instance.HowFarIntoDifficulty().TotalSeconds, 2);
+            float t = (float)Math.Round(GameManager.Instance.HowFarIntoDifficulty(), 2);
 
             int totalSeconds = (int)((t * 100) / 100);
             float millisecondsF = (float)Math.Round(t - totalSeconds, 2) * 100;

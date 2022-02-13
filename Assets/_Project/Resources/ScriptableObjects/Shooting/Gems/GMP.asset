@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: GMP
   m_EditorClassIdentifier: 
   modifiers:
-  - modifier: {fileID: 11400000, guid: 50e794cb1dcbe894d893f7281517c134, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 50e794cb1dcbe894d893f7281517c134, type: 2}
     min: 4
     max: 4
-  - modifier: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
-    min: 65
-    max: 20
+  - modifierSO: {fileID: 11400000, guid: 4134f504163f0454bb32a8ab870bc7ba, type: 2}
+    min: 80
+    max: 40
   name: Greater Multiple Projectiles
   gemColor: {r: 0.5754717, g: 0.03474543, b: 0.38277876, a: 1}
   spellSO: {fileID: 0}
-  description: Shoot 4 additional Projectiles
+  isEnabled: 1
+  description: Shoot 4 additional projectiles

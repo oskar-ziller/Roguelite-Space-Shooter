@@ -16,149 +16,31 @@ namespace MeteorGame
         [SerializeField] private int level;
 
         public Action<Enemy> DamageTaken;
-        private int id;
+        public Action<Enemy> HealthChanged;
         private float currentSpeed;
 
         private EnemySO enemySO;
 
+        private float expectedSpeed => packAvgSpeedMultip * EnemyManager.Instance.BaseEnemySpeed;
 
-        ObjectPool<Enemy> pool;
+        private float speed;
 
-
-
-
-        internal void SetPool(ObjectPool<Enemy> p)
-        {
-            pool = p;
-        }
 
         private void Die()
         {
-            //OnEnemyDeath?.Invoke(this);
-            print("trying to die");
-            pool.Release(this);
+            currentHealth = 0;
+            OnEnemyDeath?.Invoke(this);
         }
-
-
 
         public void ForceDie()
         {
             Die();
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Backspace))
-            {
-                Die();
-            }
-        }
-
-
-
-
-
-
-
-
-
-        //private List<ChillingArea> collidingChillingAreas = new List<ChillingArea>(); // keep track of which chilling areas we are colliding
-
-        //private void OnChillingAreaExpired(ChillingArea a)
-        //{
-        //    if (collidingChillingAreas.Contains(a))
-        //    {
-        //        collidingChillingAreas.Remove(a);
-
-        //        if (collidingChillingAreas.Count == 0)
-        //        {
-        //            ailmentManager.RemoveChillingAreaAilment();
-        //        }
-        //    }
-        //}
-
-        private void OnTriggerEnter(Collider other)
-        {
-            //var chillingArea = other.GetComponent<ChillingArea>();
-
-            //if (chillingArea != null)
-            //{
-            //    collidingChillingAreas.Add(chillingArea);
-            //    chillingArea.AreaExpired += OnChillingAreaExpired;
-            //}
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            //var chillingArea = other.GetComponent<ChillingArea>();
-
-            //if (chillingArea != null)
-            //{
-            //    collidingChillingAreas.Remove(chillingArea);
-
-            //    if (collidingChillingAreas.Count == 0)
-            //    {
-            //        ailmentManager.RemoveChillingAreaAilment();
-            //    }
-
-            //}
-        }
-
-        internal void Reset(EnemySO enemySO, Vector3 pos)
-        {
-            transform.position = pos;
-        }
-
-
-
-
-
-
-        // totalMonsterHealth = baseLife * monsterTypeHealthModifier
-        //                                  * monsterRarityModifier
-        //                                  * mapMonsterHealthModifier
-        //                                  * monsterAffixHealthModifier
-
-
-
-        // monsterTypeHealthModifier %50-%200 arasi
-
-
-        /*
-         * 
-         
-         Dominus level 33 -> 7043 hp
-
-         
-         
-         */
-
-
-        /* Normal 'monsterRarityModifier' = 100%.
-         * magic monsters = 187% more
-         * rares = 463% more
-         * uniques = 625% more. 
-
-         'mapMonsterHealthModifier' is just the "More Monster Life" affix on maps
-
-
-        monsterAffixHealthModifier --> ?? unknown
-
-
-         */
-
-
-
-
-        private float startingSpeed;
         private Vector3 startingVel;
         private Vector3 spawnPos;
-
-
-        private float rotationDir;
-        private Vector3 randomRotationVec;
-
-
+        private Vector3 packCenter;
+        private float packAvgSpeedMultip;
 
         public event Action<Enemy> OnEnemyDeath;
 
@@ -167,154 +49,86 @@ namespace MeteorGame
 
         public Dictionary<int, float> zapDict = new Dictionary<int, float>();
 
-        private int baseLife;
         public int totalHealth;
         public int currentHealth;
 
-
-
-        [ContextMenu("Debug enemy")]
-        void DebugEnemy()
-        {
-            print("Debug enemy");
-
-
-            Init(transform.position, UnityEngine.Random.Range(-99999, 999999), 99);
-
-            EnemyManager.Instance.AddEnemy(this);
-        }
-
-
-
-        public void Init(Vector3 endPos, int id, int level = 0)
-        {
-            this.id = id;
-
-            baseLifeList = baseLifeArr.ToList();
-            baseLifeList.Reverse();
-
-            this.spawnPos = endPos;
-
-            RepositionToSpawn();
-
-            var levelToSet = level == 0 ? Mathf.RoundToInt(GameManager.Instance.GameLevel) : level;
-            SetLevel(levelToSet);
-            //SetRandomRotation();
-
-
-            //int index = levelToSet < baseLifeList.Count ?  levelToSet : baseLifeList.Count - 1;
-
-            //baseLife = baseLifeList[index];
-
-            //var monsterTypeHealthModifier = 1f; // %50-%200 arasi
-
-            //var monsterRarityModifier = 1.3f;
-
-            //if (rarity == EnemyRarity.Magic)
-            //{
-            //    monsterRarityModifier = 2.87f;
-            //    //monsterRarityModifier = 1.87f;
-            //}
-
-            //if (rarity == EnemyRarity.Rare)
-            //{
-            //    monsterRarityModifier = 12.63f;
-            //    //monsterRarityModifier = 6.63f;
-            //}
-
-            //if (rarity == EnemyRarity.Unique)
-            //{
-            //    monsterRarityModifier = 18.25f;
-            //    //monsterRarityModifier = 8.25f;
-            //}
-
-            // totalMonsterHealth = baseLife * monsterTypeHealthModifier
-            //                                  * monsterRarityModifier
-            //                                  * mapMonsterHealthModifier
-            //                                  * monsterAffixHealthModifier
-
-            /* Normal 'monsterRarityModifier' = 100%.
-            * magic monsters = 187% more
-            * rares = 463% more
-            * uniques = 625% more. */
-
-            var curve = EnemyManager.Instance.EnemyHealthCurve;
-            var val = curve.Evaluate(level / EnemyManager.Instance.MaxEnemyLevel);
-
-
-            totalHealth = Mathf.CeilToInt(EnemyManager.Instance.BaseHP * val * enemySO.HealthMultiplier);
-            currentHealth = totalHealth;
-
-            //print($"{level} level {rarity} enemy with {totalHealth} health - pos: {pos}");
-
-
-            StartCoroutine(CheckFrozenOrChilledCoroutine());
-            StartCoroutine(CheckIgniteTickCoroutine());
-        }
-
-
-
-        //private void MoveToEndPos()
-        //{
-        //    //List<Vector3> path = new List<Vector3>();
-        //    //path.Add(transform.position);
-
-        //    //var dist = Vector3.Distance(transform.position, endPos);
-        //    //var dir = (endPos - transform.position).normalized;
-        //    //Vector3 left = Vector3.Cross(dir, Vector3.up).normalized;
-
-
-        //    //var angle = UnityEngine.Random.Range(-10, 10);
-        //    //var len = UnityEngine.Random.Range(300, 500);
-
-        //    //// rotate transform.right randomly and get a random direction on that plane
-        //    //Vector3 customAxis = Quaternion.AngleAxis(angle, left) * dir;
-
-
-        //    //Vector3 pos = transform.position + len * customAxis;
-        //    //path.Add(pos);
-        //    //path.Add(endPos);
-
-
-        //    //transform.DOPath(path.ToArray(), moveDuration, PathType.CatmullRom, PathMode.Ignore).SetEase(moveEasing).onComplete += OnMoveToSpawnEnded;
-
-        //}
-
-
-        //private IEnumerator CheckChillingAreaCoroutine()
-        //{
-        //    while (true)
-        //    {
-        //        if (collidingChillingAreas.Count > 0)
-        //        {
-        //            foreach (ChillingArea chillingArea in collidingChillingAreas)
-        //            {
-        //                TakeDoT(chillingArea.CastBy, 0.25f, applyAilment: false);
-        //            }
-
-        //            if (!ailmentManager.InChillingArea)
-        //            {
-        //                ailmentManager.AddChillingAreaAilment();
-        //            }
-
-        //            yield return new WaitForSeconds(0.25f);
-        //        }
-
-        //        yield return new WaitForSeconds(UnityEngine.Random.Range(0.15f, 0.3f));
-        //    }
-        //}
-
-
-
-        public void SetLevel(int level)
-        {
-            this.level = level;
-        }
+        private MeshRenderer renderer;
+        private MeshFilter meshFilter;
 
         private void Awake()
         {
-            ailmentManager = GetComponent<AilmentManager>();
+            if (ailmentManager == null)
+            {
+                ailmentManager = GetComponent<AilmentManager>();
+            }
+
+            if (renderer == null)
+            {
+                renderer = GetComponent<MeshRenderer>();
+            }
+
+            if (meshFilter == null)
+            {
+                meshFilter = GetComponent<MeshFilter>();
+            }
         }
+
+
+        [ContextMenu("Stop Movement")]
+        private void StopMovement()
+        {
+            speed = 0;
+            MoveToWorldOrigin(transform.position);
+        }
+
+        [SerializeField] private float newSpeedDebug = 0f;
+        [ContextMenu("Change speed")]
+        private void ChangeSpeedDebug()
+        {
+            speed = newSpeedDebug;
+            MoveToWorldOrigin(transform.position);
+        }
+
+
+        internal void Init(EnemySO enemySO, Vector3 spawnPos, Vector3 packCenter, float avgSpeed)
+        {
+            this.enemySO = enemySO;
+            this.spawnPos = spawnPos;
+            this.packCenter = packCenter;
+            this.packAvgSpeedMultip = avgSpeed;
+
+            level = GameManager.Instance.GameLevel;
+
+
+            var startingHP = EnemyManager.Instance.BaseHP * enemySO.HealthMultiplier;
+
+            var hpMultipForLevel = EnemyManager.Instance.EnemySpawner.CalculateEnemyHPMultip();
+            
+            var newHP = Mathf.CeilToInt(startingHP * hpMultipForLevel);
+
+            SetTotalHealth(newHP);
+
+            transform.position = spawnPos;
+
+            transform.localScale = enemySO.ShapeRadi * Vector3.one * 2f;
+
+            renderer.material = enemySO.BodyMat;
+
+            meshFilter.mesh = enemySO.BodyMesh;
+
+            ailmentManager.Reset();
+
+            speed = expectedSpeed;
+
+            MoveToWorldOrigin(packCenter);
+        }
+
+        private void SetTotalHealth(int newHP)
+        {
+            totalHealth = newHP;
+            SetCurrnetHealth(newHP);
+        }
+
         /*
         int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
                               32684, 30673, 28784, 27007, 25338,
@@ -339,34 +153,29 @@ namespace MeteorGame
 
         */
 
-        int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
-                              32684, 30673, 28784, 27007, 25338,
-                              23770, 22296, 20911, 19610, 18388,
-                              17240, 16161, 15149, 14198, 13304,
-                              12466, 11679, 10940, 10246, 9595,
-                              8984, 8410, 7872, 7367, 6894,
-                              6449, 6033, 5642, 5276, 4932,
-                              4610, 4308, 4025, 3760, 3512,
-                              3279, 3061, 2857, 2665, 2486,
-                              2319, 2162, 2015, 1878, 1749,
-                              1629, 1516, 1411, 1313, 1221,
-                              1135, 1055, 980, 910, 844,
-                              783, 726, 673, 624, 577,
-                              534, 494, 456, 422, 389,
-                              359, 331, 304, 280, 257,
-                              236, 217, 199, 182, 166,
-                              152, 138, 126, 114, 104};
+        //int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
+        //                      32684, 30673, 28784, 27007, 25338,
+        //                      23770, 22296, 20911, 19610, 18388,
+        //                      17240, 16161, 15149, 14198, 13304,
+        //                      12466, 11679, 10940, 10246, 9595,
+        //                      8984, 8410, 7872, 7367, 6894,
+        //                      6449, 6033, 5642, 5276, 4932,
+        //                      4610, 4308, 4025, 3760, 3512,
+        //                      3279, 3061, 2857, 2665, 2486,
+        //                      2319, 2162, 2015, 1878, 1749,
+        //                      1629, 1516, 1411, 1313, 1221,
+        //                      1135, 1055, 980, 910, 844,
+        //                      783, 726, 673, 624, 577,
+        //                      534, 494};
 
 
-        List<int> baseLifeList;
-
-
+        //List<int> baseLifeList;
 
         private void SlowDownIfChilled()
         {
             if (ailmentManager.Chill != null)
             {
-                var shouldBe = startingSpeed * (1 - ailmentManager.Chill.magnitude);
+                var shouldBe = expectedSpeed * (1 - ailmentManager.Chill.magnitude);
 
                 if (currentSpeed > shouldBe)
                 {
@@ -381,7 +190,7 @@ namespace MeteorGame
 
             if (ailmentManager.InChillingArea)
             {
-                var shouldBe = startingSpeed * (1f - AilmentManager.ChillingAreaEffect);
+                var shouldBe = expectedSpeed * (1f - AilmentManager.ChillingAreaEffect);
 
                 if (currentSpeed > shouldBe)
                 {
@@ -412,10 +221,10 @@ namespace MeteorGame
 
             if (!shouldBeSlower)
             {
-                if (currentSpeed != startingSpeed)
+                if (currentSpeed != expectedSpeed)
                 {
                     rigidBody.velocity = startingVel;
-                    currentSpeed = startingSpeed;
+                    currentSpeed = expectedSpeed;
                 }
             }
         }
@@ -431,21 +240,21 @@ namespace MeteorGame
             }
         }
 
-        private IEnumerator CheckIgniteTickCoroutine()
+        private IEnumerator CheckBurningTickCoroutine()
         {
             while (true)
             {
-                if (ailmentManager.IgniteStacks.Count > 0)
+                if (ailmentManager.BurnStacks.Count > 0)
                 {
-                    var stacks = ailmentManager.IgniteStacks;
-                    //Debug.Log($"Taking ailment damage from {stacks.Count} ignite stacks");
+                    var stacks = ailmentManager.BurnStacks;
+                    //Debug.Log($"Taking ailment damage from {stacks.Count} burn stacks");
 
                     foreach (var i in stacks) 
                     {
-                        IgniteTick((int)i.magnitude);
+                        BurningTick((int)i.magnitude);
                     }
 
-                    yield return new WaitForSeconds(AilmentManager.IgniteTickInterval);
+                    yield return new WaitForSeconds(AilmentManager.BurnTickInterval);
                 }
                 else
                 {
@@ -459,9 +268,9 @@ namespace MeteorGame
             return currentHealth > 0;
         }
 
-        public void IgniteTick(int amount)
+        public void BurningTick(int amount)
         {
-            //print("Ailment - IgniteTick " + amount);
+            //print("Ailment - BurningTick " + amount);
             TakeDamage(amount);
         }
 
@@ -472,17 +281,17 @@ namespace MeteorGame
                 return;
             }
 
-            var shock = ailmentManager.Shock;
+            var weaken = ailmentManager.Weaken;
 
-            if (shock != null)
+            if (weaken != null)
             {
-                //print("taking damage with shock. before: " + amount);
-                amount = (int)(amount * (1 + shock.magnitude));
-                //print("taking damage with shock. after: " + amount);
+                //print("taking damage with weaken. before: " + amount);
+                amount = (int)(amount * (1 + weaken.magnitude));
+                //print("taking damage with weaken. after: " + amount);
             }
 
-            currentHealth -= amount;
 
+            SetCurrnetHealth(currentHealth - amount);
 
             //print($"-ENEMY{id}- Took {amount} damage." +
             //    $" currentHealth: {currentHealth} -" +
@@ -490,12 +299,21 @@ namespace MeteorGame
             //    $" baseLife: {baseLife}");
 
 
-            if (currentHealth <= 0)
+            if (currentHealth > 0)
+            {
+                DamageTaken?.Invoke(this);
+            }
+            else
             {
                 Die();
             }
 
-            DamageTaken?.Invoke(this);
+        }
+
+        private void SetCurrnetHealth(int newHealth)
+        {
+            currentHealth = newHealth;
+            HealthChanged?.Invoke(this);
         }
 
 
@@ -504,51 +322,49 @@ namespace MeteorGame
             //print($"Taking {from.DamageOverTime} damage per second." +
             //    $" Current hit: {(int)(from.DamageOverTime * scale)}");
 
-            TakeDamage((int)(from.DamageOverTime * scale));
+            TakeDamage((int)(from.Modifiers.CombinedDoT * scale));
 
             if (applyAilment)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, from.FireDoT, from.ColdDoT, from.LightDoT);
+                ailmentManager.CheckIfDamageAppliesAilment(from, from.Modifiers.FireDoT, from.Modifiers.ColdDoT, from.Modifiers.LightDoT);
             }
         }
-
-
 
 
 
         public void TakeHit(SpellSlot from, bool applyAilment = true)
         {
-            var inc = 0f;
-            var red = 0f;
+            float increasedDamageAgainstBurning = 1f;
+            float increasedDamageAgainstChilledOrFrozen = 1f;
+            float increasedDamageAgainstWeakened = 1f;
 
-            if (ailmentManager.IgniteStacks.Count > 0)
+            if (ailmentManager.BurnStacks.Count > 0)
             {
-                inc += from.GetTotal("IncreasedDamageAgainstIgnited") / 100f;
+                increasedDamageAgainstBurning = from.GetTotal("IncreasedDamageAgainstBurning");
             }
 
             if (ailmentManager.Chill != null || ailmentManager.Freeze != null)
             {
-                inc += from.GetTotal("IncreasedDamageAgainstChilledOrFrozen") / 100f;
+                increasedDamageAgainstChilledOrFrozen  = from.GetTotal("IncreasedDamageAgainstChilledOrFrozen");
             }
 
-            if (ailmentManager.Shock != null)
+            if (ailmentManager.Weaken != null)
             {
-                inc += from.GetTotal("IncreasedDamageAgainstShocked") / 100f;
+                increasedDamageAgainstWeakened = from.GetTotal("IncreasedDamageAgainstWeakened");
             }
 
-            float fireFinal = from.FireEffectiveDamage * (1 + inc) * (1 - red);
-            float coldFinal = from.ColdEffectiveDamage * (1 + inc) * (1 - red);
-            float lightFinal = from.LightningEffectiveDamage * (1 + inc) * (1 - red);
+            float fireFinal = from.Modifiers.FireEffectiveDamage * increasedDamageAgainstBurning;
+            float coldFinal = from.Modifiers.ColdEffectiveDamage * increasedDamageAgainstChilledOrFrozen;
+            float radiationFinal = from.Modifiers.RadiationEffectiveDamage * increasedDamageAgainstWeakened;
 
-            int final = (int)(fireFinal + coldFinal + lightFinal);
-
-            //print("Taking damage of: " + final);
+            int final = (int)(fireFinal + coldFinal + radiationFinal);
 
             TakeDamage(final);
 
-            if (applyAilment)
+
+            if (applyAilment && currentHealth > 0)
             {
-                ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)lightFinal);
+                ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)radiationFinal);
             }
         }
 
@@ -556,16 +372,9 @@ namespace MeteorGame
 
 
 
-        public void StartMoving(Vector3 dir)
+        public void MoveToWorldOrigin(Vector3 from)
         {
-            startingSpeed = EnemyManager.Instance.BaseEnemySpeed * enemySO.SpeedMultiplier;
-
-
-            startingVel = dir * startingSpeed;
-
-            rigidBody.isKinematic = false;
-            rigidBody.velocity = startingVel;
-            currentSpeed = startingVel.magnitude;
+            MoveTo(from, Vector3.zero);
         }
 
    
@@ -573,6 +382,24 @@ namespace MeteorGame
         private void RepositionToSpawn()
         {
             transform.position = spawnPos;
+        }
+
+
+        private void ChangeSpeed(float newSpeed)
+        {
+            speed = newSpeed;
+        }
+
+
+        private void MoveTo(Vector3 from, Vector3 to)
+        {
+            var dir = (to - from).normalized;
+            //transform.LookAt(to);
+            startingVel = dir * speed;
+
+            rigidBody.isKinematic = false;
+            rigidBody.velocity = startingVel;
+            currentSpeed = startingVel.magnitude;
         }
 
     }

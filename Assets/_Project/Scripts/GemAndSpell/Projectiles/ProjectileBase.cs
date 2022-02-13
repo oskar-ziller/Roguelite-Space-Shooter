@@ -30,26 +30,36 @@ namespace MeteorGame
         [SerializeField] private float dummyScale;
 
 
+        public ProjectileSpawnInfo spawnInfo;
+
+
+
+
+
+
+
+
+
+
+
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
         public Rigidbody Rigidbody => rigidbody;
         //protected float DummyScale => dummyScale;
 
         public float MeshScaleMain => meshScaleMain;
-        public Enemy AimingAtEnemy { get; protected set; }
-        public int CastID { get; protected set; }
-        public int ProjectileID { get; protected set; } // when single cast has multiple projectiles
+
+
+
+
+
         public int CastProjCount { get; protected set; } // when single cast has multiple projectiles
-        public float StartingSpeed { get; protected set; }
-        public Vector3 MovingTowards { get; protected set; }
         public Vector3 StartedMovingFrom { get; protected set; }
         public IMover ProjectileMover { get; protected set; }
-        public SpellSlot CastBy { get; protected set; }
 
         public float CachedDummyScale { get; protected set; }
 
 
-        public Vector3 CastPos { get; protected set; }
 
 
         public Transform MainMesh => mainMesh;
@@ -98,52 +108,32 @@ namespace MeteorGame
         private Rigidbody rigidbody;
 
 
-        public void SetCastBy(SpellSlot spellSlot)
-        {
-            CastBy = spellSlot;
-        }
 
-        public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
+        internal void Setup(ProjectileSpawnInfo info)
         {
-            StartingSpeed = castBySlot.ProjectileSpeed;
-            CastProjCount = castBySlot.ProjectileCount;
-            CastBy = castBySlot;
-            MovingTowards = aimingAt;
-            AimingAtEnemy = hitEnemy;
-            CastID = castID;
-            ProjectileID = projectileID;  // when single cast has multiple projectiles
-            CastPos = castPos;
+            spawnInfo = info;
+
+            CastProjCount = spawnInfo.CastBy.Spell.ProjectileCount + (int)info.CastBy.GetTotal("AdditionalProjectiles");
 
             CalculateExpireTime();
-
-
-            // look at where we are moving towards (is assumed in Movers this is the case)
-            transform.LookAt(aimingAt);
-            //SetTriggers();
 
             isSetup = true;
         }
 
 
-       
-
-        public void SetProjectileID(int id)
-        {
-            ProjectileID = id;
-        }
-
         private void CalculateExpireTime()
         {
             spawnTime = Time.time;
-            var baseLifetime = CastBy.Spell.LifeTime;
-            var inceasedBy = CastBy.GetTotal("IncreasedSkillEffectDuration") / 100f;
-            var final = baseLifetime * (1 + inceasedBy);
+            var baseLifetime = spawnInfo.CastBy.Modifiers.ProjectileLifetimeCalcd;
+            var inceasedBy = spawnInfo.CastBy.GetTotal("IncreasedEffectDuration");
+            var final = baseLifetime * inceasedBy;
 
             expireTime = spawnTime + final;
         }
 
         public virtual void Move()
         {
+            transform.LookAt(spawnInfo.AimingAt);
             StartedMovingFrom = Rigidbody.position;
             ProjectileMover.Move();
             ScaleProjectileWhileMove();
@@ -197,9 +187,14 @@ namespace MeteorGame
             if (trails != null)
             {
                 trailRenderers = trails.ToList();
+
+                if (trailRenderers.Count > 0)
+                {
+                    maxTrailDur = trailRenderers.Max(t => t.time);
+                }
             }
 
-            maxTrailDur = trailRenderers.Max(t => t.time);
+
 
 
             //spinner = GetComponent<SpinAround>();
@@ -268,7 +263,6 @@ namespace MeteorGame
 
 
 
-
         private void DoAimAssist()
         {
             //var dir = InAimAssistRange.First().transform.position - transform.position;
@@ -322,7 +316,7 @@ namespace MeteorGame
 
         public virtual void OnTriggerEnter(Collider collider)
         {
-            if (isDummy)
+            if (isDummy || !collider.gameObject.activeInHierarchy)
             {
                 return;
             }
@@ -353,14 +347,14 @@ namespace MeteorGame
 
         public bool ShouldPierce()
         {
-            bool always = CastBy.GetTotal("AlwaysPierce") > 0;
+            bool always = spawnInfo.CastBy.GetTotal("AlwaysPierce") > 0;
 
             if (always)
             {
                 return true;
             }
 
-            int count = (int)CastBy.GetTotal("PierceAdditionalTimes");
+            int count = (int)spawnInfo.CastBy.GetTotal("PierceAdditionalTimes");
 
             if (count == 0)
             {
@@ -383,7 +377,7 @@ namespace MeteorGame
 
         public bool ShouldChain()
         {
-            if (ChainedFrom.Count >= CastBy.ChainAdditionalTimes)
+            if (ChainedFrom.Count >= spawnInfo.CastBy.GetTotal("ChainAdditionalTimes"))
             {
                 return false;
             }
@@ -404,7 +398,7 @@ namespace MeteorGame
 
             if (e != null)
             {
-                SetVelocityTowards(e.transform.position, StartingSpeed);
+                SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
                 ChainedFrom.Add(collidingWith);
                 return;
             }
@@ -414,7 +408,7 @@ namespace MeteorGame
 
         public bool ShouldFork()
         {
-            if (ForkedFrom.Count >= CastBy.ForkAdditionalTimes)
+            if (ForkedFrom.Count >= spawnInfo.CastBy.GetTotal("ForkAdditionalTimes"))
             {
                 return false;
             }
@@ -466,8 +460,8 @@ namespace MeteorGame
             clone.CopyFrom(this);
             clone2.CopyFrom(this);
 
-            clone.SetVelocityTowards(e.transform.position, StartingSpeed);
-            clone2.SetVelocityTowards(e2.transform.position, StartingSpeed);
+            clone.SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
+            clone2.SetVelocityTowards(e2.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
 
             return true;
         }
@@ -475,7 +469,6 @@ namespace MeteorGame
         private void SetVelocityTowards(Vector3 position, float speed)
         {
             Rigidbody.isKinematic = false;
-            transform.LookAt(position);
 
             var dir = (position - transform.position).normalized;
             Rigidbody.velocity = Vector3.zero;
@@ -484,12 +477,11 @@ namespace MeteorGame
 
         private void CopyFrom(ProjectileBase p)
         {
-            this.StartingSpeed = p.StartingSpeed;
+            this.spawnInfo = p.spawnInfo;
             this.ForkingFrom = p.ForkingFrom;
             this.ForkedFrom = new List<Enemy>(p.ForkedFrom);
             this.ChainedFrom = new List<Enemy>(p.ChainedFrom);
             this.PiercedFrom = new List<Enemy>(p.PiercedFrom);
-            this.CastBy = p.CastBy;
         }
 
 

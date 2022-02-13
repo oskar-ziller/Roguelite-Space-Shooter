@@ -18,11 +18,11 @@ namespace MeteorGame
         {
             List<Vector3> path = new List<Vector3>();
             var rigidBody = _moveable.Rigidbody;
-            var projDir = (_moveable.MovingTowards - rigidBody.position).normalized;
+            var projDir = (_moveable.spawnInfo.AimingAt - rigidBody.position).normalized;
 
 
             var total = _moveable.CastProjCount;
-            var current = _moveable.ProjectileID;
+            var current = _moveable.spawnInfo.ProjID;
 
             var len = 2f;
             var angle = 60f;
@@ -57,8 +57,8 @@ namespace MeteorGame
             _moveable.Rigidbody.isKinematic = false;
             _moveable.Rigidbody.velocity = Vector3.zero;
 
-            var origDir = (_moveable.MovingTowards - _moveable.StartedMovingFrom).normalized;
-            _moveable.Rigidbody.velocity = origDir * _moveable.StartingSpeed;
+            var origDir = (_moveable.spawnInfo.AimingAt - _moveable.StartedMovingFrom).normalized;
+            _moveable.Rigidbody.velocity = origDir * _moveable.spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd;
         }
     }
 }

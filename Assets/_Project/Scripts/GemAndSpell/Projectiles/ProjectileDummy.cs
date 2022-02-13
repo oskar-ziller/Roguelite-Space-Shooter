@@ -36,8 +36,8 @@ namespace MeteorGame
         {
             spinner.projID = id;
             spinner.totalCount = projectileCount;
-            spinner.ResetSelf();
             spinner.startDeg = startDeg;
+            spinner.ResetSelf();
         }
 
         #endregion

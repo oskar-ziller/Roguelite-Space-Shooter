@@ -18,7 +18,7 @@ namespace MeteorGame
 
         public override bool HandleEnemyCollision()
         {
-            collidingWith.TakeHit(CastBy);
+            collidingWith.TakeHit(spawnInfo.CastBy);
 
             if (base.HandleEnemyCollision())
             {
@@ -39,7 +39,7 @@ namespace MeteorGame
             DisableRigidBody();
             //DisableCollider();
 
-            var expRadiSqr = CastBy.ExpRadi * CastBy.ExpRadi;
+            var expRadiSqr = spawnInfo.CastBy.Modifiers.ExplosionRadi * spawnInfo.CastBy.Modifiers.ExplosionRadi;
 
             var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
             && e != collidingWith.gameObject
@@ -47,10 +47,10 @@ namespace MeteorGame
 
             foreach (Enemy e in potentials)
             {
-                e.TakeHit(CastBy, applyAilment: false);
+                e.TakeHit(spawnInfo.CastBy, applyAilment: false);
             }
 
-            chillingArea.Init(CastBy);
+            chillingArea.Init(spawnInfo.CastBy);
         }
 
     }

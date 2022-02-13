@@ -22,8 +22,8 @@ namespace MeteorGame
         private float currencyTweening = 0; // used to tween and display currency
 
         [SerializeField] private float currency = 0;
-        [SerializeField] private SpellSlot spellSlot1 = new SpellSlot(1);
-        [SerializeField] private SpellSlot spellSlot2 = new SpellSlot(2);
+        [SerializeField] private SpellSlot spellSlot1;
+        [SerializeField] private SpellSlot spellSlot2;
 
         private Tween currencyTween;
         private Camera cameraObj;
@@ -60,14 +60,16 @@ namespace MeteorGame
 
         private void Start()
         {
-            Setup();
         }
 
 
-        private void Setup()
+        public void Setup()
         {
             inventory = new Inventory();
             cameraObj = GetComponentInChildren<Camera>();
+
+            spellSlot1 = new SpellSlot(1);
+            spellSlot2 = new SpellSlot(2);
 
             spellSlot1.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot1.SpellChanged += OnSpellChanged;
@@ -147,6 +149,13 @@ namespace MeteorGame
             pitchResetCoroutine = StartCoroutine(PitchResetCoroutine());
         }
 
+
+        /// <summary>
+        /// Casts a ray in camera direction and returns where it hits the world,
+        /// or infinity
+        /// </summary>
+        /// <param name="hitEnemy"></param>
+        /// <returns></returns>
         public Vector3 AimingAt(out Enemy hitEnemy)
         {
             hitEnemy = null;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -67,8 +68,6 @@ namespace MeteorGame
 
             print($"Total enemies to spawn {enemiesToSpawn.Count}");
 
-
-
             var generator = new PositionGenerator(spacing: info.enemySpacing,
                                                   spawnList: enemiesToSpawn,
                                                   packShape: info.packShape);
@@ -80,36 +79,55 @@ namespace MeteorGame
             yield return null;
         }
 
+        private float CalculatePackMovementSpeed(List<FindSpawnPosResult> candidates)
+        {
+
+            // calculate average movement speed
+            var avgTestVal = 0f;
+            foreach (FindSpawnPosResult result in candidates)
+            {
+                avgTestVal += result.EnemySO.HealthMultiplier / result.EnemySO.SpeedMultiplier;
+            }
+
+
+            avgTestVal /= candidates.Count;
+
+
+            return 1f/avgTestVal;
+
+        }
+
+
 
         private IEnumerator SpawnAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates)
         {
             print("SpawnAll");
 
-            var packCenter = Random.onUnitSphere * info.packHeight;
+            var packCenter = UnityEngine.Random.onUnitSphere * info.packHeight;
 
             var packHolder = new GameObject("Pack");
             packHolder.transform.parent = info.enemyHolder;
 
             Vector3 spawnPos;
 
+
+            var packSpeed = CalculatePackMovementSpeed(candidates);
+
+
             foreach (FindSpawnPosResult result in candidates)
             {
                 spawnPos = packCenter + result.SpawnPos;
 
-                // look for pool for this type of enemy and Get() from it
-                var pool = EnemyManager.Instance.GetPoolForTypeOfEnemy(result.EnemySO);
-
-                Enemy e = pool.Get();
-                e.Reset(result.EnemySO, spawnPos);
+                var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
                 e.transform.parent = packHolder.transform;
+                e.gameObject.name = result.EnemySO.Name;
+                e.Init(result.EnemySO, spawnPos, packCenter, packSpeed);
 
 
                 if (waitAfterSpawn > 0)
                 {
                     yield return new WaitForSeconds(waitAfterSpawn);
                 }
-
-
             }
 
             yield return null;

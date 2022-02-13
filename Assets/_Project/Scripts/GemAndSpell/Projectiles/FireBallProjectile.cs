@@ -21,7 +21,7 @@ namespace MeteorGame
 
         public override bool HandleEnemyCollision()
         {
-            collidingWith.TakeHit(CastBy);
+            collidingWith.TakeHit(spawnInfo.CastBy);
 
             if (base.HandleEnemyCollision())
             {
@@ -39,7 +39,7 @@ namespace MeteorGame
             var expHandler = Instantiate(explosionPrefab);
             expHandler.transform.parent = transform.parent;
             expHandler.transform.position = transform.position;
-            expHandler.Setup(CastBy);
+            expHandler.Setup(spawnInfo.CastBy);
             expHandler.DoExplode();
 
 

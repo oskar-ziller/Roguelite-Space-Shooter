@@ -21,14 +21,14 @@ namespace MeteorGame
 
             var projDir = _moveable.Rigidbody.transform.forward;
 
-            var dist = Vector3.Distance(_moveable.MovingTowards, rigidBody.position);
+            var dist = Vector3.Distance(_moveable.spawnInfo.AimingAt, rigidBody.position);
 
             var total = _moveable.CastProjCount;
-            var currentID = _moveable.ProjectileID;
+            var currentID = _moveable.spawnInfo.ProjID;
 
             var len = Math.Min(dist / 2f, _moveable.PathLen);
 
-            if (_moveable.CastProjCount == 1)
+            if (_moveable.CastProjCount == 1 || _moveable.spawnInfo.ProjID == 0)
             {
                 var moveVector = (len * rigidBody.transform.forward * 0.8f);
 
@@ -37,7 +37,7 @@ namespace MeteorGame
             }
             else
             {
-                var centerPos = _moveable.CastPos;
+                var centerPos = _moveable.spawnInfo.CastPos;
                 var currDirectionFromCenter = (_moveable.MainMesh.position - centerPos).normalized;
 
                 var moveVector = (_moveable.SpreadFromCenter * currDirectionFromCenter) + (len * rigidBody.transform.forward);
@@ -51,14 +51,7 @@ namespace MeteorGame
         {
             // move ball towards direction of movement
             _moveable.Rigidbody.isKinematic = false;
-            //_moveable.Rigidbody.transform.LookAt(_moveable.MovingTowards);
-
-            //var origDir = (_moveable.MovingTowards - _moveable.RigidBodyObj.position).normalized;
-            _moveable.Rigidbody.velocity = _moveable.Rigidbody.transform.forward * _moveable.StartingSpeed;
-
-
-            //_moveable.Rigidbody.velocity = (_moveable.MovingTowards - _moveable.Rigidbody.position).normalized * _moveable.StartingSpeed;
-
+            _moveable.Rigidbody.velocity = _moveable.Rigidbody.transform.forward * _moveable.spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd;
         }
 
 

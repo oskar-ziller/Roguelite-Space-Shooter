@@ -17,16 +17,12 @@ namespace MeteorGame
         float spacing = 0f;
 
 
-        private const int iterationsBeforeGiveUp = 5;
+        private const int iterationsBeforeGiveUp = 100;
         private const int iterationsBeforeRegionIncrease = 5;
 
         private float delayAfterGiveUp = 0.01f;
         private float delayAfterRegionIncrease = 0.01f;
         private float delayAfterSuccess = 0.01f;
-
-
-        PackShape regionShape = PackShape.Sphere;
-
 
         private int findPosIterations = 0;
         private int gaveUpCount = 0;
@@ -39,13 +35,13 @@ namespace MeteorGame
 
             this.spacing = spacing;
             this.spawnList = new List<EnemySO>(spawnList);
-            regionShape = packShape;
+            //regionShape = packShape;
 
 
             // order the list so we spawn biggest first
-            spawnList = spawnList.OrderByDescending(e => e.ShapeRadi).ToList();
+            this.spawnList = this.spawnList.OrderByDescending(e => e.ShapeRadi).ToList();
             // set region size to biggest enemy size to save some time
-            regionExtends = Mathf.CeilToInt(spawnList.First().ShapeRadi);
+            regionExtends = Mathf.CeilToInt(this.spawnList.First().ShapeRadi + 2);
         }
 
 
@@ -61,27 +57,31 @@ namespace MeteorGame
         {
             foreach (EnemySO e in spawnList)
             {
-                FindSpawnPosResult pos = null;
+                if (spawnPositions.Count == 0)
+                {
+                    spawnPositions.Add(new FindSpawnPosResult(Vector3.zero, e));
+                    continue;
+                }
 
-                UnityEngine.Debug.Log($"Trying to find spot for {e.name} - size: {e.ShapeRadi}");
+                Vector3 pos = Vector3.zero;
 
+                UnityEngine.Debug.Log($"Trying to find spot for {e.Name} - size: {e.ShapeRadi}");
 
-                while (pos == null)
+                while (pos == Vector3.zero)
                 {
                     for (int i = 0; i < iterationsBeforeRegionIncrease; i++)
                     {
                         pos = FindSpawnPos(e);
 
-                        if (pos == null)
+                        if (pos == Vector3.zero)
                         {
                             gaveUpCount++;
-                            UnityEngine.Debug.Log("Gave up on point. Sleeping for: " + delayAfterGiveUp);
+                            //UnityEngine.Debug.Log("Gave up on point. Sleeping for: " + delayAfterGiveUp);
                             yield return new WaitForSeconds(delayAfterGiveUp);
                         }
                     }
 
-
-                    if (pos == null)
+                    if (pos == Vector3.zero)
                     {
                         regionExtends++;
                         UnityEngine.Debug.Log($"Still can't fit. Increase region to {regionExtends} and sleep for {delayAfterRegionIncrease} ");
@@ -90,57 +90,53 @@ namespace MeteorGame
                     }
                 }
 
-                UnityEngine.Debug.Log($"Found spot. center: {pos.SpawnPos}");
-
-                spawnPositions.Add(pos);
+                spawnPositions.Add(new FindSpawnPosResult(pos, e));
                 yield return new WaitForSeconds(delayAfterSuccess);
             }
         }
 
         private Vector3 GetRandomPos()
         {
-            Vector3 randomPos = Vector3.zero;
+            //if (regionShape == PackShape.Sphere || true)
+            //{
+            //    randomPos = Random.insideUnitSphere * regionExtends;
+            //}
+            //else if (regionShape == PackShape.Cube)
+            //{
+            //    var extend = regionExtends;
 
-            if (regionShape == PackShape.Sphere)
-            {
-                randomPos = Random.insideUnitSphere * regionExtends;
-            }
-            else if (regionShape == PackShape.Cube)
-            {
-                var extend = regionExtends;
+            //    randomPos = new Vector3(Random.Range(-extend, extend)
+            //        , Random.Range(-extend, extend)
+            //        , Random.Range(-extend, extend));
+            //}
 
-                randomPos = new Vector3(Random.Range(-extend, extend)
-                    , Random.Range(-extend, extend)
-                    , Random.Range(-extend, extend));
-            }
-
-            return randomPos;
+            return Random.insideUnitSphere * regionExtends;
         }
 
 
-        private FindSpawnPosResult FindSpawnPos(EnemySO toSpawn)
+        private Vector3 FindSpawnPos(EnemySO toSpawn)
         {
             for (int i = 0; i < iterationsBeforeGiveUp; i++)
             {
                 findPosIterations++;
+
                 var randPos = GetRandomPos();
 
-                if (!OverlapsWithExisting(GetRandomPos(), toSpawn.ShapeRadi))
+                if (!OverlapsWithExisting(randPos, toSpawn.ShapeRadi))
                 {
-                    return new FindSpawnPosResult(randPos, toSpawn);
+                    return randPos;
                 }
             }
 
-            return null;
+            return Vector3.zero;
         }
 
         private bool OverlapsWithExisting(Vector3 randomPos, float toCheckRadi)
         {
             foreach (FindSpawnPosResult existing in spawnPositions)
             {
-                float existingR = existing.EnemySO.ShapeRadi;
-                float withSpacing = existingR + toCheckRadi + spacing;
-                bool check = (randomPos - existing.SpawnPos).sqrMagnitude < withSpacing * withSpacing;
+                var dist = Vector3.Distance(existing.SpawnPos, randomPos);
+                bool check = dist < ((existing.EnemySO.ShapeRadi + toCheckRadi)) + spacing;
 
                 if (check)
                 {

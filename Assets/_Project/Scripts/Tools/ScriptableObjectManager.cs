@@ -9,7 +9,7 @@ namespace MeteorGame
 {
     public class ScriptableObjectManager
     {
-        public List<ModifierSO> Modifiers = new List<ModifierSO>();
+        public Dictionary<string, ModifierSO> Modifiers = new Dictionary<string, ModifierSO>();
         public List<SpellSO> Spells = new List<SpellSO>();
         public List<GemSO> Gems = new List<GemSO>();
         public List<EnemySO> Enemies = new List<EnemySO>();
@@ -26,7 +26,7 @@ namespace MeteorGame
             {
                 if (item.isEnabled)
                 {
-                    Modifiers.Add(item);
+                    Modifiers.Add(item.internalName, item);
                 }
             }
 

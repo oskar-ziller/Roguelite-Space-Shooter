@@ -31,7 +31,7 @@ MonoBehaviour:
   m_MainLightShadowsSupported: 0
   m_MainLightShadowmapResolution: 256
   m_AdditionalLightsRenderingMode: 1
-  m_AdditionalLightsPerObjectLimit: 4
+  m_AdditionalLightsPerObjectLimit: 8
   m_AdditionalLightShadowsSupported: 0
   m_AdditionalLightsShadowmapResolution: 1024
   m_AdditionalLightsShadowResolutionTierLow: 256
@@ -51,7 +51,7 @@ MonoBehaviour:
   m_ConservativeEnclosingSphere: 0
   m_NumIterationsEnclosingSphere: 64
   m_AdditionalLightsCookieResolution: 2048
-  m_AdditionalLightsCookieFormat: 3
+  m_AdditionalLightsCookieFormat: 4
   m_UseSRPBatcher: 1
   m_SupportsDynamicBatching: 1
   m_MixedLightingSupported: 1

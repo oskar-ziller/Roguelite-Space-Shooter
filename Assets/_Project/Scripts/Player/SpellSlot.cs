@@ -13,6 +13,7 @@ namespace MeteorGame
         {
             MaxLinksUnlocked = 0;
             slotNo = slotNr;
+            Modifiers = new Modifiers(this);
         }
 
         [SerializeField] private bool isUnlocked = false;
@@ -33,7 +34,13 @@ namespace MeteorGame
 
         public int slotNo;
 
-
+        public int ProjectileCount
+        {
+            get
+            {
+                return Spell.ProjectileCount + (int)GetTotal("AdditionalProjectiles");
+            }
+        }
 
         public Modifiers Modifiers;
 
@@ -67,7 +74,6 @@ namespace MeteorGame
             Equip(gem);
             //GameManager.Instance.TabMenuManager.RebuildInventoryUI();
         }
-
 
         private void ChangeSpell(SpellItem spellToEquip)
         {
@@ -141,6 +147,11 @@ namespace MeteorGame
         internal void UnlockSpellSlot()
         {
             isUnlocked = true;
+        }
+
+        internal float GetTotal(string v)
+        {
+            return Modifiers.Get(v);
         }
     }
 }

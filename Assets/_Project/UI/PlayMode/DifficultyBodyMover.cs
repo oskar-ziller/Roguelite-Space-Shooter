@@ -53,7 +53,7 @@ namespace MeteorGame
             {
                 
                 var minsToMax = GameManager.Instance.minutesToHitMaxGameLevel;
-                var secondsSinceStart = (float)GameManager.Instance.HowFarIntoDifficulty().TotalSeconds;
+                var secondsSinceStart = (float)GameManager.Instance.HowFarIntoDifficulty();
 
                 var percentage = secondsSinceStart / (minsToMax * 60);
 

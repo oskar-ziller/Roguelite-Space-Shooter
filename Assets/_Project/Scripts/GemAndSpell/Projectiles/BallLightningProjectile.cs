@@ -9,7 +9,6 @@ namespace MeteorGame
     {
         IMover _projectileMover;
 
-        [Tooltip("Mesh around ball lightning")]
         [SerializeField] private Transform ballMesh;
 
         [Tooltip("Default radius of the ball")]
@@ -29,7 +28,7 @@ namespace MeteorGame
 
         private void Begin()
         {
-            float increasedBy = CastBy.GetTotal("IncreasedAoe");
+            float increasedBy = spawnInfo.CastBy.GetTotal("IncreasedAoe");
             var totalRadi = defaultRadius * (1 + increasedBy * 2);
 
             ballMesh.localScale *= totalRadi;
@@ -64,18 +63,18 @@ namespace MeteorGame
                 Enemy collidedEnemy = other.transform.gameObject.GetComponent<Enemy>();
                 float now = Time.time;
 
-                if (!collidedEnemy.zapDict.ContainsKey(CastID))
+                if (!collidedEnemy.zapDict.ContainsKey(spawnInfo.CastID))
                 {
                     //collidedEnemy.TakeDamage(DamageType.DoT);
-                    collidedEnemy.zapDict.Add(CastID, now);
-                    collidedEnemy.TakeHit(CastBy);
+                    collidedEnemy.zapDict.Add(spawnInfo.CastID, now);
+                    collidedEnemy.TakeHit(spawnInfo.CastBy);
                     return;
                 }
 
-                if (now - collidedEnemy.zapDict[CastID] > zapInterval / 1000f)
+                if (now - collidedEnemy.zapDict[spawnInfo.CastID] > zapInterval / 1000f)
                 {
-                    collidedEnemy.zapDict[CastID] = now;
-                    collidedEnemy.TakeHit(CastBy);
+                    collidedEnemy.zapDict[spawnInfo.CastID] = now;
+                    collidedEnemy.TakeHit(spawnInfo.CastBy);
                     return;
                 }
             }

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: IncreasedDuration
   m_EditorClassIdentifier: 
   modifiers:
-  - modifier: {fileID: 11400000, guid: 8a838a74b5d772241bf42b3f9d5185f9, type: 2}
+  - modifierSO: {fileID: 11400000, guid: 975e964fb224fb54d9152d1b96a9ca12, type: 2}
     min: 30
     max: 100
   name: Increased Duration
   gemColor: {r: 0.37687448, g: 0.20163757, b: 0.6037736, a: 1}
   spellSO: {fileID: 0}
+  isEnabled: 1
   description: Increase the lifetime of any effect and projectile

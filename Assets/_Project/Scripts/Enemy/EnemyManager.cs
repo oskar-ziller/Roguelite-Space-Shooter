@@ -21,6 +21,9 @@ namespace MeteorGame
 
         public Transform goldDropHolder;
 
+        public Enemy enemyPrefab;
+
+
         [SerializeField] private EnemySpawner enemySpawner;
 
 
@@ -40,85 +43,53 @@ namespace MeteorGame
         [SerializeField] private int baseHP;
 
 
+        [Tooltip("HP Multiplier when gamelevel = max")]
+        [SerializeField] private int maxHpMultiplier;
 
 
+        public EnemySpawner EnemySpawner => enemySpawner;
 
+        public ObjectPool<Enemy> EnemyPool;
 
-
-        public Dictionary<EnemySO, ObjectPool<Enemy>> poolDict = new Dictionary<EnemySO, ObjectPool<Enemy>>();
-
-        public Dictionary<EnemySO, EnemyCreator> creatorDict = new Dictionary<EnemySO, EnemyCreator>();
-
+        public int MaxHpMultiplier => maxHpMultiplier;
 
 
 
         void OnGUI()
         {
-            var startY = 10;
-            var margin = 12;
-
-            foreach (var item in poolDict)
-            {
-                GUI.Label(new Rect(10, startY + margin * 0, 200, 20), $"Enemy: {item.Key.name}");
-                GUI.Label(new Rect(10, startY + margin * 1, 200, 20), $"CountActive: {item.Value.CountActive}");
-                GUI.Label(new Rect(10, startY + margin * 2, 200, 20), $"CountInactive: {item.Value.CountInactive}");
-                GUI.Label(new Rect(10, startY + margin * 3, 200, 20), $"CountAll: {item.Value.CountAll}");
-                GUI.Label(new Rect(10, startY + margin * 4, 200, 20), "--------------------------------");
-
-                startY += margin * 7;
-            }
-
+            GUI.Label(new Rect(10, 10, 200, 20), $"CountActive: {EnemyPool.CountActive}");
+            GUI.Label(new Rect(10, 30, 200, 20), $"CountInactive: {EnemyPool.CountInactive}");
+            GUI.Label(new Rect(10, 50, 200, 20), $"CountAll: {EnemyPool.CountAll}");
         }
 
 
 
 
-        public ObjectPool<Enemy> GetPoolForTypeOfEnemy(EnemySO enemySO)
-        {
-            return poolDict[enemySO];
-        }
-
-
-        /// <summary>
-        /// For each type of enemy, setup an EnemyCreator and point the pool to that.
-        /// Have a pool for each type of enemy.
-        /// </summary>
-        private void CreatePools()
-        {
-            foreach (EnemySO enemySO in GameManager.Instance.ScriptableObjects.Enemies)
-            {
-                // setup a creator
-                var creator = new EnemyCreator();
-
-                // create a new pool which gets its objects from the newly setup EnemyCreator 
-                var p = new ObjectPool<Enemy>(creator.CreatePooledEnemy, OnTakeFromPool, OnReturnToPool);
-                poolDict.Add(enemySO, p);
-
-
-                // fill the EnemyCreator with relevant info.
-                creator.enemySO = enemySO;
-                creator.spawner = enemySpawner;
-                creator.pool = p;
-                creatorDict.Add(enemySO, creator);
-            }
-        }
 
 
         public void Setup()
         {
-            CreatePools();
+            EnemyPool = new ObjectPool<Enemy>(OnCreateEnemy, OnTakeFromPool, OnReturnToPool);
         }
 
 
+        private Enemy OnCreateEnemy()
+        {
+            var e = Instantiate(enemyPrefab);
+            e.OnEnemyDeath += OnEnemyDeath;
+
+            return e;
+        }
+
         private void OnTakeFromPool(Enemy e)
         {
-            print("OnTakeFromPool");
             e.gameObject.SetActive(true);
         }
 
         private void OnReturnToPool(Enemy e)
         {
-            print("OnReturnToPool");
+            e.transform.parent = null;
+            e.transform.position = Vector3.zero;
             e.gameObject.SetActive(false);
         }
 
@@ -210,8 +181,9 @@ namespace MeteorGame
 
         internal void OnEnemyDeath(Enemy e)
         {
-            DropGold(e);
+            //DropGold(e);
             aliveEnemies.Remove(e);
+            EnemyPool.Release(e);
         }
 
         internal void AddEnemy(Enemy e)
@@ -292,13 +264,14 @@ namespace MeteorGame
 
         internal void DestroyAllEnemies()
         {
-            
+
+            for (int i = aliveEnemies.Count - 1; i >= 0; i--)
+            {
+                aliveEnemies[i].ForceDie();
+            }
 
 
-            //foreach (Transform child in enemiesHolder)
-            //{
-            //    Destroy(child.gameObject);
-            //}
+            //enemySpawner.DestroyPackHolders();
         }
 
         //internal Enemy PickEnemyToChainTo(Enemy from, Enemy except = null)
