@@ -50,8 +50,12 @@ Material:
     - Vector1_86c7c0c032694a799d3d468e98064e50: 0
     - Vector1_bcc729487e114073bb513dca8183f48b: 0.044
     - Vector1_d25eb45015774546a36e38c36c7b7de8: 0.55
+    - _AmbientOcclusion: 0.1
+    - _EmmisionMultip: 0
+    - _Metallic: 0.9
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Smoothness: 0.2
     - _percentage: 0.743
     m_Colors:
     - Color_16ca097ed511458e8caaf685f88e80f9: {r: 0.5803922, g: 0.05490196, b: 0, a: 1}
