@@ -41,7 +41,7 @@ namespace MeteorGame
 
             var expRadiSqr = spawnInfo.CastBy.Modifiers.ExplosionRadi * spawnInfo.CastBy.Modifiers.ExplosionRadi;
 
-            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
             && e != collidingWith.gameObject
             && (e.transform.position - transform.position).sqrMagnitude < expRadiSqr);
 

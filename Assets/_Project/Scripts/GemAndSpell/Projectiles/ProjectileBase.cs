@@ -139,12 +139,6 @@ namespace MeteorGame
             ScaleProjectileWhileMove();
         }
 
-
-
-
-
-  
-
         /// <summary>
         /// Returns true if collision is handled by base class.
         /// Returns false if base class has no further action to take on collision.
@@ -389,7 +383,7 @@ namespace MeteorGame
         {
             var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
             && e.gameObject != collidingWith.gameObject
             && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
             
@@ -424,7 +418,7 @@ namespace MeteorGame
 
             var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            var potentials = EnemyManager.Instance.aliveEnemies.Where(e => e != null
+            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
             && e.gameObject != collidingWith.gameObject
             && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
 

@@ -13,7 +13,8 @@ namespace MeteorGame
     {
         public static EnemyManager Instance { get; private set; }
 
-        public List<Enemy> aliveEnemies { get; private set; }
+        public List<Enemy> AliveEnemies { get; private set; }
+        public List<EnemyPack> AlivePacks { get; private set; }
 
         public Transform enemiesHolder;
 
@@ -55,12 +56,12 @@ namespace MeteorGame
 
 
 
-        void OnGUI()
-        {
-            GUI.Label(new Rect(10, 10, 200, 20), $"CountActive: {EnemyPool.CountActive}");
-            GUI.Label(new Rect(10, 30, 200, 20), $"CountInactive: {EnemyPool.CountInactive}");
-            GUI.Label(new Rect(10, 50, 200, 20), $"CountAll: {EnemyPool.CountAll}");
-        }
+        //void OnGUI()
+        //{
+        //    GUI.Label(new Rect(10, 10, 200, 20), $"CountActive: {EnemyPool.CountActive}");
+        //    GUI.Label(new Rect(10, 30, 200, 20), $"CountInactive: {EnemyPool.CountInactive}");
+        //    GUI.Label(new Rect(10, 50, 200, 20), $"CountAll: {EnemyPool.CountAll}");
+        //}
 
 
 
@@ -76,7 +77,7 @@ namespace MeteorGame
         private Enemy OnCreateEnemy()
         {
             var e = Instantiate(enemyPrefab);
-            e.OnEnemyDeath += OnEnemyDeath;
+            e.Died += OnEnemyDeath;
 
             return e;
         }
@@ -129,11 +130,13 @@ namespace MeteorGame
 
         private void Awake()
         {
-            aliveEnemies = new List<Enemy>();
+            AliveEnemies = new List<Enemy>();
+            AlivePacks = new List<EnemyPack>();
             Instance = this;
 
-
+            enemySpawner.SpawnedPack += OnPackSpawn;
         }
+
 
 
 
@@ -182,13 +185,28 @@ namespace MeteorGame
         internal void OnEnemyDeath(Enemy e)
         {
             //DropGold(e);
-            aliveEnemies.Remove(e);
+            AliveEnemies.Remove(e);
             EnemyPool.Release(e);
+
+            e.BelongsToPack.Enemies.Remove(e);
+
+            if (e.BelongsToPack.Enemies.Count == 0)
+            {
+                AlivePacks.Remove(e.BelongsToPack);
+                Destroy(e.BelongsToPack.gameObject);
+            }
+
         }
+
+        private void OnPackSpawn(EnemyPack p)
+        {
+            AlivePacks.Add(p);
+        }
+
 
         internal void AddEnemy(Enemy e)
         {
-            aliveEnemies.Add(e);
+            AliveEnemies.Add(e);
         }
 
         internal Enemy ClosestEnemyTo(Vector3 pos)
@@ -196,9 +214,9 @@ namespace MeteorGame
             float minDist = float.MaxValue;
             Enemy closestEnemy = null;
 
-            for (int i = 0; i < aliveEnemies.Count; i++)
+            for (int i = 0; i < AliveEnemies.Count; i++)
             {
-                Enemy e = aliveEnemies[i];
+                Enemy e = AliveEnemies[i];
 
                 float dist = Vector3.Distance(e.transform.position, pos);
 
@@ -265,9 +283,9 @@ namespace MeteorGame
         internal void DestroyAllEnemies()
         {
 
-            for (int i = aliveEnemies.Count - 1; i >= 0; i--)
+            for (int i = AliveEnemies.Count - 1; i >= 0; i--)
             {
-                aliveEnemies[i].ForceDie();
+                AliveEnemies[i].ForceDie();
             }
 
 

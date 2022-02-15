@@ -20,6 +20,9 @@ namespace MeteorGame
 
         private AilmentManager ailmentManager;
 
+        private WaitForSeconds waitRandom;
+
+
 
         #endregion
 
@@ -27,6 +30,7 @@ namespace MeteorGame
 
         private void Awake()
         {
+            waitRandom = new WaitForSeconds(Random.Range(0.3f, 0.7f));
         }
 
         private void Start()
@@ -39,11 +43,12 @@ namespace MeteorGame
 
         #region Methods
 
+
         IEnumerator CheckAilmentsCoroutine()
         {
             while (true)
             {
-                yield return new WaitForSeconds(Random.Range(0.3f, 0.7f));
+                yield return waitRandom;
                 CheckAilmentsAndUpdateVisuals();
             }
         }

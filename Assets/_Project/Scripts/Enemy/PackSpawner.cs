@@ -35,10 +35,19 @@ namespace MeteorGame
         private bool isSetup = false;
 
 
+        private WaitForSeconds waitAfterSpawnTimer;
+
+
+        public Action<EnemyPack> SpawnedPack;
+
         #endregion
 
         #region Unity Methods
 
+        private void Awake()
+        {
+            waitAfterSpawnTimer = new WaitForSeconds(waitAfterSpawn);
+        }
 
         #endregion
 
@@ -54,14 +63,12 @@ namespace MeteorGame
 
         public IEnumerator SpawnPack(PackSpawnInfo info)
         {
-
             if (!isSetup)
             {
                 Setup();
             }
 
             print($"SpawnPack");
-
 
             weightedRandomEnemy.totalMoney = info.spawnerMoney;
             List<EnemySO> enemiesToSpawn = weightedRandomEnemy.CreateSpawnList();
@@ -74,9 +81,6 @@ namespace MeteorGame
 
             yield return generator.Generate();
             yield return SpawnAll(info, generator.spawnPositions);
-
-
-            yield return null;
         }
 
         private float CalculatePackMovementSpeed(List<FindSpawnPosResult> candidates)
@@ -99,6 +103,7 @@ namespace MeteorGame
 
 
 
+
         private IEnumerator SpawnAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates)
         {
             print("SpawnAll");
@@ -108,29 +113,35 @@ namespace MeteorGame
             var packHolder = new GameObject("Pack");
             packHolder.transform.parent = info.enemyHolder;
 
+
+            var pack = packHolder.AddComponent<EnemyPack>();
+            pack.Info = info;
+            pack.Holder = packHolder.transform;
+
+
             Vector3 spawnPos;
 
-
             var packSpeed = CalculatePackMovementSpeed(candidates);
-
 
             foreach (FindSpawnPosResult result in candidates)
             {
                 spawnPos = packCenter + result.SpawnPos;
+                pack.Position = spawnPos;
 
                 var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
                 e.transform.parent = packHolder.transform;
                 e.gameObject.name = result.EnemySO.Name;
-                e.Init(result.EnemySO, spawnPos, packCenter, packSpeed);
+                e.Init(result.EnemySO, spawnPos, packCenter, packSpeed, pack);
+                pack.Enemies.Add(e);
 
 
                 if (waitAfterSpawn > 0)
                 {
-                    yield return new WaitForSeconds(waitAfterSpawn);
+                    yield return waitAfterSpawnTimer;
                 }
             }
 
-            yield return null;
+            SpawnedPack?.Invoke(pack);
         }
 
 

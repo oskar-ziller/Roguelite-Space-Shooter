@@ -167,7 +167,7 @@ namespace MeteorGame
             }
 
             float effectIncreasedBy = from.GetTotal("IncreasedEffectOfWeaken");
-            var effect = Formula(damageAmount, owner.totalHealth, effectIncreasedBy);
+            var effect = Formula(damageAmount, owner.TotalHealth, effectIncreasedBy);
 
             if (effect < minWeakenEffect)
             {
@@ -236,7 +236,7 @@ namespace MeteorGame
 
             // Freeze duration is 60 milliseconds (0.06 seconds) for every 1% of the target's maximum life
 
-            float damagePercentage = damageAmount / owner.totalHealth;
+            float damagePercentage = damageAmount / owner.TotalHealth;
             float dur = damagePercentage * 0.06f;
 
 
@@ -275,7 +275,7 @@ namespace MeteorGame
             float increasedBy = from.GetTotal("IncreasedEffectOfChill");
             var increasedEffectOfColdAilments = from.GetTotal("IncreasedEffectOfColdAilments");
 
-            var effect = Formula(damageAmount, owner.totalHealth, increasedBy);
+            var effect = Formula(damageAmount, owner.TotalHealth, increasedBy);
 
             if (effect < minChillEffect)
             {

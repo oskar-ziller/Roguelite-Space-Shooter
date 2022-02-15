@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,6 +57,7 @@ namespace MeteorGame
         [SerializeField] private float spacingBetweenEnemies;
 
 
+        public Action<EnemyPack> SpawnedPack;
 
 
         public Enemy testPrefab;
@@ -76,10 +78,18 @@ namespace MeteorGame
         {
             //pooledEnemies = new ObjectPool<Enemy>(CreatePooledEnemy, OnTakeFromPool, OnReturnToPool);
             packSpawner = GetComponent<PackSpawner>();
+            packSpawner.SpawnedPack += OnPackSpawned;
         }
 
 
-
+        /// <summary>
+        /// Packspawner raises an action and we pass it along
+        /// </summary>
+        /// <param name="pack"></param>
+        private void OnPackSpawned(EnemyPack pack)
+        {
+            SpawnedPack?.Invoke(pack);
+        }
 
         public float CalculateEnemyHPMultip()
         {
@@ -175,6 +185,8 @@ namespace MeteorGame
             info.packShape = PackShape.Sphere;
 
             yield return packSpawner.SpawnPack(info);
+
+
         }
 
         private IEnumerator SpawnLoop()

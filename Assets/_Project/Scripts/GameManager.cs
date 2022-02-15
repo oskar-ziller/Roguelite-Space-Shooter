@@ -110,13 +110,13 @@ namespace MeteorGame
 
         private void Start()
         {
-
             // load scriptable objects
             scriptableObjects.Load();
             gamePlayTime = Time.time;
 
             Cursor.lockState = CursorLockMode.Locked;
-            //TabMenuManager.RebuildTabMenu();
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 200;
 
             EnemyManager.Instance.Setup();
 

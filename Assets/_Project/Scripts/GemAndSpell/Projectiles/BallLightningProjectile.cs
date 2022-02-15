@@ -58,26 +58,26 @@ namespace MeteorGame
 
         private void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Enemy"))
-            {
-                Enemy collidedEnemy = other.transform.gameObject.GetComponent<Enemy>();
-                float now = Time.time;
+            //if (other.CompareTag("Enemy"))
+            //{
+            //    Enemy collidedEnemy = other.transform.gameObject.GetComponent<Enemy>();
+            //    float now = Time.time;
 
-                if (!collidedEnemy.zapDict.ContainsKey(spawnInfo.CastID))
-                {
-                    //collidedEnemy.TakeDamage(DamageType.DoT);
-                    collidedEnemy.zapDict.Add(spawnInfo.CastID, now);
-                    collidedEnemy.TakeHit(spawnInfo.CastBy);
-                    return;
-                }
+            //    if (!collidedEnemy.zapDict.ContainsKey(spawnInfo.CastID))
+            //    {
+            //        //collidedEnemy.TakeDamage(DamageType.DoT);
+            //        collidedEnemy.zapDict.Add(spawnInfo.CastID, now);
+            //        collidedEnemy.TakeHit(spawnInfo.CastBy);
+            //        return;
+            //    }
 
-                if (now - collidedEnemy.zapDict[spawnInfo.CastID] > zapInterval / 1000f)
-                {
-                    collidedEnemy.zapDict[spawnInfo.CastID] = now;
-                    collidedEnemy.TakeHit(spawnInfo.CastBy);
-                    return;
-                }
-            }
+            //    if (now - collidedEnemy.zapDict[spawnInfo.CastID] > zapInterval / 1000f)
+            //    {
+            //        collidedEnemy.zapDict[spawnInfo.CastID] = now;
+            //        collidedEnemy.TakeHit(spawnInfo.CastBy);
+            //        return;
+            //    }
+            //}
         }
 
         private void ScaleZapEffects(float scale)

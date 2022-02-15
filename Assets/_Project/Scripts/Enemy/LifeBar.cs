@@ -59,7 +59,7 @@ namespace MeteorGame
             }
 
             var current = mesh.material.GetFloat("_percentage");
-            var target = (float)owner.currentHealth / owner.totalHealth;
+            var target = (float)owner.CurrentHealth / owner.TotalHealth;
 
 
             var dur = tweenDur + Random.Range(-tweenVariation, tweenVariation);

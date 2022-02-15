@@ -48,9 +48,9 @@ Material:
     m_Floats:
     - Vector1_7650401e580c46b1ba247db4eb1b0335: -0.32
     - Vector1_d25eb45015774546a36e38c36c7b7de8: 0.5
-    - _AmbientOcclusion: 0.1
+    - _AmbientOcclusion: 1
     - _EmmisionMultip: 0
-    - _Metallic: 0.9
+    - _Metallic: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0.2

@@ -17,9 +17,29 @@ namespace MeteorGame
 
         public Action<Enemy> DamageTaken;
         public Action<Enemy> HealthChanged;
+        public Action<Enemy> Died;
+
+        public int TotalHealth { get; private set; }
+        public int CurrentHealth { get; private set; }
+        public EnemyPack BelongsToPack { get; private set; }
+
+
         private float currentSpeed;
 
         private EnemySO enemySO;
+
+        private Vector3 startingVel;
+        private Vector3 spawnPos;
+        private Vector3 packCenter;
+        private float packAvgSpeedMultip;
+
+
+        private AilmentManager ailmentManager;
+
+
+
+        private MeshRenderer renderer;
+        private MeshFilter meshFilter;
 
         private float expectedSpeed => packAvgSpeedMultip * EnemyManager.Instance.BaseEnemySpeed;
 
@@ -28,32 +48,14 @@ namespace MeteorGame
 
         private void Die()
         {
-            currentHealth = 0;
-            OnEnemyDeath?.Invoke(this);
+            SetCurrnetHealth(0);
+            Died?.Invoke(this);
         }
 
         public void ForceDie()
         {
             Die();
         }
-
-        private Vector3 startingVel;
-        private Vector3 spawnPos;
-        private Vector3 packCenter;
-        private float packAvgSpeedMultip;
-
-        public event Action<Enemy> OnEnemyDeath;
-
-        private AilmentManager ailmentManager;
-
-
-        public Dictionary<int, float> zapDict = new Dictionary<int, float>();
-
-        public int totalHealth;
-        public int currentHealth;
-
-        private MeshRenderer renderer;
-        private MeshFilter meshFilter;
 
         private void Awake()
         {
@@ -90,12 +92,13 @@ namespace MeteorGame
         }
 
 
-        internal void Init(EnemySO enemySO, Vector3 spawnPos, Vector3 packCenter, float avgSpeed)
+        internal void Init(EnemySO enemySO, Vector3 spawnPos, Vector3 packCenter, float avgSpeed, EnemyPack pack)
         {
             this.enemySO = enemySO;
             this.spawnPos = spawnPos;
             this.packCenter = packCenter;
             this.packAvgSpeedMultip = avgSpeed;
+            this.BelongsToPack = pack;
 
             level = GameManager.Instance.GameLevel;
 
@@ -125,8 +128,13 @@ namespace MeteorGame
 
         private void SetTotalHealth(int newHP)
         {
-            totalHealth = newHP;
+            TotalHealth = newHP;
             SetCurrnetHealth(newHP);
+        }
+
+        public bool IsVisible()
+        {
+            return renderer.isVisible;
         }
 
         /*
@@ -265,7 +273,7 @@ namespace MeteorGame
 
         public bool IsAlive()
         {
-            return currentHealth > 0;
+            return CurrentHealth > 0;
         }
 
         public void BurningTick(int amount)
@@ -291,7 +299,7 @@ namespace MeteorGame
             }
 
 
-            SetCurrnetHealth(currentHealth - amount);
+            SetCurrnetHealth(CurrentHealth - amount);
 
             //print($"-ENEMY{id}- Took {amount} damage." +
             //    $" currentHealth: {currentHealth} -" +
@@ -299,7 +307,7 @@ namespace MeteorGame
             //    $" baseLife: {baseLife}");
 
 
-            if (currentHealth > 0)
+            if (CurrentHealth > 0)
             {
                 DamageTaken?.Invoke(this);
             }
@@ -312,7 +320,7 @@ namespace MeteorGame
 
         private void SetCurrnetHealth(int newHealth)
         {
-            currentHealth = newHealth;
+            CurrentHealth = newHealth;
             HealthChanged?.Invoke(this);
         }
 
@@ -362,7 +370,7 @@ namespace MeteorGame
             TakeDamage(final);
 
 
-            if (applyAilment && currentHealth > 0)
+            if (applyAilment && CurrentHealth > 0)
             {
                 ailmentManager.CheckIfDamageAppliesAilment(from, (int)fireFinal, (int)coldFinal, (int)radiationFinal);
             }
