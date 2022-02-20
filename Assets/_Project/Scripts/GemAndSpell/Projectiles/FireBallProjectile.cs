@@ -34,7 +34,6 @@ namespace MeteorGame
 
         public void DoExplode()
         {
-            DestroySelfSoft();
 
             var expHandler = Instantiate(explosionPrefab);
             expHandler.transform.parent = transform.parent;
@@ -43,6 +42,7 @@ namespace MeteorGame
             expHandler.DoExplode();
 
 
+            Die();
 
 
 

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Tier3
   m_EditorClassIdentifier: 
   Name: Tier3
-  HealthMultiplier: 8
+  HealthMultiplier: 25
   SpeedMultiplier: 0.6
   ShapeRadi: 4
   SpawnEntry:
-    weight: 90
+    weight: 40
     cost: 6
   IsEnabled: 1
   BodyMat: {fileID: 2100000, guid: a4764c34a8c2f7d4da61eb5f69421f2f, type: 2}

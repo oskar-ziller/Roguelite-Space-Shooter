@@ -22,7 +22,13 @@ namespace MeteorGame
         public int TotalHealth { get; private set; }
         public int CurrentHealth { get; private set; }
         public EnemyPack BelongsToPack { get; private set; }
+        public bool IsDying { get; private set; }
 
+
+        public Vector3 Position => transform.position;
+        public Vector3 WorldPos => transform.TransformPoint(Vector3.zero);
+
+        public Vector3 TransformScale => enemySO.ShapeRadi * Vector3.one * 2f;
 
         private float currentSpeed;
 
@@ -37,14 +43,12 @@ namespace MeteorGame
         private AilmentManager ailmentManager;
 
 
-
         private MeshRenderer renderer;
         private MeshFilter meshFilter;
 
         private float expectedSpeed => packAvgSpeedMultip * EnemyManager.Instance.BaseEnemySpeed;
 
         private float speed;
-
 
         private void Die()
         {
@@ -94,6 +98,7 @@ namespace MeteorGame
 
         internal void Init(EnemySO enemySO, Vector3 spawnPos, Vector3 packCenter, float avgSpeed, EnemyPack pack)
         {
+            this.IsDying = false;
             this.enemySO = enemySO;
             this.spawnPos = spawnPos;
             this.packCenter = packCenter;
@@ -113,7 +118,7 @@ namespace MeteorGame
 
             transform.position = spawnPos;
 
-            transform.localScale = enemySO.ShapeRadi * Vector3.one * 2f;
+            transform.localScale = TransformScale;
 
             renderer.material = enemySO.BodyMat;
 
@@ -313,9 +318,19 @@ namespace MeteorGame
             }
             else
             {
-                Die();
+                DieWithEffect();
             }
+        }
 
+        private void DieWithEffect()
+        {
+            //if (!IsDying)
+            //{
+            //    IsDying = true;
+            //    transform.DOScale(0, 0.5f).onComplete = Die;
+            //}
+
+            Die();
         }
 
         private void SetCurrnetHealth(int newHealth)

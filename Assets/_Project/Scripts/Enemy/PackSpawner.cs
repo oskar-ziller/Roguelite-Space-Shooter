@@ -14,7 +14,6 @@ namespace MeteorGame
         public float packHeight;
         public float enemySpacing;
         public PackShape packShape;
-        public Transform enemyHolder;
     }
 
 
@@ -39,6 +38,9 @@ namespace MeteorGame
 
 
         public Action<EnemyPack> SpawnedPack;
+
+
+        private int packCount = 0;
 
         #endregion
 
@@ -106,18 +108,15 @@ namespace MeteorGame
 
         private IEnumerator SpawnAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates)
         {
-            print("SpawnAll");
-
             var packCenter = UnityEngine.Random.onUnitSphere * info.packHeight;
 
-            var packHolder = new GameObject("Pack");
-            packHolder.transform.parent = info.enemyHolder;
+            var packGameObject = new GameObject("Pack " + packCount);
+            packCount++;
 
-
-            var pack = packHolder.AddComponent<EnemyPack>();
+            var pack = packGameObject.AddComponent<EnemyPack>();
             pack.Info = info;
-            pack.Holder = packHolder.transform;
 
+            packGameObject.transform.parent = EnemyManager.Instance.EnemiesHolder;
 
             Vector3 spawnPos;
 
@@ -129,11 +128,10 @@ namespace MeteorGame
                 pack.Position = spawnPos;
 
                 var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
-                e.transform.parent = packHolder.transform;
+                e.transform.parent = packGameObject.transform;
                 e.gameObject.name = result.EnemySO.Name;
                 e.Init(result.EnemySO, spawnPos, packCenter, packSpeed, pack);
-                pack.Enemies.Add(e);
-
+                pack.AddEnemy(e);
 
                 if (waitAfterSpawn > 0)
                 {
@@ -141,6 +139,7 @@ namespace MeteorGame
                 }
             }
 
+            // signal to anything listening that we have spawned a new pack
             SpawnedPack?.Invoke(pack);
         }
 

@@ -16,7 +16,7 @@ namespace MeteorGame
         public List<Enemy> AliveEnemies { get; private set; }
         public List<EnemyPack> AlivePacks { get; private set; }
 
-        public Transform enemiesHolder;
+        public Transform EnemiesHolder;
 
         public GoldCoinDrop coinDropBig, coinDropMedium, coinDropSmall;
 
@@ -48,9 +48,17 @@ namespace MeteorGame
         [SerializeField] private int maxHpMultiplier;
 
 
+        [Tooltip("Transform holding all the particle systems to spawn when an enemy dies")]
+        [SerializeField] private Transform enemyExplosionPrefab;
+
+        [Tooltip("Transform holding all the explosions that spawn after Enemy death")]
+        [SerializeField] Transform enemyExplosionHolder;
+
         public EnemySpawner EnemySpawner => enemySpawner;
 
+
         public ObjectPool<Enemy> EnemyPool;
+
 
         public int MaxHpMultiplier => maxHpMultiplier;
 
@@ -77,18 +85,18 @@ namespace MeteorGame
         private Enemy OnCreateEnemy()
         {
             var e = Instantiate(enemyPrefab);
-            e.Died += OnEnemyDeath;
-
             return e;
         }
 
         private void OnTakeFromPool(Enemy e)
         {
+            e.Died += OnEnemyDeath;
             e.gameObject.SetActive(true);
         }
 
         private void OnReturnToPool(Enemy e)
         {
+            e.Died = null;
             e.transform.parent = null;
             e.transform.position = Vector3.zero;
             e.gameObject.SetActive(false);
@@ -182,27 +190,36 @@ namespace MeteorGame
             //}
         }
 
+        public void OnPackDeath(EnemyPack p)
+        {
+            AlivePacks.Remove(p);
+        }
+
         internal void OnEnemyDeath(Enemy e)
         {
             //DropGold(e);
             AliveEnemies.Remove(e);
+
+            // spawn explosion effect
+            SpawnExplosion(e);
+
             EnemyPool.Release(e);
-
-            e.BelongsToPack.Enemies.Remove(e);
-
-            if (e.BelongsToPack.Enemies.Count == 0)
-            {
-                AlivePacks.Remove(e.BelongsToPack);
-                Destroy(e.BelongsToPack.gameObject);
-            }
-
         }
+
+        private void SpawnExplosion(Enemy e)
+        {
+            Transform explosion = Instantiate(enemyExplosionPrefab);
+
+            explosion.position = e.WorldPos;
+            explosion.localScale = e.TransformScale;
+            explosion.SetParent(enemyExplosionHolder, true);
+        }
+
 
         private void OnPackSpawn(EnemyPack p)
         {
             AlivePacks.Add(p);
         }
-
 
         internal void AddEnemy(Enemy e)
         {

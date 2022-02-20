@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tier4
   m_EditorClassIdentifier: 
   Name: Tier4
-  HealthMultiplier: 16
+  HealthMultiplier: 100
   SpeedMultiplier: 0.4
   ShapeRadi: 12
   SpawnEntry:

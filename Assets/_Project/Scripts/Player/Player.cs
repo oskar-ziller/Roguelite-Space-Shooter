@@ -30,9 +30,35 @@ namespace MeteorGame
 
         private bool isSetup = false;
 
+        private float pitch = 1f;
+        private Coroutine pitchResetCoroutine;
+        private float pitchResetDurInSeconds = 1.5f;
+
         #endregion
 
         #region Unity Methods
+
+
+
+        private void Awake()
+        {
+            //QualitySettings.vSyncCount = 1;
+            //Application.targetFrameRate = 144;
+
+            Instance = this;
+
+        }
+
+        private void Start()
+        {
+        }
+
+
+        
+
+        #endregion
+
+        #region Methods
 
         public SpellSlot SpellSlot(int i)
         {
@@ -47,19 +73,6 @@ namespace MeteorGame
             }
 
             return null;
-        }
-
-        private void Awake()
-        {
-            //QualitySettings.vSyncCount = 1;
-            //Application.targetFrameRate = 144;
-
-            Instance = this;
-
-        }
-
-        private void Start()
-        {
         }
 
 
@@ -77,7 +90,7 @@ namespace MeteorGame
             spellSlot2.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot2.SpellChanged += OnSpellChanged;
 
-            
+
 
             //GameManager.Instance.TabMenuManager.RebuildTabMenu();
 
@@ -120,14 +133,6 @@ namespace MeteorGame
                 //GameManager.Instance.TabMenuManager.RebuildTabMenu();
             }
         }
-
-        #endregion
-
-        #region Methods
-
-        private float pitch = 1f;
-        Coroutine pitchResetCoroutine;
-        private float pitchResetDurInSeconds = 1.5f;
 
         IEnumerator PitchResetCoroutine()
         {
@@ -182,11 +187,6 @@ namespace MeteorGame
             return destination;
         }
 
-
-        private void PlayGoldPickup()
-        {
-
-        }
 
         internal void ChangeCurrency(int amount)
         {

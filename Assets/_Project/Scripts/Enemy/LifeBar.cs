@@ -19,6 +19,8 @@ namespace MeteorGame
 
         private float percentageTweening = 1f; // used for tween
 
+        private Tween barPercentTween;
+
         #endregion
 
         #region Unity Methods
@@ -27,6 +29,13 @@ namespace MeteorGame
         {
             owner = GetComponent<Enemy>();
             mesh = GetComponent<MeshRenderer>();
+
+            owner.Died += OnOwnerDied;
+        }
+
+        private void OnOwnerDied(Enemy obj)
+        {
+            barPercentTween.Kill();
         }
 
         private void Start()
@@ -35,18 +44,12 @@ namespace MeteorGame
             mesh.material.SetFloat("_percentage", 1);
         }
 
-        private void Update()
-        {
-        
-        }
-
         #endregion
 
         #region Methods
 
 
 
-        private Tween barPercentTween;
 
         internal void StartBarPercentTween()
         {

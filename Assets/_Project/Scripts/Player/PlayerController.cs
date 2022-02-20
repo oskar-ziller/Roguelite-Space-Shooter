@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 
-namespace MeteorGame
+namespace MeteorGame.Movement
 {
     public enum JumpState
     {

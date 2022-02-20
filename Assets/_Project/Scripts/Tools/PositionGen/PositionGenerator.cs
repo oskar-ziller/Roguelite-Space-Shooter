@@ -65,7 +65,7 @@ namespace MeteorGame
 
                 Vector3 pos = Vector3.zero;
 
-                UnityEngine.Debug.Log($"Trying to find spot for {e.Name} - size: {e.ShapeRadi}");
+                //UnityEngine.Debug.Log($"Trying to find spot for {e.Name} - size: {e.ShapeRadi}");
 
                 while (pos == Vector3.zero)
                 {
@@ -84,7 +84,7 @@ namespace MeteorGame
                     if (pos == Vector3.zero)
                     {
                         regionExtends++;
-                        UnityEngine.Debug.Log($"Still can't fit. Increase region to {regionExtends} and sleep for {delayAfterRegionIncrease} ");
+                        //UnityEngine.Debug.Log($"Still can't fit. Increase region to {regionExtends} and sleep for {delayAfterRegionIncrease} ");
                         increasedRegionCount++;
                         yield return new WaitForSeconds(delayAfterRegionIncrease);
                     }

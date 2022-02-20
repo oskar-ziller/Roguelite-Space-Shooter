@@ -27,7 +27,7 @@ namespace MeteorGame
             rt = GetComponent<RectTransform>();
 
             coreIndicator = Instantiate(coreIndicatorPrefab);
-            coreIndicator.transform.parent = transform;
+            coreIndicator.transform.SetParent(transform, true);
 
             coreIndRect = coreIndicator.GetComponent<RectTransform>();
         }
@@ -85,7 +85,7 @@ namespace MeteorGame
         private void CreateIndicator(EnemyPack e)
         {
             var ind = Instantiate(targetIndicatorPrefab);
-            ind.transform.parent = transform;
+            ind.transform.SetParent(transform, true);
 
             indicators.Add(e, ind.GetComponent<RectTransform>());
         }

@@ -4,29 +4,23 @@ using UnityEngine;
 
 namespace MeteorGame
 {
-    public class Turret : MonoBehaviour
+    public class CoreMain : MonoBehaviour
     {
 
+
+
         #region Variables
-        
+
         #endregion
 
         #region Unity Methods
 
-        private void Awake()
+
+        private void OnTriggerEnter(Collider other)
         {
 
         }
 
-        private void Start()
-        {
-        
-        }
-
-        private void Update()
-        {
-        
-        }
 
         #endregion
 

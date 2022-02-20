@@ -23,7 +23,7 @@ Material:
   m_Name: M_Normal_Fill
   m_Shader: {fileID: -6465566751694194690, guid: 27239c4f29d84834ba6e34ff9ec28121, type: 3}
   m_ShaderKeywords: 
-  m_LightmapFlags: 1
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1

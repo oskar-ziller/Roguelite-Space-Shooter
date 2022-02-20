@@ -5,30 +5,9 @@ using System.Linq;
 using UnityEngine;
 
 
-namespace MeteorGame
+namespace MeteorGame.Flight
 {
-    //public enum JumpState
-    //{
-    //    Jumping,
-    //    Falling,
-    //    Grounded
-    //}
-
-    //public struct FrameInput
-    //{
-    //    public float z;
-    //    public float x;
-    //    public bool jumpPressed;
-    //    public bool jumpReleased;
-    //    public bool jumpDown;
-    //    public bool boostDown;
-
-    //    public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
-    //}
-
-
-
-    public class FlyController : MonoBehaviour
+    public class FlightController : MonoBehaviour
     {
         #region Variables
 
@@ -54,38 +33,28 @@ namespace MeteorGame
         [Range(0, 50)] [SerializeField] private float maxSpeed = 5f;
 
 
-
-
-
-
         private FrameInput inputs;
-        //private Rigidbody rb;
         private float boostAccel = 1f;
         private float boostDec = 1f;
         private float boostSpeed = 1f;
-        
 
         private Vector3 frameTravelVec = Vector3.zero;
-        private float frameTravelDist = 0f;
 
         private float maxSpeedReal => maxSpeed / 100f;
+
+
 
         #endregion
 
         #region Unity Methods
 
-        private void Awake()
-        {
-            //rb = GetComponentInParent<Rigidbody>();
-        }
-
-
-        void Start()
-        {
-        }
-
         void Update()
         {
+            if (GameManager.Instance.IsGamePaused)
+            {
+                return;
+            }
+
             if (Input.GetKey(KeyCode.Mouse0))
             {
                 Player.Instance.SpellSlot(1).Cast();
@@ -115,79 +84,21 @@ namespace MeteorGame
             var rgh = CalculateRight();
             var up = CalculateUp();
             //var down = CalculateDown();
-            var slow = CalculateSlow();
-
-
-            //var stop = CalculateStop();
-            //var grav = CalculateGravity();
-            //var desc = CalculateDescent();
-
 
 
             var v = new Vector3(fwd.x + rgh.x + up.x, fwd.y + rgh.y + up.y, fwd.z + rgh.z + up.z);
 
-            //frameVel = frameVel.normalized * airMaxSpeed * Time.deltaTime;
-
             frameTravelVec += v;
 
-            frameTravelDist = (float)Math.Round(v.magnitude, 7);
-
-            //velocity = velocity.normalized * airMaxSpeed;
             transform.position += frameTravelVec;
-
-            //velocity += fwd + jumpVel;
-
-            //velocity += groundVel;
-            //velocity += asc;
-            //velocity += grav;
-            //velocity += desc;
         }
 
-        //private Vector3 CalculateDown()
-        //{
-        //    var pressingFall = inputs.jump < 0;
-
-        //    if (pressingFall)
-        //    {
-        //        var locVel = transform.InverseTransformDirection(velocity);
-        //        var targetSpeed =  airMaxSpeed * boostSpeed;
-
-        //        var accel = airAccel * boostAccel;
-
-        //        locVel.y = Mathf.MoveTowards(locVel.y, -targetSpeed, accel * Time.deltaTime); ;
-
-        //        var globalVel = transform.TransformDirection(locVel);
-
-        //        return globalVel - velocity;
-        //    }
-
-        //    return Vector3.zero;
 
 
 
+        #endregion
 
-
-
-
-
-        //    var locVel = transform.InverseTransformDirection(velocity);
-        //    var targetSpeed = inputs.jump * airMaxSpeed * boostSpeed;
-
-        //    var accel = airAccel * boostAccel;
-
-        //    if (inputs.jump == 0)
-        //    {
-        //        accel = airDecel * boostDec;
-        //    }
-
-        //    locVel.z = Mathf.MoveTowards(locVel.y, targetSpeed, accel * Time.deltaTime);
-
-        //    var globalVel = transform.TransformDirection(locVel);
-
-        //    return globalVel - velocity;
-        //}
-
-
+        #region Methods
 
         private Vector3 CalculateUp()
         {
@@ -207,27 +118,6 @@ namespace MeteorGame
 
             return globalVel - frameTravelVec;
         }
-
-
-        private Vector3 CalculateSlow()
-        {
-            var pressingJump = inputs.jump != 0;
-            var pressingArrows = inputs.inputVector != Vector2.zero;
-            var pressingBoost = inputs.boostDown;
-            var accel = airDecel * boostDec;
-
-            //if (!pressingJump && !pressingArrows && !pressingBoost) // pressing nothing, low decel
-            //{
-            //    accel = airDecelFreefall * boostDec;
-            //}
-
-            var newVel = Vector3.MoveTowards(frameTravelVec, Vector3.zero, accel * Time.deltaTime);
-
-            return Vector3.zero;
-            return newVel - frameTravelVec;
-        }
-
-
 
 
         private Vector3 CalculateForward()
@@ -250,8 +140,6 @@ namespace MeteorGame
         }
 
 
-
-
         private Vector3 CalculateRight()
         {
             var locVel = transform.InverseTransformDirection(frameTravelVec);
@@ -271,18 +159,6 @@ namespace MeteorGame
             return globalVel - frameTravelVec;
         }
 
-        private struct FrameInput
-        {
-            public float z;
-            public float x;
-            public float jump;
-            //public bool jumpDown;
-            public bool boostDown;
-            //public bool descentDown;
-
-            public Vector2 inputVector => Vector2.ClampMagnitude(new Vector2(x, z), 1f);
-        }
-
         private void GatherInput()
         {
             inputs = new FrameInput
@@ -295,12 +171,6 @@ namespace MeteorGame
                 jump = UnityEngine.Input.GetAxisRaw("Jump")
             };
         }
-
-
-        #endregion
-
-        #region Methods
-
 
         public void TurnHorizontal(float amount)
         {

@@ -93,7 +93,6 @@ namespace MeteorGame
         //protected HashSet<GameObject> InAimAssistRange => inAimAssistRange;
 
         private List<TrailRenderer> trailRenderers;
-        private float maxTrailDur = 0f;
 
         //private SpinAround spinner;
 
@@ -102,8 +101,6 @@ namespace MeteorGame
         //private HashSet<GameObject> inChainRange = new HashSet<GameObject>();
         //private HashSet<GameObject> inAimAssistRange = new HashSet<GameObject>();
 
-        private bool aimAssisted = false;
-        private bool expiring;
 
         private Rigidbody rigidbody;
 
@@ -156,7 +153,7 @@ namespace MeteorGame
             {
                 if (DoFork())
                 {
-                    DestroySelfSoft();
+                    Die();
                     return true;
                 }
             }
@@ -176,17 +173,17 @@ namespace MeteorGame
             ChainedFrom = new List<Enemy>();
             ForkedFrom = new List<Enemy>();
 
-            var trails = GetComponentsInChildren<TrailRenderer>();
+            //var trails = GetComponentsInChildren<TrailRenderer>();
 
-            if (trails != null)
-            {
-                trailRenderers = trails.ToList();
+            //if (trails != null)
+            //{
+            //    trailRenderers = trails.ToList();
 
-                if (trailRenderers.Count > 0)
-                {
-                    maxTrailDur = trailRenderers.Max(t => t.time);
-                }
-            }
+            //    if (trailRenderers.Count > 0)
+            //    {
+            //        maxTrailDur = trailRenderers.Max(t => t.time);
+            //    }
+            //}
 
 
 
@@ -245,14 +242,19 @@ namespace MeteorGame
 
         internal virtual void Expire()
         {
-            expiring = true;
-            Rigidbody.DOKill();
-            DestroySelfSoft();
+            Die();
         }
 
         private bool ShouldExpire()
         {
-            return !expiring && Time.time > expireTime && isSetup;
+            return Time.time > expireTime && isSetup;
+        }
+
+
+        protected void Die()
+        {
+            transform.DOKill();
+            Destroy(gameObject);
         }
 
 
@@ -329,9 +331,15 @@ namespace MeteorGame
                     return;
                 }
 
+                if (collidedEnemy.IsDying)
+                {
+                    return;
+                }
+
                 collided = true;
                 collidingWith = collidedEnemy;
 
+                bodyMesh.DOKill();
                 transform.DOKill();
                 HandleEnemyCollision();
             }
@@ -495,14 +503,15 @@ namespace MeteorGame
             transform.DOScale(1f, ScaleDur);
         }
 
-        protected void DestroySelfSoft()
-        {
-            mainMesh.gameObject.SetActive(false);
-            DisableRigidBody();
-            collider.enabled = false;
+        //protected void DestroySelfSoft()
+        //{
+        //    mainMesh.gameObject.SetActive(false);
+        //    DisableRigidBody();
+        //    collider.enabled = false;
+        //    transform.DOKill();
 
-            Destroy(gameObject, maxTrailDur);
-        }
+        //    Destroy(gameObject);
+        //}
 
         //public void EnableSpinner()
         //{

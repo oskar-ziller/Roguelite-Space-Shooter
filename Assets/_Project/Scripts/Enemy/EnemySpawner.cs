@@ -16,7 +16,6 @@ namespace MeteorGame
     {
         #region Variables
 
-        [SerializeField] private Transform enemyHolder;
         [SerializeField] private Transform packTestCube, packTestSphere;
 
 
@@ -178,7 +177,6 @@ namespace MeteorGame
         {
             var info = new PackSpawnInfo();
 
-            info.enemyHolder = enemyHolder;
             info.enemySpacing = spacingBetweenEnemies;
             info.packHeight = PackHeightAtCurrentGameLevel;
             info.spawnerMoney = PackMoneyAtCurrentGameLevel;
@@ -227,21 +225,6 @@ namespace MeteorGame
             EnemyManager.Instance.AddEnemy(e);
             return e;
         }
-
-        /// <summary>
-        /// Parse enemy holder and destroy all child holders
-        /// </summary>
-        internal void DestroyPackHolders()
-        {
-            foreach (Transform child in enemyHolder)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-
-
-
-
 
 
         #endregion

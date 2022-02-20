@@ -11,8 +11,6 @@ namespace MeteorGame
         public float spinDurInSeconds = 10f;
         public Ease easing = Ease.Linear;
 
-
-
         public void StopSpin()
         {
             transform.DOKill();

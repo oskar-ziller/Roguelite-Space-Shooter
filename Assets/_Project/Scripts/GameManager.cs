@@ -29,7 +29,6 @@ namespace MeteorGame
         [SerializeField] private int maxGameLevel = 100;
 
 
-
         [Header("Misc Settings")]
 
         [Tooltip("Max chain range for projectiles")]
@@ -56,7 +55,6 @@ namespace MeteorGame
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
 
-        //private Stopwatch gameStartSW = Stopwatch.StartNew();
 
         private float gameLaunchTime;
         private float gamePlayTime;
@@ -64,43 +62,14 @@ namespace MeteorGame
         private float debugGameLevel = 0;
         private int gameLevel = 1; // derived from minutes since start and difficultyCurve
 
-        //public Stopwatch gamePlaySW = Stopwatch.StartNew();
-
-
         private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
-
-
 
 
         #endregion
 
         #region Unity Methods
 
-        private void KeepGameTime()
-        {
-            gameLaunchTime += Time.deltaTime;
-
-            if (!IsGamePaused)
-            {
-                gamePlayTime += Time.deltaTime;
-            }
-        }
-
-
-
-
-        public void PauseGame()
-        {
-            Time.timeScale = 0;
-            IsGamePaused = true;
-        }
-
-        public void ResumeGame()
-        {
-            Time.timeScale = 1;
-            IsGamePaused = false;
-        }
-
+        
 
         private void Awake()
         {
@@ -144,7 +113,7 @@ namespace MeteorGame
             if (Input.GetKeyDown(KeyCode.KeypadPlus))
             {
                 //debugElapsed += TimeSpan.FromSeconds(15);
-                debugGameLevel += 10;
+                debugGameLevel += 50;
             }
 
             if (Input.GetKeyDown(KeyCode.KeypadMinus))
@@ -179,16 +148,38 @@ namespace MeteorGame
             KeepGameTime();
         }
 
-        public float HowFarIntoDifficulty()
-        {
-            return gamePlayTime + debugElapsedSeconds;
-        }
+
 
         #endregion
 
         #region Methods
 
+        public float HowFarIntoDifficulty()
+        {
+            return gamePlayTime + debugElapsedSeconds;
+        }
 
+        private void KeepGameTime()
+        {
+            gameLaunchTime += Time.deltaTime;
+
+            if (!IsGamePaused)
+            {
+                gamePlayTime += Time.deltaTime;
+            }
+        }
+
+        public void PauseGame()
+        {
+            Time.timeScale = 0;
+            IsGamePaused = true;
+        }
+
+        public void ResumeGame()
+        {
+            Time.timeScale = 1;
+            IsGamePaused = false;
+        }
         private void ShowHideTabMenu()
         {
             if (tabMenuManager.IsShowing)
@@ -202,11 +193,6 @@ namespace MeteorGame
                 PauseGame();
             }
         }
-
-
-       
-
-
 
         #endregion
 
