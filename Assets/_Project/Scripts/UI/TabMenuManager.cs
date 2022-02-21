@@ -53,14 +53,16 @@ namespace MeteorGame
             }
 
             gameObject.SetActive(true);
-            Cursor.lockState = CursorLockMode.Confined;
+
+            GameManager.Instance.SetCursorMode(CursorLockMode.Confined);
+
             RebuildTabMenu();
             isShowing = true;
         }
 
         public void Hide()
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            GameManager.Instance.SetCursorMode(CursorLockMode.Locked);
             isShowing = false;
             gameObject.SetActive(false);
         }

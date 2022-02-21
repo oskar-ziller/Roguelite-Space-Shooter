@@ -17,7 +17,7 @@ namespace MeteorGame
 
         public Action<Enemy> DamageTaken;
         public Action<Enemy> HealthChanged;
-        public Action<Enemy> Died;
+        public Action<Enemy> KilledByPlayer;
 
         public int TotalHealth { get; private set; }
         public int CurrentHealth { get; private set; }
@@ -52,8 +52,8 @@ namespace MeteorGame
 
         private void Die()
         {
-            SetCurrnetHealth(0);
-            Died?.Invoke(this);
+            //SetCurrnetHealth(0);
+            KilledByPlayer?.Invoke(this);
         }
 
         public void ForceDie()

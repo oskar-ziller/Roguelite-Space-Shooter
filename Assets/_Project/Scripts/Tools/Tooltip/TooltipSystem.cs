@@ -51,10 +51,9 @@ namespace MeteorGame
 
         private void Update()
         {
-            Vector2 mousePos = Input.mousePosition;
-
             if (Instance.gemInfoRT.gameObject.activeSelf)
             {
+                Vector2 mousePos = Input.mousePosition;
                 Vector2 gemInfoTooltipPos = mousePos;
 
                 if (mousePos.x > Screen.width / 2)
@@ -86,6 +85,7 @@ namespace MeteorGame
 
             if (Instance.infoRT.gameObject.activeSelf)
             {
+                Vector2 mousePos = Input.mousePosition;
                 Vector2 tooltipPos = mousePos;
 
                 if (mousePos.x < Screen.width / 2)

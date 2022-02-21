@@ -18,7 +18,12 @@ namespace MeteorGame
 
         private void OnTriggerEnter(Collider other)
         {
+            Enemy e = other.GetComponent<Enemy>();
 
+            if (e != null)
+            {
+                GameManager.Instance.InitGameOver(e);
+            }
         }
 
 

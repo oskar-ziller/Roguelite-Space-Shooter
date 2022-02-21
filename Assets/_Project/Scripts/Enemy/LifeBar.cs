@@ -30,7 +30,7 @@ namespace MeteorGame
             owner = GetComponent<Enemy>();
             mesh = GetComponent<MeshRenderer>();
 
-            owner.Died += OnOwnerDied;
+            owner.KilledByPlayer += OnOwnerDied;
         }
 
         private void OnOwnerDied(Enemy obj)

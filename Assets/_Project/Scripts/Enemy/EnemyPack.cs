@@ -35,7 +35,7 @@ namespace MeteorGame
 
         public void AddEnemy(Enemy e)
         {
-            e.Died += OnPackEnemyDeath;
+            e.KilledByPlayer += OnPackEnemyDeath;
             Enemies.Add(e);
         }
 

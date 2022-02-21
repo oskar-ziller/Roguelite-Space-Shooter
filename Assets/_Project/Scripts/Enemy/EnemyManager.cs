@@ -16,7 +16,7 @@ namespace MeteorGame
         public List<Enemy> AliveEnemies { get; private set; }
         public List<EnemyPack> AlivePacks { get; private set; }
 
-        public Transform EnemiesHolder;
+        public Transform EnemiesHolder, PooledEnemiesHolder;
 
         public GoldCoinDrop coinDropBig, coinDropMedium, coinDropSmall;
 
@@ -85,20 +85,22 @@ namespace MeteorGame
         private Enemy OnCreateEnemy()
         {
             var e = Instantiate(enemyPrefab);
+            e.transform.parent = PooledEnemiesHolder;
             return e;
         }
 
         private void OnTakeFromPool(Enemy e)
         {
-            e.Died += OnEnemyDeath;
+            e.KilledByPlayer += OnEnemyKilledByPlayer;
             e.gameObject.SetActive(true);
         }
 
         private void OnReturnToPool(Enemy e)
         {
-            e.Died = null;
+            e.KilledByPlayer = null;
             e.transform.parent = null;
             e.transform.position = Vector3.zero;
+            e.transform.parent = PooledEnemiesHolder;
             e.gameObject.SetActive(false);
         }
 
@@ -195,7 +197,7 @@ namespace MeteorGame
             AlivePacks.Remove(p);
         }
 
-        internal void OnEnemyDeath(Enemy e)
+        internal void OnEnemyKilledByPlayer(Enemy e)
         {
             //DropGold(e);
             AliveEnemies.Remove(e);
@@ -247,90 +249,19 @@ namespace MeteorGame
             return closestEnemy;
         }
 
-
-        //internal List<Enemy> EnemiesInRange(Enemy e, float range, bool fromShell = false)
-        //{
-        //    return EnemiesInRange(e.transform.position, range, fromShell);
-        //}
-
-
-        //internal List<Enemy> EnemiesInRange(Vector3 pos, float range, bool fromShell = false)
-        //{
-        //    var toreturn = new List<Enemy>();
-
-        //    for (int i = 0; i < aliveEnemies.Count; i++)
-        //    {
-        //        Enemy e = aliveEnemies[i];
-
-        //        var vec = (e.transform.position - pos);
-        //        float dist = vec.sqrMagnitude;
-
-        //        if (fromShell)
-        //        {
-        //            if (e.rarity == EnemyRarity.Normal)
-        //            {
-        //                dist -= normalSpawnInfo.r * normalSpawnInfo.r;
-        //            }
-
-        //            if (e.rarity == EnemyRarity.Magic)
-        //            {
-        //                dist -= magicSpawnInfo.r * magicSpawnInfo.r;
-        //            }
-
-        //            if (e.rarity == EnemyRarity.Unique)
-        //            {
-        //                dist -= uniqueSpawnInfo.r * uniqueSpawnInfo.r;
-        //            }
-
-        //            if (e.rarity == EnemyRarity.Rare)
-        //            {
-        //                dist -= rareSpawnInfo.extends.sqrMagnitude;
-        //            }
-        //        }
-
-        //        if (dist <= range * range)
-        //        {
-        //            toreturn.Add(e);
-        //        }
-        //    }
-
-        //    return toreturn;
-        //}
-
         internal void DestroyAllEnemies()
         {
-
             for (int i = AliveEnemies.Count - 1; i >= 0; i--)
             {
-                AliveEnemies[i].ForceDie();
+                //DropGold(e);
+                EnemyPool.Release(AliveEnemies[i]);
+                AliveEnemies.Remove(AliveEnemies[i]);
             }
 
 
-            //enemySpawner.DestroyPackHolders();
+            AlivePacks.Clear();
+
         }
-
-        //internal Enemy PickEnemyToChainTo(Enemy from, Enemy except = null)
-        //{
-        //    List<Enemy> potential = EnemiesInRange(from, GameManager.Instance.chainRange, true);
-
-        //    if (potential.Count == 0)
-        //    {
-        //        return null;
-        //    }
-
-        //    var refined = potential.Where(p => p != except && p != from);
-
-        //    if (refined.Count() == 0)
-        //    {
-        //        return null;
-        //    }
-
-        //    return refined.ElementAt(UnityEngine.Random.Range(0, refined.Count()));
-        //}
-
-
-
-
 
 
         #endregion

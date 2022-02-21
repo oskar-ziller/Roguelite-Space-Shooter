@@ -15,10 +15,6 @@ namespace MeteorGame.Flight
         [SerializeField] private float airAccel = 1f;
         [SerializeField] private float airDecel = 10f;
 
-        [Tooltip("Amount to decel with when pressing no input." +
-            " Makes it so that when pressing buttons, manouverability is better.")]
-        [SerializeField] private float airDecelFreefall = 10f;
-
         [Header("BOOST")]
         [Tooltip("Max speed multiplier wheen boost key is down, higher value = faster when boosting")]
         [SerializeField] private float boostMultipMaxVel = 2f;

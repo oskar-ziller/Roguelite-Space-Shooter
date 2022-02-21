@@ -19,13 +19,10 @@ namespace MeteorGame
         
         [Tooltip("How many minutes should gamelevel take to reac max")]
         public float minutesToHitMaxGameLevel = 10f;
-
         [Tooltip("How many levels to reach a level-checkpoint")]
         public float checkpointLevelInterval = 5;
-
         [Tooltip("Curve of Min-Max level in Min-Max minutes")]
         [SerializeField] private AnimationCurve difficultyCurve;
-
         [SerializeField] private int maxGameLevel = 100;
 
 
@@ -33,15 +30,10 @@ namespace MeteorGame
 
         [Tooltip("Max chain range for projectiles")]
         public float ChainAndForkRange = 45f;
-
-
         [Tooltip("Max aim assist range for projectiles")]
         public float AimAssistRange = 45f;
-
-
         [Tooltip("Max links allowed per spell slot")]
         public int MaxLinksAllowed = 7;
-
 
         [Header("References")]
         [SerializeField] private TabMenuManager tabMenuManager;
@@ -51,19 +43,16 @@ namespace MeteorGame
         public int GameLevel => gameLevel;
         public TabMenuManager TabMenuManager => tabMenuManager;
         public bool IsGamePaused { get; private set; }
-
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
-
+        public Action<Enemy> GameOver;
 
         private float gameLaunchTime;
         private float gamePlayTime;
         private float debugElapsedSeconds;
         private float debugGameLevel = 0;
         private int gameLevel = 1; // derived from minutes since start and difficultyCurve
-
         private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
-
 
         #endregion
 
@@ -83,7 +72,8 @@ namespace MeteorGame
             scriptableObjects.Load();
             gamePlayTime = Time.time;
 
-            Cursor.lockState = CursorLockMode.Locked;
+            SetCursorMode(CursorLockMode.Locked);
+
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 200;
 
@@ -141,10 +131,6 @@ namespace MeteorGame
             }
 
 
-
-
-
-
             KeepGameTime();
         }
 
@@ -153,6 +139,20 @@ namespace MeteorGame
         #endregion
 
         #region Methods
+
+
+        public void SetCursorMode(CursorLockMode newMode)
+        {
+            Cursor.lockState = newMode;
+        }
+
+
+        internal void InitGameOver(Enemy e)
+        {
+            PauseGame();
+            GameOver?.Invoke(e);
+        }
+
 
         public float HowFarIntoDifficulty()
         {
@@ -175,7 +175,7 @@ namespace MeteorGame
             IsGamePaused = true;
         }
 
-        public void ResumeGame()
+        public void UnPauseGame()
         {
             Time.timeScale = 1;
             IsGamePaused = false;
@@ -185,13 +185,19 @@ namespace MeteorGame
             if (tabMenuManager.IsShowing)
             {
                 tabMenuManager.Hide();
-                ResumeGame();
+                UnPauseGame();
             }
             else
             {
                 tabMenuManager.Show();
                 PauseGame();
             }
+        }
+
+        internal void RestartGame()
+        {
+            EnemyManager.Instance.DestroyAllEnemies();
+            UnPauseGame();
         }
 
         #endregion
