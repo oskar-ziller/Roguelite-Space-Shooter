@@ -16,30 +16,20 @@ namespace MeteorGame
         public PackShape packShape;
     }
 
-
-
-
-
     public class PackSpawner : MonoBehaviour
     {
 
         #region Variables
 
-        private WeightedRandomEnemy weightedRandomEnemy;
-
+        [Tooltip("Transform to mark position of 1st wave spawning on new game")]
+        [SerializeField] private Transform firstWaveSpawnPos;
 
         public float waitAfterSpawn = 0.15f;
-
-
-        private bool isSetup = false;
-
-
-        private WaitForSeconds waitAfterSpawnTimer;
-
-
         public Action<EnemyPack> SpawnedPack;
 
-
+        private WeightedRandomEnemy weightedRandomEnemy;
+        private bool isSetup = false;
+        private WaitForSeconds waitAfterSpawnCached;
         private int packCount = 0;
 
         #endregion
@@ -48,12 +38,18 @@ namespace MeteorGame
 
         private void Awake()
         {
-            waitAfterSpawnTimer = new WaitForSeconds(waitAfterSpawn);
+            waitAfterSpawnCached = new WaitForSeconds(waitAfterSpawn);
+            GameManager.Instance.GameOver += OnGameOver;
         }
 
         #endregion
 
         #region Methods
+
+        private void OnGameOver()
+        {
+            packCount = 0;
+        }
 
         internal void Setup()
         {
@@ -110,6 +106,11 @@ namespace MeteorGame
         {
             var packCenter = UnityEngine.Random.onUnitSphere * info.packHeight;
 
+            if (packCount == 0)
+            {
+                packCenter = firstWaveSpawnPos.position;
+            }
+
             var packGameObject = new GameObject("Pack " + packCount);
             packCount++;
 
@@ -135,7 +136,11 @@ namespace MeteorGame
 
                 if (waitAfterSpawn > 0)
                 {
-                    yield return waitAfterSpawnTimer;
+                    yield return waitAfterSpawnCached;
+                }
+                else
+                {
+                    yield return null;
                 }
             }
 

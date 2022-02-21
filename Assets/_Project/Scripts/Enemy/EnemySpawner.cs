@@ -49,7 +49,8 @@ namespace MeteorGame
         [Tooltip("Pack spawner money curve")]
         [SerializeField] private AnimationCurve packSpawnerMoneyCurve;
 
-        private Coroutine spawnLoop_Co;
+        [Tooltip("Multiplier of enemy HP as level goes from 0->maxGameLevel")]
+        [SerializeField] private AnimationCurve enemyHPMultipCurve;
 
 
         [Tooltip("Spacing between two enemies in a pack")]
@@ -57,19 +58,37 @@ namespace MeteorGame
 
 
         public Action<EnemyPack> SpawnedPack;
-
-
         public Enemy testPrefab;
 
+        private Coroutine spawnLoop_Co;
         private PackSpawner packSpawner;
 
 
 
-        //public ObjectPool<Enemy> pooledEnemies;
+        private float CurrentLevelRatio { get { return GameManager.Instance.GameLevel / GameManager.Instance.MaxGameLevel; } }
+
+        private float PackMoneyAtCurrentGameLevel
+        {
+            get
+            {
+                return minMoney + (EvalCurveForCurrentLevel(packSpawnerMoneyCurve) * moneyVariance);
+            }
+        }
+
+        private float PackHeightAtCurrentGameLevel
+        {
+            get
+            {
+                return startPosMinHeight + (EvalCurveForCurrentLevel(packSpawnPosHeightCurve) * moneyVariance);
+            }
+        }
 
 
-        [Tooltip("Multiplier of enemy HP as level goes from 0->maxGameLevel")]
-        [SerializeField] private AnimationCurve enemyHPMultipCurve;
+
+
+        #endregion
+
+        #region Unity Methods
 
 
 
@@ -79,6 +98,14 @@ namespace MeteorGame
             packSpawner = GetComponent<PackSpawner>();
             packSpawner.SpawnedPack += OnPackSpawned;
         }
+
+
+
+
+
+        #endregion
+
+        #region Methods
 
 
         /// <summary>
@@ -108,53 +135,6 @@ namespace MeteorGame
         }
 
 
-
-
-
-
-
-
-
-        private float CurrentLevelRatio { get { return GameManager.Instance.GameLevel / GameManager.Instance.MaxGameLevel; } }
-
-        private float PackMoneyAtCurrentGameLevel
-        {
-            get
-            {
-                return minMoney + (EvalCurveForCurrentLevel(packSpawnerMoneyCurve) * moneyVariance);
-            }
-        }
-
-        private float PackHeightAtCurrentGameLevel
-        {
-            get
-            {
-                return startPosMinHeight + (EvalCurveForCurrentLevel(packSpawnPosHeightCurve) * moneyVariance);
-            }
-        }
-
-        private void Update()
-        {
-
-        }
-
-
-
-
-
-
-
-
-        #endregion
-
-
-        #region Unity Methods
-
-
-
-
-
-
         private float CalculateNextWaveDelay()
         {
             float level = GameManager.Instance.GameLevel;
@@ -182,9 +162,14 @@ namespace MeteorGame
             info.spawnerMoney = PackMoneyAtCurrentGameLevel;
             info.packShape = PackShape.Sphere;
 
+
+            if (true)
+            {
+
+            }
+
+
             yield return packSpawner.SpawnPack(info);
-
-
         }
 
         private IEnumerator SpawnLoop()
@@ -212,13 +197,6 @@ namespace MeteorGame
 
             spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
-
-
-        #endregion
-
-        #region Methods
-
-
         public Enemy SpawnEnemyFromPool()
         {
             var e = EnemyManager.Instance.EnemyPool.Get();

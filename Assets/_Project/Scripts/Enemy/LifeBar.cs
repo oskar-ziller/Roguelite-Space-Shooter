@@ -48,9 +48,6 @@ namespace MeteorGame
 
         #region Methods
 
-
-
-
         internal void StartBarPercentTween()
         {
             if (barPercentTween != null && barPercentTween.active)
@@ -68,41 +65,23 @@ namespace MeteorGame
             var dur = tweenDur + Random.Range(-tweenVariation, tweenVariation);
 
             barPercentTween = DOTween.To(() => percentageTweening, x => percentageTweening = x, target, dur).SetUpdate(true);
-            //barPercentTween.onStepComplete += StepComplete;
             barPercentTween.onUpdate += StepComplete;
         }
 
 
         private void StepComplete()
         {
-            //print("step");
             mesh.material.SetFloat("_percentage", percentageTweening);
         }
 
         private void UpdateHealthBar(Enemy _)
         {
-            //gameObject.SetActive(true);
             var current = mesh.material.GetFloat("_percentage");
             percentageTweening = current;
             StartBarPercentTween();
-
-            //if (hideLifeBar_Co != null)
-            //{
-            //    StopCoroutine(hideLifeBar_Co);
-            //}
-
-            //if (owner.hideLifebarAfterSeconds > 0)
-            //{
-            //    hideLifeBar_Co = StartCoroutine(HideHealthbar());
-            //}
         }
 
 
-        //private IEnumerator HideHealthbar()
-        //{
-        //    yield return new WaitForSeconds(owner.hideLifebarAfterSeconds);
-        //    gameObject.SetActive(false);
-        //}
 
 
         #endregion

@@ -15,9 +15,9 @@ namespace MeteorGame
         [SerializeField] private Rigidbody rigidBody;
         [SerializeField] private int level;
 
-        public Action<Enemy> DamageTaken;
-        public Action<Enemy> HealthChanged;
-        public Action<Enemy> KilledByPlayer;
+        public event Action<Enemy> DamageTaken;
+        public event Action<Enemy> HealthChanged;
+        public event Action<Enemy> KilledByPlayer;
 
         public int TotalHealth { get; private set; }
         public int CurrentHealth { get; private set; }
@@ -50,6 +50,7 @@ namespace MeteorGame
 
         private float speed;
 
+
         private void Die()
         {
             //SetCurrnetHealth(0);
@@ -59,6 +60,11 @@ namespace MeteorGame
         public void ForceDie()
         {
             Die();
+        }
+
+        public void ResetOnKilledEvent()
+        {
+            KilledByPlayer = null;
         }
 
         private void Awake()

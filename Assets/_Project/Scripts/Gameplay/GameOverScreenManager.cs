@@ -34,7 +34,7 @@ namespace MeteorGame
 
         #region Methods
 
-        private void OnGameOver(Enemy _)
+        private void OnGameOver()
         {
             gameOverCanvas.gameObject.SetActive(true);
             GameManager.Instance.SetCursorMode(CursorLockMode.Confined);

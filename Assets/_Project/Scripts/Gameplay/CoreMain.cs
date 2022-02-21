@@ -6,26 +6,21 @@ namespace MeteorGame
 {
     public class CoreMain : MonoBehaviour
     {
-
-
-
         #region Variables
 
         #endregion
 
         #region Unity Methods
 
-
         private void OnTriggerEnter(Collider other)
         {
-            Enemy e = other.GetComponent<Enemy>();
+            Enemy e = other.gameObject.GetComponent<Enemy>();
 
             if (e != null)
             {
                 GameManager.Instance.InitGameOver(e);
             }
         }
-
 
         #endregion
 

@@ -97,10 +97,10 @@ namespace MeteorGame
 
         private void OnReturnToPool(Enemy e)
         {
-            e.KilledByPlayer = null;
             e.transform.parent = null;
             e.transform.position = Vector3.zero;
             e.transform.parent = PooledEnemiesHolder;
+            e.ResetOnKilledEvent(); // remove listeners because we add them again on spawn
             e.gameObject.SetActive(false);
         }
 

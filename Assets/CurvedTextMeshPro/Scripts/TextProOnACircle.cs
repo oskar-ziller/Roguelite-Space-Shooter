@@ -84,6 +84,8 @@ namespace ntw.CurvedTextMeshPro
         /// </summary>
         private float m_oldMaxDegreesPerLetter = float.MaxValue;
 
+        public float AngularOffset => m_angularOffset;
+
         /// <summary>
         /// Method executed at every frame that checks if some parameters have been changed
         /// </summary>
@@ -130,6 +132,11 @@ namespace ntw.CurvedTextMeshPro
             //compute the trasformation matrix: move the points to the just found position, then rotate the character to fit the angle of the curve 
             //(-90 is because the text is already vertical, it is as if it were already rotated 90 degrees)
             return Matrix4x4.TRS(new Vector3(newMideBaselinePos.x, newMideBaselinePos.y, 0), Quaternion.AngleAxis(-Mathf.Atan2(y0, x0) * Mathf.Rad2Deg - 90, Vector3.forward), Vector3.one);
+        }
+
+        public void SetAngularOffset(float newOffset)
+        {
+            m_angularOffset = newOffset;
         }
     }
 }

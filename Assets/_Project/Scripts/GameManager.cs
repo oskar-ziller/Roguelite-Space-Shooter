@@ -45,7 +45,8 @@ namespace MeteorGame
         public bool IsGamePaused { get; private set; }
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
-        public Action<Enemy> GameOver;
+        public event Action GameOver;
+        public event Action GameRestart;
 
         private float gameLaunchTime;
         private float gamePlayTime;
@@ -89,6 +90,8 @@ namespace MeteorGame
             SpellCaster.Instance.Setup();
 
             Player.Instance.DebugAddStuff();
+
+
         }
 
 
@@ -150,7 +153,7 @@ namespace MeteorGame
         internal void InitGameOver(Enemy e)
         {
             PauseGame();
-            GameOver?.Invoke(e);
+            GameOver?.Invoke();
         }
 
 
@@ -198,6 +201,7 @@ namespace MeteorGame
         {
             EnemyManager.Instance.DestroyAllEnemies();
             UnPauseGame();
+            GameRestart?.Invoke();
         }
 
         #endregion

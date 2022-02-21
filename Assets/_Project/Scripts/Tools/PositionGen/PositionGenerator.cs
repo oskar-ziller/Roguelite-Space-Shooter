@@ -17,16 +17,20 @@ namespace MeteorGame
         float spacing = 0f;
 
 
-        private const int iterationsBeforeGiveUp = 100;
+        private const int iterationsBeforeGiveUp = 10;
         private const int iterationsBeforeRegionIncrease = 5;
 
         private float delayAfterGiveUp = 0.01f;
-        private float delayAfterRegionIncrease = 0.01f;
-        private float delayAfterSuccess = 0.01f;
+        private float delayAfterRegionIncrease = 0f;
+        private float delayAfterSuccess = 0f;
 
         private int findPosIterations = 0;
         private int gaveUpCount = 0;
         private int increasedRegionCount = 0;
+
+        private WaitForSeconds delayAfterGiveUpCached;
+        private WaitForSeconds delayAfterRegionIncreaseCached;
+        private WaitForSeconds delayAfterSuccessCached;
 
         public PositionGenerator(List<EnemySO> spawnList, PackShape packShape, float spacing)
         {
@@ -42,6 +46,10 @@ namespace MeteorGame
             this.spawnList = this.spawnList.OrderByDescending(e => e.ShapeRadi).ToList();
             // set region size to biggest enemy size to save some time
             regionExtends = Mathf.CeilToInt(this.spawnList.First().ShapeRadi + 2);
+
+            delayAfterGiveUpCached = new WaitForSeconds(delayAfterGiveUp);
+            delayAfterRegionIncreaseCached = new WaitForSeconds(delayAfterRegionIncrease);
+            delayAfterSuccessCached = new WaitForSeconds(delayAfterSuccess);
         }
 
 
@@ -77,7 +85,15 @@ namespace MeteorGame
                         {
                             gaveUpCount++;
                             //UnityEngine.Debug.Log("Gave up on point. Sleeping for: " + delayAfterGiveUp);
-                            yield return new WaitForSeconds(delayAfterGiveUp);
+
+                            if (delayAfterGiveUp > 0)
+                            {
+                                yield return delayAfterGiveUpCached;
+                            }
+                            else
+                            {
+                                yield return null;
+                            }
                         }
                     }
 
@@ -86,12 +102,30 @@ namespace MeteorGame
                         regionExtends++;
                         //UnityEngine.Debug.Log($"Still can't fit. Increase region to {regionExtends} and sleep for {delayAfterRegionIncrease} ");
                         increasedRegionCount++;
-                        yield return new WaitForSeconds(delayAfterRegionIncrease);
+
+                        if (delayAfterRegionIncrease > 0)
+                        {
+                            yield return delayAfterRegionIncreaseCached;
+                        }
+                        else
+                        {
+                            yield return null;
+                        }
+
                     }
                 }
 
                 spawnPositions.Add(new FindSpawnPosResult(pos, e));
-                yield return new WaitForSeconds(delayAfterSuccess);
+
+
+                if (delayAfterSuccess > 0)
+                {
+                    yield return delayAfterSuccessCached;
+                }
+                else
+                {
+                    yield return null;
+                }
             }
         }
 
