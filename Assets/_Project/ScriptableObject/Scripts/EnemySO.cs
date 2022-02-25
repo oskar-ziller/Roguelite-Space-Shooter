@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MeteorGame
+namespace MeteorGame.Enemies
 {
 
     [CreateAssetMenu(fileName = "New Enemy", menuName = "ScriptableObjects/Enemy")]
@@ -22,7 +22,11 @@ namespace MeteorGame
 
         [Tooltip("Mat for body (healthbar fill)")]
         public Material BodyMat;
+
         [Tooltip("Mesh for body")]
         public Mesh BodyMesh;
+
+        [Tooltip("ExplosionHandler to spawn on death")]
+        public ExplosionHandler ExplosionHandler;
     }
 }

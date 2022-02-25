@@ -117,6 +117,9 @@ namespace MeteorGame
             SpawnedPack?.Invoke(pack);
         }
 
+        /// <summary>
+        /// Calculates HP multiplier for current GameLevel from enemyHPMultipCurve
+        /// </summary>
         public float CalculateEnemyHPMultip()
         {
             var currLevel = GameManager.Instance.GameLevel;

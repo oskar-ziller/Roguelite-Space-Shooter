@@ -22,3 +22,4 @@ MonoBehaviour:
   IsEnabled: 1
   BodyMat: {fileID: 2100000, guid: b8520324faf45164c8ababa9625b8819, type: 2}
   BodyMesh: {fileID: 4300000, guid: 502caac999291ec4d9bf54a7abf87425, type: 2}
+  ExplosionHandler: {fileID: -8792791386569414376, guid: 72618acde6d0c95408173621613fb5bc, type: 3}

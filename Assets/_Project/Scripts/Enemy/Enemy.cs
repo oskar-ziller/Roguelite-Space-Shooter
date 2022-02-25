@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MeteorGame.Enemies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,19 +26,15 @@ namespace MeteorGame
         public bool IsDying { get; private set; }
 
 
-        public Vector3 Position => transform.position;
-        public Vector3 WorldPos => transform.TransformPoint(Vector3.zero);
-
-        public Vector3 TransformScale => enemySO.ShapeRadi * Vector3.one * 2f;
+        //public Vector3 TransformScale => enemySO.ShapeRadi * Vector3.one * 2f;
 
         private float currentSpeed;
 
-        private EnemySO enemySO;
 
         private Vector3 startingVel;
-        private Vector3 spawnPos;
-        private Vector3 packCenter;
-        private float packAvgSpeedMultip;
+        //private Vector3 spawnPos;
+        //private Vector3 packCenter;
+
 
 
         private AilmentManager ailmentManager;
@@ -46,10 +43,10 @@ namespace MeteorGame
         private MeshRenderer renderer;
         private MeshFilter meshFilter;
 
-        private float expectedSpeed => packAvgSpeedMultip * EnemyManager.Instance.BaseEnemySpeed;
+        private float normalSpeed;
 
-        private float speed;
 
+        private ExplosionHandler explosionHandler;
 
         private void Die()
         {
@@ -85,68 +82,81 @@ namespace MeteorGame
             }
         }
 
-
-        [ContextMenu("Stop Movement")]
-        private void StopMovement()
+        private void SetValuesToDefaults()
         {
-            speed = 0;
-            MoveToWorldOrigin(transform.position);
-        }
-
-        [SerializeField] private float newSpeedDebug = 0f;
-        [ContextMenu("Change speed")]
-        private void ChangeSpeedDebug()
-        {
-            speed = newSpeedDebug;
-            MoveToWorldOrigin(transform.position);
-        }
-
-
-        internal void Init(EnemySO enemySO, Vector3 spawnPos, Vector3 packCenter, float avgSpeed, EnemyPack pack)
-        {
-            this.IsDying = false;
-            this.enemySO = enemySO;
-            this.spawnPos = spawnPos;
-            this.packCenter = packCenter;
-            this.packAvgSpeedMultip = avgSpeed;
-            this.BelongsToPack = pack;
-
+            IsDying = false;
             level = GameManager.Instance.GameLevel;
-
-
-            var startingHP = EnemyManager.Instance.BaseHP * enemySO.HealthMultiplier;
-
-            var hpMultipForLevel = EnemyManager.Instance.EnemySpawner.CalculateEnemyHPMultip();
-            
-            var newHP = Mathf.CeilToInt(startingHP * hpMultipForLevel);
-
-            SetTotalHealth(newHP);
-
-            transform.position = spawnPos;
-
-            transform.localScale = TransformScale;
-
-            renderer.material = enemySO.BodyMat;
-
-            meshFilter.mesh = enemySO.BodyMesh;
-
             ailmentManager.Reset();
-
-            speed = expectedSpeed;
-
-            MoveToWorldOrigin(packCenter);
         }
 
-        private void SetTotalHealth(int newHP)
+        /// <summary>
+        /// Calculates HP depending on level, curve and kind
+        /// </summary>
+        private int CalculateHP(float hpMultip)
         {
-            TotalHealth = newHP;
-            SetCurrnetHealth(newHP);
+            var startingHP = EnemyManager.Instance.BaseEnemyHP * hpMultip;
+            var hpMultipForLevel = EnemyManager.Instance.EnemySpawner.CalculateEnemyHPMultip();
+            return Mathf.CeilToInt(startingHP * hpMultipForLevel);
         }
+
+        /// <summary>
+        /// Sets transform pos and scale from EnemySpawnInfo
+        /// </summary>
+        private void SetTransform(EnemySpawnInfo spawninfo)
+        {
+            //spawnPos = spawninfo.spawnPos;
+            transform.position = spawninfo.spawnPos;
+            transform.localScale = spawninfo.SO.ShapeRadi * Vector3.one * 2f;
+        }
+
+        /// <summary>
+        /// Sets mat and mesh from EnemySO
+        /// </summary>
+        private void SetBody(EnemySO so)
+        {
+            renderer.material = so.BodyMat;
+            meshFilter.mesh = so.BodyMesh;
+        }
+
+        internal void Init(EnemySpawnInfo spawninfo)
+        {
+            SetValuesToDefaults();
+
+            explosionHandler = spawninfo.SO.ExplosionHandler;
+            BelongsToPack = spawninfo.pack;
+            normalSpeed = spawninfo.packSpeed * EnemyManager.Instance.BaseEnemySpeed;
+
+            SetTransform(spawninfo);
+            SetBody(spawninfo.SO);
+
+            TotalHealth = CalculateHP(spawninfo.SO.HealthMultiplier);
+            SetCurrnetHealth(TotalHealth);
+
+            MoveToWorldOrigin(from: spawninfo.packCenter);
+        }
+
+ 
 
         public bool IsVisible()
         {
             return renderer.isVisible;
         }
+
+
+        private void SpawnExplosion()
+        {
+            if (explosionHandler == null)
+            {
+                return;
+            }
+
+            ExplosionHandler explosion = Instantiate(explosionHandler);
+
+            explosion.transform.position = transform.TransformPoint(Vector3.zero);
+            explosion.transform.localScale = transform.localScale;
+            explosion.transform.transform.SetParent(EnemyManager.Instance.EnemyExplosionHolder, true);
+        }
+
 
         /*
         int[] baseLifeArr = { 44831, 42093, 39519, 37098, 34823,
@@ -194,7 +204,7 @@ namespace MeteorGame
         {
             if (ailmentManager.Chill != null)
             {
-                var shouldBe = expectedSpeed * (1 - ailmentManager.Chill.magnitude);
+                var shouldBe = normalSpeed * (1 - ailmentManager.Chill.magnitude);
 
                 if (currentSpeed > shouldBe)
                 {
@@ -209,7 +219,7 @@ namespace MeteorGame
 
             if (ailmentManager.InChillingArea)
             {
-                var shouldBe = expectedSpeed * (1f - AilmentManager.ChillingAreaEffect);
+                var shouldBe = normalSpeed * (1f - AilmentManager.ChillingAreaEffect);
 
                 if (currentSpeed > shouldBe)
                 {
@@ -240,10 +250,10 @@ namespace MeteorGame
 
             if (!shouldBeSlower)
             {
-                if (currentSpeed != expectedSpeed)
+                if (currentSpeed != normalSpeed)
                 {
                     rigidBody.velocity = startingVel;
-                    currentSpeed = expectedSpeed;
+                    currentSpeed = normalSpeed;
                 }
             }
         }
@@ -336,6 +346,7 @@ namespace MeteorGame
             //    transform.DOScale(0, 0.5f).onComplete = Die;
             //}
 
+            SpawnExplosion();
             Die();
         }
 
@@ -406,25 +417,13 @@ namespace MeteorGame
             MoveTo(from, Vector3.zero);
         }
 
-   
-
-        private void RepositionToSpawn()
-        {
-            transform.position = spawnPos;
-        }
-
-
-        private void ChangeSpeed(float newSpeed)
-        {
-            speed = newSpeed;
-        }
 
 
         private void MoveTo(Vector3 from, Vector3 to)
         {
             var dir = (to - from).normalized;
             //transform.LookAt(to);
-            startingVel = dir * speed;
+            startingVel = dir * normalSpeed;
 
             rigidBody.isKinematic = false;
             rigidBody.velocity = startingVel;

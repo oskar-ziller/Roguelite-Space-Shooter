@@ -120,7 +120,7 @@ MonoBehaviour:
   SpreadFromCenter: 1.5
   ScaleDur: 0.5
   PathDur: 0.1
-  PathLen: 10
+  PathLen: 20
   explosionPrefab: {fileID: 9222142054075351443, guid: d66a798ae52d7dd40b76ae45f778017f, type: 3}
 --- !u!114 &8769852731920459519
 MonoBehaviour:

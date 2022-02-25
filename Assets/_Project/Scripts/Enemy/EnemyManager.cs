@@ -47,15 +47,12 @@ namespace MeteorGame
         [Tooltip("HP Multiplier when gamelevel = max")]
         [SerializeField] private int maxHpMultiplier;
 
-
-        [Tooltip("Transform holding all the particle systems to spawn when an enemy dies")]
-        [SerializeField] private Transform enemyExplosionPrefab;
-
         [Tooltip("Transform holding all the explosions that spawn after Enemy death")]
-        [SerializeField] Transform enemyExplosionHolder;
+        [SerializeField] private Transform enemyExplosionHolder;
 
         public EnemySpawner EnemySpawner => enemySpawner;
 
+        public Transform EnemyExplosionHolder => enemyExplosionHolder;
 
         public ObjectPool<Enemy> EnemyPool;
 
@@ -131,7 +128,7 @@ namespace MeteorGame
 
         public int BaseEnemySpeed => baseEnemySpeed;
 
-        public int BaseHP => baseHP;
+        public int BaseEnemyHP => baseHP;
 
 
         #endregion
@@ -201,21 +198,9 @@ namespace MeteorGame
         {
             //DropGold(e);
             AliveEnemies.Remove(e);
-
-            // spawn explosion effect
-            SpawnExplosion(e);
-
             EnemyPool.Release(e);
         }
 
-        private void SpawnExplosion(Enemy e)
-        {
-            Transform explosion = Instantiate(enemyExplosionPrefab);
-
-            explosion.position = e.WorldPos;
-            explosion.localScale = e.TransformScale;
-            explosion.SetParent(enemyExplosionHolder, true);
-        }
 
 
         private void OnPackSpawn(EnemyPack p)

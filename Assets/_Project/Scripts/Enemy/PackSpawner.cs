@@ -1,3 +1,4 @@
+using MeteorGame.Enemies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -131,7 +132,19 @@ namespace MeteorGame
                 var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
                 e.transform.parent = packGameObject.transform;
                 e.gameObject.name = result.EnemySO.Name;
-                e.Init(result.EnemySO, spawnPos, packCenter, packSpeed, pack);
+
+
+                var spawninfo = new EnemySpawnInfo
+                {
+                    SO = result.EnemySO,
+                    spawnPos = spawnPos,
+                    packCenter = packCenter,
+                    packSpeed = packSpeed,
+                    pack = pack
+                };
+
+
+                e.Init(spawninfo);
                 pack.AddEnemy(e);
 
                 if (waitAfterSpawn > 0)
