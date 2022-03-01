@@ -44,7 +44,7 @@ namespace MeteorGame
         {
             gameOverCanvas.gameObject.SetActive(false);
             GameManager.Instance.SetCursorMode(CursorLockMode.Locked);
-            GameManager.Instance.RestartGame();
+            GameManager.Instance.OnRetryClicked();
         }
 
         #endregion

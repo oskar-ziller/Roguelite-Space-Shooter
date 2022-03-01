@@ -44,7 +44,12 @@ namespace MeteorGame.Flight
 
         #region Unity Methods
 
-        void Update()
+        private void Start()
+        {
+            GameManager.Instance.GameOver += OnGameOver;
+        }
+
+        private void Update()
         {
             if (GameManager.Instance.IsGamePaused)
             {
@@ -95,6 +100,11 @@ namespace MeteorGame.Flight
         #endregion
 
         #region Methods
+
+        private void OnGameOver()
+        {
+            frameTravelVec = Vector3.zero;
+        }
 
         private Vector3 CalculateUp()
         {

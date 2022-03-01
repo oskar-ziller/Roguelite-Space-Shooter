@@ -33,19 +33,12 @@ namespace MeteorGame
             tmpObj = GetComponent<TextMeshPro>();
             startingColor = tmpObj.color;
 
-            GameManager.Instance.GameRestart += ResetAndRestart;
-        }
-
-        private void Update()
-        {
-            
-
-            
+            GameManager.Instance.GameStart += OnGameStart;
         }
 
         private void Start()
         {
-            ResetAndRestart();
+
         }
 
         private void FixedUpdate()
@@ -66,7 +59,7 @@ namespace MeteorGame
 
         #region Methods
 
-        private void ResetAndRestart()
+        private void OnGameStart()
         {
             fadeTween.Kill();
 

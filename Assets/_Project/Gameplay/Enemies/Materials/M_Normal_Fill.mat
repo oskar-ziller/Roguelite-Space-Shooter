@@ -53,8 +53,8 @@ Material:
     - _Metallic: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Smoothness: 0.469
-    - _Specular: 0.327
+    - _Smoothness: 0.114
+    - _Specular: 0
     - _percentage: 1
     m_Colors:
     - Color_16ca097ed511458e8caaf685f88e80f9: {r: 0.30588236, g: 0.30588236, b: 0.30588236, a: 1}

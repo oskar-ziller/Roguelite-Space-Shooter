@@ -34,11 +34,14 @@ namespace MeteorGame
         private Coroutine pitchResetCoroutine;
         private float pitchResetDurInSeconds = 1.5f;
 
+        private Vector3 startingPos;
+        private Quaternion startingRotation;
+
+        public event Action Ready;
+
         #endregion
 
         #region Unity Methods
-
-
 
         private void Awake()
         {
@@ -46,11 +49,13 @@ namespace MeteorGame
             //Application.targetFrameRate = 144;
 
             Instance = this;
-
+            startingPos = transform.position;
+            startingRotation = transform.rotation;
         }
 
         private void Start()
         {
+            GameManager.Instance.GameStart += OnGameStart;
         }
 
 
@@ -59,6 +64,20 @@ namespace MeteorGame
         #endregion
 
         #region Methods
+
+
+        private void OnGameStart()
+        {
+            transform.DOMove(startingPos, 2f);
+            transform.DORotate(startingRotation.eulerAngles, 2f);
+            StartCoroutine(ReadyAfterDelay(2f));
+        }
+
+        private IEnumerator ReadyAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            Ready?.Invoke();
+        }
 
         public SpellSlot SpellSlot(int i)
         {
@@ -206,7 +225,6 @@ namespace MeteorGame
         {
             return currency >= amount;
         }
-
 
 
         #endregion

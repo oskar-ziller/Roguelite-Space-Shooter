@@ -46,7 +46,7 @@ namespace MeteorGame
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
         public event Action GameOver;
-        public event Action GameRestart;
+        public event Action GameStart;
 
         private float gameLaunchTime;
         private float gamePlayTime;
@@ -80,10 +80,7 @@ namespace MeteorGame
 
             EnemyManager.Instance.Setup();
 
-            EnemyManager.Instance.BeginSpawning();
-
             tabMenuManager.Setup();
-
 
             Player.Instance.Setup();
 
@@ -91,7 +88,7 @@ namespace MeteorGame
 
             Player.Instance.DebugAddStuff();
 
-
+            StartGame();
         }
 
 
@@ -156,7 +153,6 @@ namespace MeteorGame
             GameOver?.Invoke();
         }
 
-
         public float HowFarIntoDifficulty()
         {
             return gamePlayTime + debugElapsedSeconds;
@@ -183,6 +179,7 @@ namespace MeteorGame
             Time.timeScale = 1;
             IsGamePaused = false;
         }
+
         private void ShowHideTabMenu()
         {
             if (tabMenuManager.IsShowing)
@@ -197,12 +194,19 @@ namespace MeteorGame
             }
         }
 
-        internal void RestartGame()
+        private void StartGame()
         {
             EnemyManager.Instance.DestroyAllEnemies();
             UnPauseGame();
-            GameRestart?.Invoke();
+            GameStart?.Invoke();
         }
+
+
+        public void OnRetryClicked()
+        {
+            StartGame();
+        }
+
 
         #endregion
 

@@ -118,11 +118,6 @@ namespace MeteorGame
 
         public AnimationCurve EnemyHealthCurve => enemyHealthCurve;
 
-        internal void BeginSpawning()
-        {
-            enemySpawner.BeginSpawning();
-        }
-
         public int MaxEnemyLevel => maxEnemyLevel;
 
 

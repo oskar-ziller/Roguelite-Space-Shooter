@@ -9,14 +9,14 @@ namespace MeteorGame
     public class TargetIndicator : MonoBehaviour
     {
         [SerializeField] private Image targetIndicatorPrefab;
-        [SerializeField] private Image coreIndicatorPrefab;
+        //[SerializeField] private Image coreIndicatorPrefab;
         [SerializeField] private Camera cam;
 
         private RectTransform rt;
         private Dictionary<EnemyPack, RectTransform> indicators;
 
-        private Image coreIndicator;
-        private RectTransform coreIndRect;
+        //private Image coreIndicator;
+        //private RectTransform coreIndRect;
 
         float outOfSightOffest = 20;
 
@@ -26,10 +26,10 @@ namespace MeteorGame
             indicators = new Dictionary<EnemyPack, RectTransform>();
             rt = GetComponent<RectTransform>();
 
-            coreIndicator = Instantiate(coreIndicatorPrefab);
-            coreIndicator.transform.SetParent(transform, true);
+            //coreIndicator = Instantiate(coreIndicatorPrefab);
+            //coreIndicator.transform.SetParent(transform, true);
 
-            coreIndRect = coreIndicator.GetComponent<RectTransform>();
+            //coreIndRect = coreIndicator.GetComponent<RectTransform>();
         }
 
         void Update()
@@ -77,7 +77,7 @@ namespace MeteorGame
             }
 
             // update core
-            SetIndicatorPos(Vector3.zero, coreIndRect);
+            //SetIndicatorPos(Vector3.zero, coreIndRect);
         }
 
 
@@ -106,7 +106,7 @@ namespace MeteorGame
                 indicatorPosition.z = 0f;
             }
 
-            //In case the target is in front of the ship, but out of sight
+            //In case the target is in front of the cam, but out of sight
             else if (indicatorPosition.z >= 0f)
             {
                 //Set indicatorposition and set targetIndicator to outOfSight form.
@@ -176,7 +176,7 @@ namespace MeteorGame
 
         private Vector3 OutOfRangeindicatorPositionB(Vector3 indicatorPosition)
         {
-            //Set indicatorPosition.z to 0f; We don't need that and it'll actually cause issues if it's outside the camera range (which easily happens in my case)
+            //Set indicatorPosition.z to 0f; We don't need that and it'll actually cause issues if it's outside the camera range
             indicatorPosition.z = 0f;
 
             //Calculate Center of Canvas and subtract from the indicator position to have indicatorCoordinates from the Canvas Center instead the bottom left!

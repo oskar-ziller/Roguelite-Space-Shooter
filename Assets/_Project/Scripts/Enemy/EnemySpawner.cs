@@ -101,6 +101,12 @@ namespace MeteorGame
 
 
 
+        private void Start()
+        {
+            GameManager.Instance.GameOver += OnGameOver;
+            GameManager.Instance.GameStart += OnGameStart;
+
+        }
 
 
         #endregion
@@ -155,7 +161,6 @@ namespace MeteorGame
             StartCoroutine(SpawnPackCoroutine());
         }
 
-
         private IEnumerator SpawnPackCoroutine()
         {
             var info = new PackSpawnInfo();
@@ -164,13 +169,6 @@ namespace MeteorGame
             info.packHeight = PackHeightAtCurrentGameLevel;
             info.spawnerMoney = PackMoneyAtCurrentGameLevel;
             info.packShape = PackShape.Sphere;
-
-
-            if (true)
-            {
-
-            }
-
 
             yield return packSpawner.SpawnPack(info);
         }
@@ -195,16 +193,40 @@ namespace MeteorGame
         {
             if (spawnLoop_Co != null)
             {
+                UnityEngine.Debug.LogError("Called BeginSpawning when spawnLoop_Co already running");
                 StopCoroutine(spawnLoop_Co);
             }
 
             spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
+
+
+        private void StopSpawning()
+        {
+            if (spawnLoop_Co != null)
+            {
+                StopCoroutine(spawnLoop_Co);
+                spawnLoop_Co = null;
+            }
+        }
+
+
         public Enemy SpawnEnemyFromPool()
         {
             var e = EnemyManager.Instance.EnemyPool.Get();
             EnemyManager.Instance.AddEnemy(e);
             return e;
+        }
+
+
+        private void OnGameOver()
+        {
+            StopSpawning();
+        }
+
+        private void OnGameStart()
+        {
+            BeginSpawning();
         }
 
 
