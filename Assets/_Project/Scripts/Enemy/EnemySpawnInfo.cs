@@ -7,8 +7,7 @@ namespace MeteorGame.Enemies
     public class EnemySpawnInfo
     {
         internal Vector3 spawnPos;
-        internal Vector3 packCenter;
-        internal float packSpeed;
+        internal Transform portalTransform;
         internal EnemyPack pack;
         internal EnemySO SO;
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MeteorGame.Enemies;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,13 @@ namespace MeteorGame
 {
     public class EnemyPack : MonoBehaviour
     {
-        public PackSpawnInfo Info;
-        public Vector3 Position;
-        public bool IsVisible;
+        public PackSpawnInfo Info { get; internal set; }
+        public Vector3 Position { get; internal set; }
+        public bool IsVisible { get; internal set; }
+        public float Speed { get; internal set; }
 
         private List<Enemy> Enemies;
+
 
         private void Update()
         {
@@ -35,11 +38,20 @@ namespace MeteorGame
 
         public void AddEnemy(Enemy e)
         {
-            e.KilledByPlayer += OnPackEnemyDeath;
+            e.Died += OnPackEnemyDeath;
             Enemies.Add(e);
         }
 
-        private void OnPackEnemyDeath(Enemy e)
+        public void ForceDie()
+        {
+            for (int i = Enemies.Count - 1; i >= 0; i--)
+            {
+                Enemy e = Enemies[i];
+                e.ForceDie();
+            }
+        }
+
+        private void OnPackEnemyDeath(Enemy e, bool _)
         {
             Enemies.Remove(e);
 
@@ -49,5 +61,30 @@ namespace MeteorGame
                 Destroy(gameObject);
             }
         }
+
+        internal void DoSpawn()
+        {
+            foreach (var e in Enemies)
+            {
+                e.DoSpawn();
+            }
+        }
+
+        internal void CalculatePackMovementSpeed()
+        {
+            // calculate average movement speed
+            var avgTestVal = 0f;
+            foreach (Enemy e in Enemies)
+            {
+                avgTestVal += e.SO.HealthMultiplier / e.SO.SpeedMultiplier;
+            }
+
+
+            avgTestVal /= Enemies.Count;
+
+
+            Speed = 1f / avgTestVal;
+        }
+
     }
 }

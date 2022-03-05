@@ -8,7 +8,6 @@ using UnityEngine.Pool;
 namespace MeteorGame
 {
 
-
     public struct PackSpawnInfo
     {
         public float spawnerMoney;
@@ -24,6 +23,10 @@ namespace MeteorGame
 
         [Tooltip("Transform to mark position of 1st wave spawning on new game")]
         [SerializeField] private Transform firstWaveSpawnPos;
+
+
+        [SerializeField] private GameObject spawnPortalPrefab;
+
 
         public float waitAfterSpawn = 0.15f;
         public Action<EnemyPack> SpawnedPack;
@@ -60,6 +63,21 @@ namespace MeteorGame
 
 
 
+        private Transform CreatePortal(Vector3 packCenter, int regionSize)
+        {
+            var portal = Instantiate(spawnPortalPrefab);
+
+            var dir = packCenter.normalized;
+            var dist = Vector3.Distance(Vector3.zero, packCenter);
+
+            portal.transform.position = dir * (dist + regionSize + 25);
+
+            portal.transform.LookAt(Vector3.zero);
+
+            return portal.transform;
+        }
+
+
         public IEnumerator SpawnPack(PackSpawnInfo info)
         {
             if (!isSetup)
@@ -78,73 +96,51 @@ namespace MeteorGame
                                                   spawnList: enemiesToSpawn,
                                                   packShape: info.packShape);
 
+
             yield return generator.Generate();
-            yield return SpawnAll(info, generator.spawnPositions);
-        }
-
-        private float CalculatePackMovementSpeed(List<FindSpawnPosResult> candidates)
-        {
-
-            // calculate average movement speed
-            var avgTestVal = 0f;
-            foreach (FindSpawnPosResult result in candidates)
-            {
-                avgTestVal += result.EnemySO.HealthMultiplier / result.EnemySO.SpeedMultiplier;
-            }
-
-
-            avgTestVal /= candidates.Count;
-
-
-            return 1f/avgTestVal;
-
+            yield return CreateAll(info, generator.spawnPositions, generator.regionExtends);
         }
 
 
 
 
-        private IEnumerator SpawnAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates)
+        private EnemyPack CreatePackObject(PackSpawnInfo info)
         {
-            var packCenter = UnityEngine.Random.onUnitSphere * info.packHeight;
+            var packPos = UnityEngine.Random.onUnitSphere * info.packHeight;
 
             if (packCount == 0)
             {
-                packCenter = firstWaveSpawnPos.position;
+                packPos = firstWaveSpawnPos.position;
             }
 
-            var packGameObject = new GameObject("Pack " + packCount);
+            var holder = new GameObject("Pack " + packCount);
+            var packObj = holder.AddComponent<EnemyPack>();
+            packObj.Info = info;
+            packObj.Position = packPos;
+            holder.transform.parent = EnemyManager.Instance.EnemiesHolder;
             packCount++;
 
-            var pack = packGameObject.AddComponent<EnemyPack>();
-            pack.Info = info;
 
-            packGameObject.transform.parent = EnemyManager.Instance.EnemiesHolder;
+            return packObj;
+        }
 
-            Vector3 spawnPos;
-
-            var packSpeed = CalculatePackMovementSpeed(candidates);
-
+        private IEnumerator CreateCandidatesInPack(List<FindSpawnPosResult> candidates, EnemyPack pack, Transform portal)
+        {
             foreach (FindSpawnPosResult result in candidates)
             {
-                spawnPos = packCenter + result.SpawnPos;
-                pack.Position = spawnPos;
-
                 var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
-                e.transform.parent = packGameObject.transform;
+                e.transform.SetParent(pack.transform);
                 e.gameObject.name = result.EnemySO.Name;
-
 
                 var spawninfo = new EnemySpawnInfo
                 {
                     SO = result.EnemySO,
-                    spawnPos = spawnPos,
-                    packCenter = packCenter,
-                    packSpeed = packSpeed,
-                    pack = pack
+                    spawnPos = result.SpawnPos,
+                    pack = pack,
+                    portalTransform = portal
                 };
 
-
-                e.Init(spawninfo);
+                e.Create(spawninfo);
                 pack.AddEnemy(e);
 
                 if (waitAfterSpawn > 0)
@@ -156,6 +152,19 @@ namespace MeteorGame
                     yield return null;
                 }
             }
+        }
+
+        private IEnumerator CreateAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates, int regionSize)
+        {
+            EnemyPack pack = CreatePackObject(info);
+
+            var portal = CreatePortal(pack.Position, regionSize);
+            yield return CreateCandidatesInPack(candidates, pack, portal);
+
+            pack.CalculatePackMovementSpeed();
+
+
+            pack.DoSpawn();
 
             // signal to anything listening that we have spawned a new pack
             SpawnedPack?.Invoke(pack);

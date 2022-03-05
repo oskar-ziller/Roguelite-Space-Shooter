@@ -1,3 +1,4 @@
+using MeteorGame.Enemies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace MeteorGame
     {
         public static EnemyManager Instance { get; private set; }
 
-        public List<Enemy> AliveEnemies { get; private set; }
+        //public List<Enemy> AliveEnemies { get; private set; }
         public List<EnemyPack> AlivePacks { get; private set; }
 
         public Transform EnemiesHolder, PooledEnemiesHolder;
@@ -88,7 +89,7 @@ namespace MeteorGame
 
         private void OnTakeFromPool(Enemy e)
         {
-            e.KilledByPlayer += OnEnemyKilledByPlayer;
+            e.Died += OnEnemyDied;
             e.gameObject.SetActive(true);
         }
 
@@ -97,7 +98,7 @@ namespace MeteorGame
             e.transform.parent = null;
             e.transform.position = Vector3.zero;
             e.transform.parent = PooledEnemiesHolder;
-            e.ResetOnKilledEvent(); // remove listeners because we add them again on spawn
+            e.Died -= OnEnemyDied;
             e.gameObject.SetActive(false);
         }
 
@@ -132,11 +133,8 @@ namespace MeteorGame
 
         private void Awake()
         {
-            AliveEnemies = new List<Enemy>();
             AlivePacks = new List<EnemyPack>();
             Instance = this;
-
-            enemySpawner.SpawnedPack += OnPackSpawn;
         }
 
 
@@ -189,58 +187,35 @@ namespace MeteorGame
             AlivePacks.Remove(p);
         }
 
-        internal void OnEnemyKilledByPlayer(Enemy e)
+        internal void OnEnemyDied(Enemy e, bool _)
         {
             //DropGold(e);
-            AliveEnemies.Remove(e);
+            //AliveEnemies.Remove(e);
             EnemyPool.Release(e);
         }
 
 
-
-        private void OnPackSpawn(EnemyPack p)
+        internal void AddPack(EnemyPack p)
         {
             AlivePacks.Add(p);
         }
 
-        internal void AddEnemy(Enemy e)
-        {
-            AliveEnemies.Add(e);
-        }
-
-        internal Enemy ClosestEnemyTo(Vector3 pos)
-        {
-            float minDist = float.MaxValue;
-            Enemy closestEnemy = null;
-
-            for (int i = 0; i < AliveEnemies.Count; i++)
-            {
-                Enemy e = AliveEnemies[i];
-
-                float dist = Vector3.Distance(e.transform.position, pos);
-
-                if (dist > 0 && dist < minDist)
-                {
-                    minDist = dist;
-                    closestEnemy = e;
-                }
-            }
-
-            return closestEnemy;
-        }
-
         internal void DestroyAllEnemies()
         {
-            for (int i = AliveEnemies.Count - 1; i >= 0; i--)
+
+            for (int i = AlivePacks.Count - 1; i >= 0; i--)
             {
+                EnemyPack pack = AlivePacks[i];
+
+                pack.ForceDie();
+
                 //DropGold(e);
-                EnemyPool.Release(AliveEnemies[i]);
-                AliveEnemies.Remove(AliveEnemies[i]);
+                //EnemyPool.Release(AliveEnemies[i]);
+                //AliveEnemies.Remove(AliveEnemies[i]);
             }
 
 
             AlivePacks.Clear();
-
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using MeteorGame.Enemies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -389,23 +390,23 @@ namespace MeteorGame
 
         public void DoChain()
         {
-            var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
+            //var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
-            && e.gameObject != collidingWith.gameObject
-            && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
+            //var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
+            //&& e.gameObject != collidingWith.gameObject
+            //&& (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
             
-            Enemy e = potentials.Count() > 0 ?
-                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+            //Enemy e = potentials.Count() > 0 ?
+            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
-            if (e != null)
-            {
-                SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
-                ChainedFrom.Add(collidingWith);
-                return;
-            }
+            //if (e != null)
+            //{
+            //    SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
+            //    ChainedFrom.Add(collidingWith);
+            //    return;
+            //}
 
-            print("enemyToChainTo == null");
+            //print("enemyToChainTo == null");
         }
 
         public bool ShouldFork()
@@ -420,52 +421,54 @@ namespace MeteorGame
 
         public bool DoFork()
         {
-            /* When a projectile forks, it splits into two identical projectiles
-             * that continue travelling at 60 and -60 degree angles
-             * from the projectile's original trajectory. */
+            ///* When a projectile forks, it splits into two identical projectiles
+            // * that continue travelling at 60 and -60 degree angles
+            // * from the projectile's original trajectory. */
 
-            var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
+            //var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
 
-            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
-            && e.gameObject != collidingWith.gameObject
-            && (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
+            //var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
+            //&& e.gameObject != collidingWith.gameObject
+            //&& (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
 
-            Enemy e = potentials.Count() > 0 ?
-                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
-
-
-            if (e == null)
-            {
-                print("can't fork");
-                return false;
-            }
-
-            ForkedFrom.Add(collidingWith);
-            ForkingFrom = collidingWith;
+            //Enemy e = potentials.Count() > 0 ?
+            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
 
-            potentials = potentials.Where(p => p != e);
+            //if (e == null)
+            //{
+            //    print("can't fork");
+            //    return false;
+            //}
 
-            Enemy e2 = potentials.Count() > 0 ?
-                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+            //ForkedFrom.Add(collidingWith);
+            //ForkingFrom = collidingWith;
 
-            if (e2 == null)
-            {
-                print("use same enemy for fork");
-                e2 = e;
-            }
 
-            
-            ProjectileBase clone = Instantiate(this, transform.position, Quaternion.identity);
-            ProjectileBase clone2 = Instantiate(this, transform.position, Quaternion.identity);
+            //potentials = potentials.Where(p => p != e);
 
-            clone.CopyFrom(this);
-            clone2.CopyFrom(this);
+            //Enemy e2 = potentials.Count() > 0 ?
+            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
-            clone.SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
-            clone2.SetVelocityTowards(e2.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
+            //if (e2 == null)
+            //{
+            //    print("use same enemy for fork");
+            //    e2 = e;
+            //}
 
-            return true;
+
+            //ProjectileBase clone = Instantiate(this, transform.position, Quaternion.identity);
+            //ProjectileBase clone2 = Instantiate(this, transform.position, Quaternion.identity);
+
+            //clone.CopyFrom(this);
+            //clone2.CopyFrom(this);
+
+            //clone.SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
+            //clone2.SetVelocityTowards(e2.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
+
+            //return true;
+
+            return false;
         }
 
         private void SetVelocityTowards(Vector3 position, float speed)

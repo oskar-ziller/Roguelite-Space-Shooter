@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 
-namespace MeteorGame
+namespace MeteorGame.Enemies
 {
     public class Enemy : MonoBehaviour
     {
@@ -18,50 +18,49 @@ namespace MeteorGame
 
         public event Action<Enemy> DamageTaken;
         public event Action<Enemy> HealthChanged;
-        public event Action<Enemy> KilledByPlayer;
+        public event Action<Enemy, bool> Died;
+        public event Action<Enemy> Spawned;
 
         public int TotalHealth { get; private set; }
         public int CurrentHealth { get; private set; }
         public EnemyPack BelongsToPack { get; private set; }
         public bool IsDying { get; private set; }
-
-
-        //public Vector3 TransformScale => enemySO.ShapeRadi * Vector3.one * 2f;
+        public Mesh Mesh => spawnInfo.SO.BodyMesh;
+        public Transform PortalTransform => spawnInfo.portalTransform;
+        public float Radi => spawnInfo.SO.ShapeRadi;
+        public bool IsActive => isActive;
+        public EnemySO SO => spawnInfo.SO;
 
         private float currentSpeed;
-
-
         private Vector3 startingVel;
-        //private Vector3 spawnPos;
-        //private Vector3 packCenter;
-
-
-
         private AilmentManager ailmentManager;
-
-
         private MeshRenderer renderer;
         private MeshFilter meshFilter;
-
         private float normalSpeed;
-
-
         private ExplosionHandler explosionHandler;
+        private EnemySpawnInfo spawnInfo;
+        private Tween alphaTween;
+        private float alphaTweening;
+        private bool isActive = false;
 
-        private void Die()
+        private void Die(bool forced = false)
         {
-            //SetCurrnetHealth(0);
-            KilledByPlayer?.Invoke(this);
+            Died?.Invoke(this, forced);
         }
 
         public void ForceDie()
         {
-            Die();
+            Die(true);
         }
 
-        public void ResetOnKilledEvent()
+        internal void DoSpawn()
         {
-            KilledByPlayer = null;
+            Spawned?.Invoke(this);
+        }
+
+        internal void Activate()
+        {
+            isActive = true;
         }
 
         private void Awake()
@@ -85,6 +84,7 @@ namespace MeteorGame
         private void SetValuesToDefaults()
         {
             IsDying = false;
+            isActive = true;
             level = GameManager.Instance.GameLevel;
             ailmentManager.Reset();
         }
@@ -102,40 +102,61 @@ namespace MeteorGame
         /// <summary>
         /// Sets transform pos and scale from EnemySpawnInfo
         /// </summary>
-        private void SetTransform(EnemySpawnInfo spawninfo)
+        private void SetPosAndScale(EnemySpawnInfo spawninfo)
         {
             //spawnPos = spawninfo.spawnPos;
-            transform.position = spawninfo.spawnPos;
+            transform.position = spawnInfo.pack.Position + spawninfo.spawnPos;
             transform.localScale = spawninfo.SO.ShapeRadi * Vector3.one * 2f;
         }
 
-        /// <summary>
-        /// Sets mat and mesh from EnemySO
-        /// </summary>
-        private void SetBody(EnemySO so)
-        {
-            renderer.material = so.BodyMat;
-            meshFilter.mesh = so.BodyMesh;
-        }
-
-        internal void Init(EnemySpawnInfo spawninfo)
+        internal void Create(EnemySpawnInfo info)
         {
             SetValuesToDefaults();
 
-            explosionHandler = spawninfo.SO.ExplosionHandler;
-            BelongsToPack = spawninfo.pack;
-            normalSpeed = spawninfo.packSpeed * EnemyManager.Instance.BaseEnemySpeed;
+            spawnInfo = info;
 
-            SetTransform(spawninfo);
-            SetBody(spawninfo.SO);
+            explosionHandler = info.SO.ExplosionHandler;
+            BelongsToPack = info.pack;
+            normalSpeed = info.pack.Speed * EnemyManager.Instance.BaseEnemySpeed;
+            meshFilter.mesh = info.SO.BodyMesh;
+            renderer.material = info.SO.BodyMat;
 
-            TotalHealth = CalculateHP(spawninfo.SO.HealthMultiplier);
+            SetPosAndScale(info);
+            SetAlpha(0f);
+
+            //Spawned?.Invoke(this);
+
+            //StartFade();
+
+
+            TotalHealth = CalculateHP(info.SO.HealthMultiplier);
             SetCurrnetHealth(TotalHealth);
-
-            MoveToWorldOrigin(from: spawninfo.packCenter);
+            //MoveToWorldOrigin(from: info.packCenter);
         }
 
- 
+        internal void FadeIn(float dur)
+        {
+            if (alphaTween != null && alphaTween.active)
+            {
+                alphaTween.Complete();
+                alphaTween.Kill();
+                alphaTweening = 0f;
+                renderer.material.SetFloat("_alpha", alphaTweening);
+            }
+
+            alphaTween = DOTween.To(() => alphaTweening, x => alphaTweening = x, 1, dur);
+            alphaTween.onUpdate += StepComplete;
+        }
+
+        private void SetAlpha(float newAlpha)
+        {
+            renderer.material.SetFloat("_alpha", newAlpha);
+        }
+
+        private void StepComplete()
+        {
+            SetAlpha(alphaTweening);
+        }
 
         public bool IsVisible()
         {

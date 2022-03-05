@@ -57,6 +57,7 @@ Material:
     - _QueueOffset: 0
     - _Smoothness: 0.3
     - _Specular: 0.3
+    - _alpha: 0.646
     - _percentage: 0.731
     m_Colors:
     - Color_16ca097ed511458e8caaf685f88e80f9: {r: 0, g: 0.19607843, b: 1.4980392, a: 1}

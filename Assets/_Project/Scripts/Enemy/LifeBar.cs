@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MeteorGame
+namespace MeteorGame.Enemies
 {
     public class LifeBar : MonoBehaviour
     {
@@ -12,7 +12,7 @@ namespace MeteorGame
         #region Variables
 
         private Enemy owner;
-        private MeshRenderer mesh;
+        private MeshRenderer renderer;
 
         public float tweenDur = 0.1f;
         public float tweenVariation = 0.05f;
@@ -27,13 +27,21 @@ namespace MeteorGame
 
         private void Awake()
         {
-            owner = GetComponent<Enemy>();
-            mesh = GetComponent<MeshRenderer>();
 
-            owner.KilledByPlayer += OnOwnerDied;
+            if (owner == null)
+            {
+                owner = GetComponent<Enemy>();
+                owner.Died += OnOwnerDied;
+            }
+
+            if (renderer == null)
+            {
+                renderer = GetComponent<MeshRenderer>();
+            }
+
         }
 
-        private void OnOwnerDied(Enemy obj)
+        private void OnOwnerDied(Enemy _, bool __)
         {
             barPercentTween.Kill();
         }
@@ -41,7 +49,7 @@ namespace MeteorGame
         private void Start()
         {
             owner.HealthChanged += UpdateHealthBar;
-            mesh.material.SetFloat("_percentage", 1);
+            renderer.material.SetFloat("_percentage", 1);
         }
 
         #endregion
@@ -55,28 +63,28 @@ namespace MeteorGame
                 barPercentTween.Complete();
                 barPercentTween.Kill();
                 //percentageTweening = 1f;
-                mesh.material.SetFloat("_percentage", percentageTweening);
+                renderer.material.SetFloat("_percentage", percentageTweening);
             }
 
-            var current = mesh.material.GetFloat("_percentage");
+            var current = renderer.material.GetFloat("_percentage");
             var target = (float)owner.CurrentHealth / owner.TotalHealth;
 
 
             var dur = tweenDur + Random.Range(-tweenVariation, tweenVariation);
 
-            barPercentTween = DOTween.To(() => percentageTweening, x => percentageTweening = x, target, dur).SetUpdate(true);
+            barPercentTween = DOTween.To(() => percentageTweening, x => percentageTweening = x, target, dur);
             barPercentTween.onUpdate += StepComplete;
         }
 
 
         private void StepComplete()
         {
-            mesh.material.SetFloat("_percentage", percentageTweening);
+            renderer.material.SetFloat("_percentage", percentageTweening);
         }
 
         private void UpdateHealthBar(Enemy _)
         {
-            var current = mesh.material.GetFloat("_percentage");
+            var current = renderer.material.GetFloat("_percentage");
             percentageTweening = current;
             StartBarPercentTween();
         }

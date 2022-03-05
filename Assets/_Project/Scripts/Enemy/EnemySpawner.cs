@@ -1,3 +1,4 @@
+using MeteorGame.Enemies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -57,7 +58,6 @@ namespace MeteorGame
         [SerializeField] private float spacingBetweenEnemies;
 
 
-        public Action<EnemyPack> SpawnedPack;
         public Enemy testPrefab;
 
         private Coroutine spawnLoop_Co;
@@ -114,13 +114,10 @@ namespace MeteorGame
         #region Methods
 
 
-        /// <summary>
-        /// Packspawner raises an action and we pass it along
-        /// </summary>
-        /// <param name="pack"></param>
+
         private void OnPackSpawned(EnemyPack pack)
         {
-            SpawnedPack?.Invoke(pack);
+            EnemyManager.Instance.AddPack(pack);
         }
 
         /// <summary>
@@ -214,7 +211,7 @@ namespace MeteorGame
         public Enemy SpawnEnemyFromPool()
         {
             var e = EnemyManager.Instance.EnemyPool.Get();
-            EnemyManager.Instance.AddEnemy(e);
+            //EnemyManager.Instance.AddEnemy(e);
             return e;
         }
 

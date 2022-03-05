@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MeteorGame.Enemies;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,25 +33,25 @@ namespace MeteorGame
 
         public void DoExplode() // explode and spawn chilling area
         {
-            //print("DoExplode()");
-            //Rigidbody.velocity = Vector3.zero;
-            //Rigidbody.isKinematic = true;
+            ////print("DoExplode()");
+            ////Rigidbody.velocity = Vector3.zero;
+            ////Rigidbody.isKinematic = true;
 
-            DisableRigidBody();
-            //DisableCollider();
+            //DisableRigidBody();
+            ////DisableCollider();
 
-            var expRadiSqr = spawnInfo.CastBy.Modifiers.ExplosionRadi * spawnInfo.CastBy.Modifiers.ExplosionRadi;
+            //var expRadiSqr = spawnInfo.CastBy.Modifiers.ExplosionRadi * spawnInfo.CastBy.Modifiers.ExplosionRadi;
 
-            var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
-            && e != collidingWith.gameObject
-            && (e.transform.position - transform.position).sqrMagnitude < expRadiSqr);
+            //var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
+            //&& e != collidingWith.gameObject
+            //&& (e.transform.position - transform.position).sqrMagnitude < expRadiSqr);
 
-            foreach (Enemy e in potentials)
-            {
-                e.TakeHit(spawnInfo.CastBy, applyAilment: false);
-            }
+            //foreach (Enemy e in potentials)
+            //{
+            //    e.TakeHit(spawnInfo.CastBy, applyAilment: false);
+            //}
 
-            chillingArea.Init(spawnInfo.CastBy);
+            //chillingArea.Init(spawnInfo.CastBy);
         }
 
     }
