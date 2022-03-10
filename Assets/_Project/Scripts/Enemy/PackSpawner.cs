@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace MeteorGame
+namespace MeteorGame.Enemies
 {
 
     public struct PackSpawnInfo
     {
         public float spawnerMoney;
-        public float packHeight;
+        public float distFromOrigin;
         public float enemySpacing;
         public PackShape packShape;
     }
@@ -24,12 +24,14 @@ namespace MeteorGame
         [Tooltip("Transform to mark position of 1st wave spawning on new game")]
         [SerializeField] private Transform firstWaveSpawnPos;
 
+        [Tooltip("Trasnparant object to spawn and fade during pack spawn visual effects")]
+        [SerializeField] private SpawnAreaVisual spawnAreaVisual;
 
-        [SerializeField] private GameObject spawnPortalPrefab;
-
+        [Tooltip("SpawnBox animation controller")]
+        [SerializeField] private SpawnBox spawnBox;
 
         public float waitAfterSpawn = 0.15f;
-        public Action<EnemyPack> SpawnedPack;
+        public Action<EnemyPack> PackSpawned;
 
         private WeightedRandomEnemy weightedRandomEnemy;
         private bool isSetup = false;
@@ -62,22 +64,6 @@ namespace MeteorGame
         }
 
 
-
-        private Transform CreatePortal(Vector3 packCenter, int regionSize)
-        {
-            var portal = Instantiate(spawnPortalPrefab);
-
-            var dir = packCenter.normalized;
-            var dist = Vector3.Distance(Vector3.zero, packCenter);
-
-            portal.transform.position = dir * (dist + regionSize + 25);
-
-            portal.transform.LookAt(Vector3.zero);
-
-            return portal.transform;
-        }
-
-
         public IEnumerator SpawnPack(PackSpawnInfo info)
         {
             if (!isSetup)
@@ -106,7 +92,7 @@ namespace MeteorGame
 
         private EnemyPack CreatePackObject(PackSpawnInfo info)
         {
-            var packPos = UnityEngine.Random.onUnitSphere * info.packHeight;
+            var packPos = UnityEngine.Random.onUnitSphere * info.distFromOrigin;
 
             if (packCount == 0)
             {
@@ -124,7 +110,19 @@ namespace MeteorGame
             return packObj;
         }
 
-        private IEnumerator CreateCandidatesInPack(List<FindSpawnPosResult> candidates, EnemyPack pack, Transform portal)
+        private IEnumerator WaitIfNeeded()
+        {
+            if (waitAfterSpawn > 0)
+            {
+                yield return waitAfterSpawnCached;
+            }
+            else
+            {
+                yield return null;
+            }
+        }
+
+        private IEnumerator CreateCandidatesInPack(List<FindSpawnPosResult> candidates, EnemyPack pack)
         {
             foreach (FindSpawnPosResult result in candidates)
             {
@@ -137,38 +135,53 @@ namespace MeteorGame
                     SO = result.EnemySO,
                     spawnPos = result.SpawnPos,
                     pack = pack,
-                    portalTransform = portal
                 };
 
                 e.Create(spawninfo);
                 pack.AddEnemy(e);
 
-                if (waitAfterSpawn > 0)
-                {
-                    yield return waitAfterSpawnCached;
-                }
-                else
-                {
-                    yield return null;
-                }
+                yield return WaitIfNeeded();
             }
+        }
+
+        private void CreateSpawnBoxAnim(EnemyPack pack)
+        {
+            SpawnBox box = Instantiate(spawnBox);
+
+            box.SetSize(pack.PackSize * 2.5f);
+
+            box.transform.position = pack.Position;
+            box.AnimCompleted += pack.OnSpawnAnimCompleted;
+            box.transform.SetParent(pack.transform);
+        }
+
+        private SpawnAreaVisual CreateSpawnAreaVisual(EnemyPack pack)
+        {
+            SpawnAreaVisual visual = Instantiate(spawnAreaVisual);
+
+            visual.transform.localScale = pack.PackSize * 2.1f * Vector3.one;
+            visual.transform.position = pack.Position;
+            visual.transform.SetParent(pack.transform);
+
+            return visual;
         }
 
         private IEnumerator CreateAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates, int regionSize)
         {
             EnemyPack pack = CreatePackObject(info);
+            pack.PackSize = regionSize;
 
-            var portal = CreatePortal(pack.Position, regionSize);
-            yield return CreateCandidatesInPack(candidates, pack, portal);
+            yield return CreateCandidatesInPack(candidates, pack);
 
             pack.CalculatePackMovementSpeed();
 
+            CreateSpawnBoxAnim(pack);
+            pack.SpawnAreaVisual = CreateSpawnAreaVisual(pack);
 
-            pack.DoSpawn();
-
-            // signal to anything listening that we have spawned a new pack
-            SpawnedPack?.Invoke(pack);
+            PackSpawned?.Invoke(pack);
         }
+
+
 
 
         #endregion

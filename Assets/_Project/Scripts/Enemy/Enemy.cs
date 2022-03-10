@@ -19,14 +19,12 @@ namespace MeteorGame.Enemies
         public event Action<Enemy> DamageTaken;
         public event Action<Enemy> HealthChanged;
         public event Action<Enemy, bool> Died;
-        public event Action<Enemy> Spawned;
 
         public int TotalHealth { get; private set; }
         public int CurrentHealth { get; private set; }
         public EnemyPack BelongsToPack { get; private set; }
         public bool IsDying { get; private set; }
         public Mesh Mesh => spawnInfo.SO.BodyMesh;
-        public Transform PortalTransform => spawnInfo.portalTransform;
         public float Radi => spawnInfo.SO.ShapeRadi;
         public bool IsActive => isActive;
         public EnemySO SO => spawnInfo.SO;
@@ -39,28 +37,23 @@ namespace MeteorGame.Enemies
         private float normalSpeed;
         private ExplosionHandler explosionHandler;
         private EnemySpawnInfo spawnInfo;
-        private Tween alphaTween;
-        private float alphaTweening;
+        //private Tween alphaTween;
+        //private float alphaTweening;
         private bool isActive = false;
+
+        private int enemiesLayer = int.MinValue;
+        private int stencilLayer = int.MinValue;
 
         private void Die(bool forced = false)
         {
+            SetValuesToDefaults();
+            spawnInfo.pack.OnPackEnemyDeath(this);
             Died?.Invoke(this, forced);
         }
 
         public void ForceDie()
         {
             Die(true);
-        }
-
-        internal void DoSpawn()
-        {
-            Spawned?.Invoke(this);
-        }
-
-        internal void Activate()
-        {
-            isActive = true;
         }
 
         private void Awake()
@@ -79,13 +72,29 @@ namespace MeteorGame.Enemies
             {
                 meshFilter = GetComponent<MeshFilter>();
             }
+
+            enemiesLayer = LayerMask.NameToLayer("Enemies");
+            stencilLayer = LayerMask.NameToLayer("Stencil1");
+        }
+
+
+        /// <summary>
+        /// Activates and starts moving
+        /// </summary>
+        internal void Activate()
+        {
+            isActive = true;
+            gameObject.layer = enemiesLayer;
+
+            MoveToWorldOrigin(from: spawnInfo.pack.Position);
         }
 
         private void SetValuesToDefaults()
         {
+            rigidBody.velocity = Vector3.zero;
+            rigidBody.isKinematic = true;
             IsDying = false;
-            isActive = true;
-            level = GameManager.Instance.GameLevel;
+            isActive = false;
             ailmentManager.Reset();
         }
 
@@ -109,20 +118,20 @@ namespace MeteorGame.Enemies
             transform.localScale = spawninfo.SO.ShapeRadi * Vector3.one * 2f;
         }
 
+
+
         internal void Create(EnemySpawnInfo info)
         {
-            SetValuesToDefaults();
-
+            level = GameManager.Instance.GameLevel;
             spawnInfo = info;
-
             explosionHandler = info.SO.ExplosionHandler;
             BelongsToPack = info.pack;
-            normalSpeed = info.pack.Speed * EnemyManager.Instance.BaseEnemySpeed;
             meshFilter.mesh = info.SO.BodyMesh;
             renderer.material = info.SO.BodyMat;
 
             SetPosAndScale(info);
-            SetAlpha(0f);
+            gameObject.layer = stencilLayer;
+            //SetAlpha(0f);
 
             //Spawned?.Invoke(this);
 
@@ -131,32 +140,31 @@ namespace MeteorGame.Enemies
 
             TotalHealth = CalculateHP(info.SO.HealthMultiplier);
             SetCurrnetHealth(TotalHealth);
-            //MoveToWorldOrigin(from: info.packCenter);
         }
 
-        internal void FadeIn(float dur)
-        {
-            if (alphaTween != null && alphaTween.active)
-            {
-                alphaTween.Complete();
-                alphaTween.Kill();
-                alphaTweening = 0f;
-                renderer.material.SetFloat("_alpha", alphaTweening);
-            }
+        //internal void FadeIn(float dur)
+        //{
+        //    if (alphaTween != null && alphaTween.active)
+        //    {
+        //        alphaTween.Complete();
+        //        alphaTween.Kill();
+        //        alphaTweening = 0f;
+        //        renderer.material.SetFloat("_alpha", alphaTweening);
+        //    }
 
-            alphaTween = DOTween.To(() => alphaTweening, x => alphaTweening = x, 1, dur);
-            alphaTween.onUpdate += StepComplete;
-        }
+        //    alphaTween = DOTween.To(() => alphaTweening, x => alphaTweening = x, 1, dur);
+        //    alphaTween.onUpdate += StepComplete;
+        //}
 
-        private void SetAlpha(float newAlpha)
-        {
-            renderer.material.SetFloat("_alpha", newAlpha);
-        }
+        //private void SetAlpha(float newAlpha)
+        //{
+        //    renderer.material.SetFloat("_alpha", newAlpha);
+        //}
 
-        private void StepComplete()
-        {
-            SetAlpha(alphaTweening);
-        }
+        //private void StepComplete()
+        //{
+        //    SetAlpha(alphaTweening);
+        //}
 
         public bool IsVisible()
         {
@@ -438,12 +446,11 @@ namespace MeteorGame.Enemies
             MoveTo(from, Vector3.zero);
         }
 
-
-
         private void MoveTo(Vector3 from, Vector3 to)
         {
             var dir = (to - from).normalized;
             //transform.LookAt(to);
+            normalSpeed = spawnInfo.pack.Speed * EnemyManager.Instance.BaseEnemySpeed;
             startingVel = dir * normalSpeed;
 
             rigidBody.isKinematic = false;

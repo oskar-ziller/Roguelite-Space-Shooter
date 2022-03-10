@@ -96,7 +96,7 @@ namespace MeteorGame
         {
             //pooledEnemies = new ObjectPool<Enemy>(CreatePooledEnemy, OnTakeFromPool, OnReturnToPool);
             packSpawner = GetComponent<PackSpawner>();
-            packSpawner.SpawnedPack += OnPackSpawned;
+            packSpawner.PackSpawned += OnPackSpawned;
         }
 
 
@@ -163,7 +163,7 @@ namespace MeteorGame
             var info = new PackSpawnInfo();
 
             info.enemySpacing = spacingBetweenEnemies;
-            info.packHeight = PackHeightAtCurrentGameLevel;
+            info.distFromOrigin = PackHeightAtCurrentGameLevel;
             info.spawnerMoney = PackMoneyAtCurrentGameLevel;
             info.packShape = PackShape.Sphere;
 

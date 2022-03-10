@@ -17,7 +17,7 @@ MonoBehaviour:
   SpeedMultiplier: 0.4
   ShapeRadi: 12
   SpawnEntry:
-    weight: 505
+    weight: 50
     cost: 10
   IsEnabled: 1
   BodyMat: {fileID: 2100000, guid: 77926865e504b9c41abd51fbd223f185, type: 2}

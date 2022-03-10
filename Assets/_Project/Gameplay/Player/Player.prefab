@@ -10140,7 +10140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory:
     gems: []
-  currency: 9999999
+  currency: 999999
   spellSlot1:
     isUnlocked: 0
     slotNo: 1
@@ -10183,12 +10183,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afac890af4f297f4d9f99081e760795f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  airAccel: 0.07
-  airDecel: 0.07
-  boostMultipMaxVel: 3
+  airAccel: 0.5
+  airDecel: 0.3
+  boostMultipMaxVel: 1.5
   boostMultipAccel: 3
-  boostMultipDec: 1
-  maxSpeed: 10
+  boostMultipDec: 3
+  maxSpeed: 25
 --- !u!114 &8454831337768183200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10201,11 +10201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5fa895deb849b34da3a7395b0cda295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationDirections: -1
-  acceleration: {x: 99999, y: 99999}
   sensitivity: {x: 250, y: -250}
   maxVerticalAngleFromHorizon: 90
-  inputLagPeriod: 0.005
 --- !u!1 &5161389037377674083
 GameObject:
   m_ObjectHideFlags: 0

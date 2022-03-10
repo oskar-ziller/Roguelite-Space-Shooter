@@ -14,9 +14,11 @@ namespace MeteorGame
         public Vector3 Position { get; internal set; }
         public bool IsVisible { get; internal set; }
         public float Speed { get; internal set; }
+        public int PackSize { get; internal set; }
+        public SpawnAreaVisual SpawnAreaVisual { get; internal set; }
 
         private List<Enemy> Enemies;
-
+        private bool isActivated = false;
 
         private void Update()
         {
@@ -38,7 +40,6 @@ namespace MeteorGame
 
         public void AddEnemy(Enemy e)
         {
-            e.Died += OnPackEnemyDeath;
             Enemies.Add(e);
         }
 
@@ -51,7 +52,7 @@ namespace MeteorGame
             }
         }
 
-        private void OnPackEnemyDeath(Enemy e, bool _)
+        public void OnPackEnemyDeath(Enemy e)
         {
             Enemies.Remove(e);
 
@@ -62,27 +63,40 @@ namespace MeteorGame
             }
         }
 
-        internal void DoSpawn()
+        private void ActivatePack()
         {
-            foreach (var e in Enemies)
+            if (!isActivated)
             {
-                e.DoSpawn();
+                foreach (Enemy enemy in Enemies)
+                {
+                    enemy.Activate();
+                }
+
+                isActivated = true;
             }
+            else
+            {
+                Debug.LogError("Trying to activate an active pack");
+            }
+        }
+
+        internal void OnSpawnAnimCompleted()
+        {
+            SpawnAreaVisual.FadeOut();
+            ActivatePack();
         }
 
         internal void CalculatePackMovementSpeed()
         {
             // calculate average movement speed
             var avgTestVal = 0f;
+
             foreach (Enemy e in Enemies)
             {
                 avgTestVal += e.SO.HealthMultiplier / e.SO.SpeedMultiplier;
             }
 
-
             avgTestVal /= Enemies.Count;
-
-
             Speed = 1f / avgTestVal;
         }
 
