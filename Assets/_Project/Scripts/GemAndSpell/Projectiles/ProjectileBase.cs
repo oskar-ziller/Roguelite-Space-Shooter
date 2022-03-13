@@ -22,26 +22,15 @@ namespace MeteorGame
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-        //[Tooltip("Trigger collider for projectile")]
-        //[SerializeField] private Collider mainProjCollider;
-
-
-
-        [Tooltip("Scale for ONE dummy projectile at the spawn point")]
-        [SerializeField] private float dummyScale;
-
-
-        public ProjectileSpawnInfo spawnInfo;
 
 
 
 
+        //[Tooltip("Scale for ONE dummy projectile at the spawn point")]
+        //[SerializeField] private float dummyScale;
 
 
-
-
-
-
+        public ProjectileSpawnInfo spawnInfo { get; private set; }
 
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
@@ -66,7 +55,9 @@ namespace MeteorGame
         public Transform MainMesh => mainMesh;
 
 
-        public float SpreadFromCenter; // with LMP etc. how spread each proj should be from their center
+        [Tooltip("with LMP etc. how spread each proj should be from their center")]
+        public float SpreadFromCenter; 
+
         public float ScaleDur;
         public float PathDur;
         public float PathLen;
@@ -86,14 +77,16 @@ namespace MeteorGame
         private List<Enemy> ChainedFrom;
         private List<Enemy> ForkedFrom;
 
-        private SphereCollider collider;
+        private Collider collider;
+
+        //private SphereCollider collider;
 
 
         //protected HashSet<GameObject> InExplosionRange => inExplosionRange;
         //protected HashSet<GameObject> InChainRange => inChainRange;
         //protected HashSet<GameObject> InAimAssistRange => inAimAssistRange;
 
-        private List<TrailRenderer> trailRenderers;
+        //private List<TrailRenderer> trailRenderers;
 
         //private SpinAround spinner;
 

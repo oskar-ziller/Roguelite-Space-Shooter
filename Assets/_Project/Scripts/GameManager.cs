@@ -89,9 +89,16 @@ namespace MeteorGame
 
             Player.Instance.DebugAddStuff();
 
-            StartGame();
+
+            StartCoroutine(StartGameWithDelay(1f));
         }
 
+
+        private IEnumerator StartGameWithDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            StartGame();
+        }
 
         private void Update()
         {

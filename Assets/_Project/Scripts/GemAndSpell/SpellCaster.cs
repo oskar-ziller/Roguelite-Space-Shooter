@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using MeteorGame.Enemies;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using UnityEngine.Pool;
 namespace MeteorGame
 {
 
+    [Serializable]
     public class ProjectileSpawnInfo
     {
         //public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
@@ -18,7 +20,6 @@ namespace MeteorGame
         public int CastID;
         public int ProjID;
         public Vector3 CastPos;
-
     }
 
     public class SpellCaster : MonoBehaviour
@@ -117,7 +118,7 @@ namespace MeteorGame
             List<ProjectileDummy> dummies = Instance.dummyDict[slot];
 
             // starts at this and rotates counter clockwise as a whole group
-            float randomStartDeg = Random.Range(0, 350);
+            float randomStartDeg = UnityEngine.Random.Range(0, 350);
 
             for (int i = 0; i < slot.ProjectileCount; i++)
             {

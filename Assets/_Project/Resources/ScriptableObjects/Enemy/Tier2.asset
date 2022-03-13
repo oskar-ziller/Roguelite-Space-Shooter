@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Tier2
   HealthMultiplier: 15
-  SpeedMultiplier: 0.8
+  SpeedMultiplier: 0.9
   ShapeRadi: 3
   SpawnEntry:
     weight: 200
@@ -22,3 +22,4 @@ MonoBehaviour:
   IsEnabled: 1
   BodyMat: {fileID: 2100000, guid: c841ac97d22d7e24bb0105d457f695be, type: 2}
   BodyMesh: {fileID: 4300000, guid: 502caac999291ec4d9bf54a7abf87425, type: 2}
+  ExplosionHandler: {fileID: 0}

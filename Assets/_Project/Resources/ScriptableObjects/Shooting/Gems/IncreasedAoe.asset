@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modifiers:
   - modifierSO: {fileID: 11400000, guid: acdc1ba2a8782ee41b5b8c16beeaef1f, type: 2}
-    min: 20
-    max: 60
+    min: 40
+    max: 120
   name: Increased Area of Effect
   gemColor: {r: 0.18533282, g: 0.665471, b: 0.7169812, a: 1}
   spellSO: {fileID: 0}

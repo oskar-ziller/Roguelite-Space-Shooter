@@ -25,8 +25,8 @@ namespace MeteorGame
         public ProjectileBase projectilePrefab;
         [Tooltip("Dummy object that shows up (at wand etc.) before travel")]
         public ProjectileDummy dummyPrefab;
-        [Tooltip("Explosion object to spawn when proj explodes")]
-        public Explosion explosionPrefab;
+        //[Tooltip("Explosion object to spawn when proj explodes")]
+        //public Explosion explosionPrefab;
 
 
         [Tooltip("Uncheck to disable from loading")]

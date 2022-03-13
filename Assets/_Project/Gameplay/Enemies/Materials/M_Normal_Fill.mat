@@ -49,16 +49,17 @@ Material:
     - Vector1_7650401e580c46b1ba247db4eb1b0335: -0.32
     - Vector1_d25eb45015774546a36e38c36c7b7de8: 0.5
     - _AlphaTween: 1
-    - _AmbientOcclusion: 0
+    - _AmbientOcclusion: 2
     - _EmmisionMultip: 0
     - _Metallic: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Smoothness: 0.114
+    - _Smoothness: 0
     - _Specular: 0
     - _alpha: 1
     - _percentage: 1
     m_Colors:
-    - Color_16ca097ed511458e8caaf685f88e80f9: {r: 0.30588236, g: 0.30588236, b: 0.30588236, a: 1}
+    - Color_16ca097ed511458e8caaf685f88e80f9: {r: 0.9411765, g: 0.9411765, b: 0.9411765, a: 1}
     - Color_94f204e5beb64d199d7fccd511d534b7: {r: 0, g: 0, b: 0, a: 1}
+    - _Spec: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

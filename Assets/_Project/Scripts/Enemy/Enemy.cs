@@ -47,7 +47,18 @@ namespace MeteorGame.Enemies
         private void Die(bool forced = false)
         {
             SetValuesToDefaults();
-            spawnInfo.pack.OnPackEnemyDeath(this);
+
+            // can't be null but sometimes we manually drop prefabs into scene for testing
+            // in that case it can be null
+            if (spawnInfo != null && spawnInfo.pack != null)
+            {
+                spawnInfo.pack.OnPackEnemyDeath(this);
+            }
+            else
+            {
+                Debug.LogWarning("spawnInfo.pack was null");
+            }
+
             Died?.Invoke(this, forced);
         }
 

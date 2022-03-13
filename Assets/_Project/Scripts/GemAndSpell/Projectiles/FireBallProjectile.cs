@@ -11,8 +11,6 @@ namespace MeteorGame
         [SerializeField] private Explosion explosionPrefab;
 
 
-
-
         public override void Awake()
         {
             base.Awake();

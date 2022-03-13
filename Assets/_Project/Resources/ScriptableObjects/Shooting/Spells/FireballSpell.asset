@@ -15,11 +15,10 @@ MonoBehaviour:
   spellGemSO: {fileID: 11400000, guid: 1af0a2f3dc3cbd342bff57be549fcbfe, type: 2}
   internalName: Fireball
   prettyName: Fireball Spell
-  shootTime: 0.45
-  projectileSpeed: 45
-  projectileLifetime: 5
+  shootTime: 0.35
+  projectileSpeed: 180
+  projectileLifetime: 9
   projectileCount: 1
   projectilePrefab: {fileID: 6188853978788883409, guid: 8dced4614df9f424ca8f767c451325fc, type: 3}
   dummyPrefab: {fileID: 3947332782983735750, guid: 7a33c4148bb08f64aabbda9ef0c7e4dc, type: 3}
-  explosionPrefab: {fileID: 0}
   isEnabled: 1

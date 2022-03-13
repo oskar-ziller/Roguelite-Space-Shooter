@@ -47,7 +47,7 @@ namespace MeteorGame.Enemies
                 child.gameObject.layer = LayerMask.NameToLayer("Default");
             }
 
-            mat.DOColor(endColor, 2.5f); 
+            mat.DOColor(endColor, .5f); 
         }
 
         #endregion

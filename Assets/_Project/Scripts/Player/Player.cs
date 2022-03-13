@@ -69,9 +69,12 @@ namespace MeteorGame
 
         private void OnGameStart()
         {
-            transform.DOMove(startingPos, 2f);
-            transform.DORotate(startingRotation.eulerAngles, 2f);
-            StartCoroutine(ReadyAfterDelay(2f));
+            var dist = Vector3.Distance(transform.position, startingPos);
+            var dur = MathF.Min(dist / 50f, 2f);
+
+            transform.DOMove(startingPos, dur);
+            transform.DORotate(startingRotation.eulerAngles, dur);
+            StartCoroutine(ReadyAfterDelay(dur));
         }
 
         private IEnumerator ReadyAfterDelay(float delay)
