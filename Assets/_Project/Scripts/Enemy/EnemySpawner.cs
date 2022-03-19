@@ -12,21 +12,9 @@ using UnityEngine.Pool;
 namespace MeteorGame
 {
 
-    [RequireComponent(typeof(PackSpawner))]
     public class EnemySpawner : MonoBehaviour
     {
         #region Variables
-
-        [SerializeField] private Transform packTestCube, packTestSphere;
-
-
-        [Tooltip("Starting height for enemies at level 0")]
-        [SerializeField] private int startPosMinHeight;
-
-        [Tooltip("How much further should max level enemies spawn on top of startPosMinHeight")]
-        [SerializeField] private int startPosVariance;
-
-
 
         [Tooltip("Min delay between two pack spawns in seconds")]
         [SerializeField] private float minDelayBeteenPacks;
@@ -40,7 +28,6 @@ namespace MeteorGame
         [Tooltip("Pack spawn height curve")]
         [SerializeField] private AnimationCurve packSpawnPosHeightCurve;
 
-
         [Tooltip("Pack spawner min money")]
         [SerializeField] private float minMoney;
 
@@ -53,20 +40,14 @@ namespace MeteorGame
         [Tooltip("Multiplier of enemy HP as level goes from 0->maxGameLevel")]
         [SerializeField] private AnimationCurve enemyHPMultipCurve;
 
-
         [Tooltip("Spacing between two enemies in a pack")]
         [SerializeField] private float spacingBetweenEnemies;
 
-
-        public Enemy testPrefab;
-
+        private List<Spawner> spawners = new();
         private Coroutine spawnLoop_Co;
         private PackSpawner packSpawner;
 
-
-
         private float CurrentLevelRatio { get { return GameManager.Instance.GameLevel / GameManager.Instance.MaxGameLevel; } }
-
         private float PackMoneyAtCurrentGameLevel
         {
             get
@@ -74,17 +55,6 @@ namespace MeteorGame
                 return minMoney + (EvalCurveForCurrentLevel(packSpawnerMoneyCurve) * moneyVariance);
             }
         }
-
-        private float PackHeightAtCurrentGameLevel
-        {
-            get
-            {
-                return startPosMinHeight + (EvalCurveForCurrentLevel(packSpawnPosHeightCurve) * moneyVariance);
-            }
-        }
-
-
-
 
         #endregion
 
@@ -113,7 +83,10 @@ namespace MeteorGame
 
         #region Methods
 
-
+        public void AddSpawner(Spawner s)
+        {
+            spawners.Add(s);
+        }
 
         private void OnPackSpawned(EnemyPack pack)
         {
@@ -158,14 +131,22 @@ namespace MeteorGame
             StartCoroutine(SpawnPackCoroutine());
         }
 
+
+        private Spawner PickRandomSpawner()
+        {
+            return spawners[UnityEngine.Random.Range(0, spawners.Count)];
+        }
+
+
         private IEnumerator SpawnPackCoroutine()
         {
-            var info = new PackSpawnInfo();
-
-            info.enemySpacing = spacingBetweenEnemies;
-            info.distFromOrigin = PackHeightAtCurrentGameLevel;
-            info.spawnerMoney = PackMoneyAtCurrentGameLevel;
-            info.packShape = PackShape.Sphere;
+            var info = new PackSpawnInfo
+            {
+                spawner = PickRandomSpawner(),
+                enemySpacing = spacingBetweenEnemies,
+                spawnerMoney = PackMoneyAtCurrentGameLevel,
+                packShape = PackShape.Sphere
+            };
 
             yield return packSpawner.SpawnPack(info);
         }
@@ -188,13 +169,13 @@ namespace MeteorGame
 
         public void BeginSpawning()
         {
-            if (spawnLoop_Co != null)
-            {
-                UnityEngine.Debug.LogError("Called BeginSpawning when spawnLoop_Co already running");
-                StopCoroutine(spawnLoop_Co);
-            }
+            //if (spawnLoop_Co != null)
+            //{
+            //    UnityEngine.Debug.LogError("Called BeginSpawning when spawnLoop_Co already running");
+            //    StopCoroutine(spawnLoop_Co);
+            //}
 
-            spawnLoop_Co = StartCoroutine(SpawnLoop());
+            //spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
 
 

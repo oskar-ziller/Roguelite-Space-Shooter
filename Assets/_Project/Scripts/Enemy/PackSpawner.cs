@@ -11,9 +11,9 @@ namespace MeteorGame.Enemies
     public struct PackSpawnInfo
     {
         public float spawnerMoney;
-        public float distFromOrigin;
         public float enemySpacing;
         public PackShape packShape;
+        public Spawner spawner;
     }
 
     public class PackSpawner : MonoBehaviour
@@ -73,6 +73,8 @@ namespace MeteorGame.Enemies
 
             print($"SpawnPack");
 
+            info.spawner.StartSpawnAnim();
+
             weightedRandomEnemy.totalMoney = info.spawnerMoney;
             List<EnemySO> enemiesToSpawn = weightedRandomEnemy.CreateSpawnList();
 
@@ -92,20 +94,12 @@ namespace MeteorGame.Enemies
 
         private EnemyPack CreatePackObject(PackSpawnInfo info)
         {
-            var packPos = UnityEngine.Random.onUnitSphere * info.distFromOrigin;
-
-            if (packCount == 0)
-            {
-                packPos = firstWaveSpawnPos.position;
-            }
-
             var holder = new GameObject("Pack " + packCount);
             var packObj = holder.AddComponent<EnemyPack>();
             packObj.Info = info;
-            packObj.Position = packPos;
+            packObj.Position = info.spawner.PackPos;
             holder.transform.parent = EnemyManager.Instance.EnemiesHolder;
             packCount++;
-
 
             return packObj;
         }

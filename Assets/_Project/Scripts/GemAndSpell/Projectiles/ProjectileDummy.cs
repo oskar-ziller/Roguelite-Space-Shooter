@@ -10,7 +10,7 @@ namespace MeteorGame
 
         #region Variables
 
-        private SpinAround spinner;
+        private DummyProjectileSpin spinner;
         public Transform bodyMesh;
 
         #endregion
@@ -19,7 +19,7 @@ namespace MeteorGame
 
         private void Awake()
         {
-            spinner = GetComponent<SpinAround>();
+            spinner = GetComponent<DummyProjectileSpin>();
         }
 
         private void Start()

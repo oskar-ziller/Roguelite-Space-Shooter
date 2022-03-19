@@ -83,6 +83,7 @@ namespace MeteorGame
         internal void OnSpawnAnimCompleted()
         {
             SpawnAreaVisual.FadeOut();
+            Info.spawner.EndSpawnAnim();
             ActivatePack();
         }
 

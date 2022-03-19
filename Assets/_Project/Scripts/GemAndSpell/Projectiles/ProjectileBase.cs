@@ -22,20 +22,11 @@ namespace MeteorGame
         [Tooltip("Does projectile need aim assist (snap to enemies if close enough)")]
         [SerializeField] private bool aimAssist = false;
 
-
-
-
-
-        //[Tooltip("Scale for ONE dummy projectile at the spawn point")]
-        //[SerializeField] private float dummyScale;
-
-
         public ProjectileSpawnInfo spawnInfo { get; private set; }
 
         public Vector3 Position { get { return rigidbody.position; } set { rigidbody.position = value; } }
 
         public Rigidbody Rigidbody => rigidbody;
-        //protected float DummyScale => dummyScale;
 
         public float MeshScaleMain => meshScaleMain;
 
@@ -46,8 +37,6 @@ namespace MeteorGame
         public int CastProjCount { get; protected set; } // when single cast has multiple projectiles
         public Vector3 StartedMovingFrom { get; protected set; }
         public IMover ProjectileMover { get; protected set; }
-
-        public float CachedDummyScale { get; protected set; }
 
 
 
@@ -495,6 +484,7 @@ namespace MeteorGame
 
         private  void ScaleProjectileWhileMove()
         {
+            bodyMesh.localScale = Vector3.zero;
             bodyMesh.DOScale(MeshScaleMain, ScaleDur);
             transform.DOScale(1f, ScaleDur);
         }

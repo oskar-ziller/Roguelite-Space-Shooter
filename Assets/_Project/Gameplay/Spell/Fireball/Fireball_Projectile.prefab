@@ -117,7 +117,7 @@ MonoBehaviour:
   meshScaleMain: 2
   aimAssist: 1
   SpreadFromCenter: 6
-  ScaleDur: 0.2
+  ScaleDur: 0.4
   PathDur: 0.1
   PathLen: 40
   explosionPrefab: {fileID: 9222142054075351443, guid: d66a798ae52d7dd40b76ae45f778017f, type: 3}

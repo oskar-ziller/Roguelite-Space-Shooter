@@ -36,6 +36,15 @@ namespace MeteorGame
         private List<ChillingArea> creepingFrostChillingAreas = new List<ChillingArea>();
         private int castID = 0;
 
+        [Tooltip("After how many projectileCount the dummy scale should be halved")]
+        private float dummyHalfScaleProjectileCount = 8f;
+
+        [Tooltip("Dummy scale max")]
+        [SerializeField] private float dummyScaleMax = 1f;
+
+        [Tooltip("Dummy scale min")]
+        [SerializeField] private float dummyScaleMin = 0.5f;
+
         // have a list for 2 slots and combine into dictionary
         private Dictionary<SpellSlot, List<ProjectileDummy>> dummyDict = new Dictionary<SpellSlot, List<ProjectileDummy>>();
         private Dictionary<SpellSlot, List<ProjectileBase>> projDict = new Dictionary<SpellSlot, List<ProjectileBase>>();
@@ -128,8 +137,7 @@ namespace MeteorGame
             }
         }
 
-        [Tooltip("After how many projectileCount the dummy scale should be halved")]
-        public float dummyHalfScaleProjectileCount = 8f;
+        
 
         /// <summary>
         /// Scales dummies at start from 0->1
@@ -139,11 +147,11 @@ namespace MeteorGame
         {
             var dummies = Instance.dummyDict[slot];
 
-            var calculatedScale = Helper.Map(dummies.Count, 1, Instance.dummyHalfScaleProjectileCount, 1, 0.5f);
+            var calculatedScale = Helper.Map(dummies.Count, 1, Instance.dummyHalfScaleProjectileCount, Instance.dummyScaleMax, Instance.dummyScaleMin);
 
             foreach (var item in dummies)
             {
-                item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
+                //item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
                 //item.transform.DOScale(1f/ dummies.Count, dur);
             }
         }

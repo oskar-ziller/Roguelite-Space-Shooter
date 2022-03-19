@@ -13,8 +13,6 @@ namespace MeteorGame
     public class EnemyManager : MonoBehaviour
     {
         public static EnemyManager Instance { get; private set; }
-
-        //public List<Enemy> AliveEnemies { get; private set; }
         public List<EnemyPack> AlivePacks { get; private set; }
 
         public Transform EnemiesHolder, PooledEnemiesHolder;
@@ -27,23 +25,16 @@ namespace MeteorGame
 
 
         [SerializeField] private EnemySpawner enemySpawner;
-
-
-
         [SerializeField] private int maxEnemyLevel;
-
 
         [Tooltip("Speed at which enemies go with 1f speed multiplier")]
         [SerializeField] private int baseEnemySpeed;
 
-
         [Tooltip("Enemy health curve between 0-MaxEnemyLevel")]
         [SerializeField] private AnimationCurve enemyHealthCurve;
 
-
         [Tooltip("Base hp for enemies at level = 0 and multiplier = 1")]
         [SerializeField] private int baseHP;
-
 
         [Tooltip("HP Multiplier when gamelevel = max")]
         [SerializeField] private int maxHpMultiplier;
@@ -52,14 +43,10 @@ namespace MeteorGame
         [SerializeField] private Transform enemyExplosionHolder;
 
         public EnemySpawner EnemySpawner => enemySpawner;
-
         public Transform EnemyExplosionHolder => enemyExplosionHolder;
-
-        public ObjectPool<Enemy> EnemyPool;
-
-
         public int MaxHpMultiplier => maxHpMultiplier;
 
+        public ObjectPool<Enemy> EnemyPool;
 
 
         //void OnGUI()
@@ -68,17 +55,11 @@ namespace MeteorGame
         //    GUI.Label(new Rect(10, 30, 200, 20), $"CountInactive: {EnemyPool.CountInactive}");
         //    GUI.Label(new Rect(10, 50, 200, 20), $"CountAll: {EnemyPool.CountAll}");
         //}
-
-
-
-
-
-
+        
         public void Setup()
         {
             EnemyPool = new ObjectPool<Enemy>(OnCreateEnemy, OnTakeFromPool, OnReturnToPool);
         }
-
 
         private Enemy OnCreateEnemy()
         {
