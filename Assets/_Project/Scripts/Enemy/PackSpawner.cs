@@ -33,10 +33,14 @@ namespace MeteorGame.Enemies
         public float waitAfterSpawn = 0.15f;
         public Action<EnemyPack> PackSpawned;
 
+        public int SpawnedPacksCount => packCount;
+
         private WeightedRandomEnemy weightedRandomEnemy;
         private bool isSetup = false;
         private WaitForSeconds waitAfterSpawnCached;
         private int packCount = 0;
+
+
 
         #endregion
 
@@ -73,6 +77,8 @@ namespace MeteorGame.Enemies
 
             print($"SpawnPack");
 
+            packCount++;
+
             info.spawner.StartSpawnAnim();
 
             weightedRandomEnemy.totalMoney = info.spawnerMoney;
@@ -99,7 +105,6 @@ namespace MeteorGame.Enemies
             packObj.Info = info;
             packObj.Position = info.spawner.PackPos;
             holder.transform.parent = EnemyManager.Instance.EnemiesHolder;
-            packCount++;
 
             return packObj;
         }

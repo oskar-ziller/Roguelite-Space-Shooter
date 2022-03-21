@@ -11,12 +11,24 @@ namespace MeteorGame.Enemies
 
         #region Variables
 
-        List<LineRenderer> lineRenderers;
-        Animator animator;
-        readonly int animStartTrigger = Animator.StringToHash("StartSpawnAnim");
-        readonly int animEndTrigger = Animator.StringToHash("EndSpawnAnim");
+        // only one spawner has this true
+        // 1st wave always spawns on this
+        public bool InitialSpawner = false;
+
+        private readonly int animEndTrigger = Animator.StringToHash("EndSpawnAnim");
+        private readonly int animStartTrigger = Animator.StringToHash("StartSpawnAnim");
+
+        // duration to wait after spawn to let enemies spawn from this spawner
+        // so packs don't spawn inside each other
+        private readonly float waitAfterSpawnDuration = 15f;
+
+
+        private List<LineRenderer> lineRenderers;
+        private Animator animator;
+        private bool isSpawning = false;
 
         public Vector3 PackPos => transform.position;
+        public bool CanSpawn => !isSpawning;
         
         #endregion
 
@@ -42,32 +54,28 @@ namespace MeteorGame.Enemies
 
         #region Methods
 
-        private void DisableLines()
-        {
-            foreach (var lr in lineRenderers)
-            {
-                lr.enabled = false;
-            }
-        }
-
-        private void EnableLines()
-        {
-            foreach (var lr in lineRenderers)
-            {
-                lr.enabled = true;
-            }
-        }
-
-        [ContextMenu("test")]
         public void StartSpawnAnim()
         {
+            if (isSpawning)
+            {
+                return;
+            }
+
+            isSpawning = true;
             animator.SetTrigger(animStartTrigger);
         }
 
-        [ContextMenu("test2")]
         public void EndSpawnAnim()
         {
             animator.SetTrigger(animEndTrigger);
+            StartCoroutine(SetIsSpawningWithDelay());
+        }
+
+
+        private IEnumerator SetIsSpawningWithDelay()
+        {
+            yield return new WaitForSeconds(waitAfterSpawnDuration);
+            isSpawning = false;
         }
 
         #endregion

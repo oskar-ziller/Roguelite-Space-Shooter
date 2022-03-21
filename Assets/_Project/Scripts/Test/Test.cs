@@ -10,7 +10,15 @@ namespace MeteorGame
     public class Test : MonoBehaviour
     {
 
-        
+        private void Start()
+        {
+            var rb = GetComponent<Rigidbody>();
+
+            rb.velocity = new Vector3(0, -4, 0);
+        }
+
+
+
 
     }
 }

@@ -151,8 +151,8 @@ namespace MeteorGame
 
             foreach (var item in dummies)
             {
-                //item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
-                //item.transform.DOScale(1f/ dummies.Count, dur);
+                item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
+                item.transform.DOScale(1f / dummies.Count, dur);
             }
         }
 

@@ -134,7 +134,14 @@ namespace MeteorGame
 
         private Spawner PickRandomSpawner()
         {
-            return spawners[UnityEngine.Random.Range(0, spawners.Count)];
+            if (packSpawner.SpawnedPacksCount == 0)
+            {
+                return spawners.First(s => s.InitialSpawner);
+            }
+
+            var available = spawners.Where(s => s.CanSpawn);
+            var randomIndex = UnityEngine.Random.Range(0, available.Count());
+            return available.ElementAt(randomIndex);
         }
 
 
