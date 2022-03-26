@@ -38,6 +38,7 @@ namespace MeteorGame.Flight
 
         private float maxSpeedReal => maxSpeed / 100f;
 
+        public float Speed { get; private set; }
 
 
         #endregion
@@ -87,11 +88,16 @@ namespace MeteorGame.Flight
             //var down = CalculateDown();
 
 
-            var v = new Vector3(fwd.x + rgh.x + up.x, fwd.y + rgh.y + up.y, fwd.z + rgh.z + up.z);
+            //var v = new Vector3(fwd.x + rgh.x + up.x, fwd.y + rgh.y + up.y, fwd.z + rgh.z + up.z);
+            var v = fwd + rgh + up;
 
             frameTravelVec += v;
 
             transform.position += frameTravelVec;
+
+            Speed = frameTravelVec.magnitude;
+
+            //Debug.Log("Speed: " + Speed);
         }
 
 
@@ -158,7 +164,7 @@ namespace MeteorGame.Flight
                 accel = airDecel * boostDec;
             }
 
-            locVel.x = Mathf.MoveTowards(locVel.x, targetSpeed, accel * Time.deltaTime); ;
+            locVel.x = Mathf.MoveTowards(locVel.x, targetSpeed, accel * Time.deltaTime);
 
             var globalVel = transform.TransformDirection(locVel);
 
@@ -169,12 +175,10 @@ namespace MeteorGame.Flight
         {
             inputs = new FrameInput
             {
-                //jumpDown = UnityEngine.Input.GetButton("Jump") || UnityEngine.Input.GetKey(KeyCode.E),
                 boostDown = Input.GetKey(KeyCode.LeftShift),
-                //descentDown = Input.GetKey(KeyCode.LeftControl) || UnityEngine.Input.GetKey(KeyCode.Q),
-                x = UnityEngine.Input.GetAxisRaw("Horizontal"),
-                z = UnityEngine.Input.GetAxisRaw("Vertical"),
-                jump = UnityEngine.Input.GetAxisRaw("Jump")
+                x = Input.GetAxisRaw("Horizontal"),
+                z = Input.GetAxisRaw("Vertical"),
+                jump = Input.GetAxisRaw("Jump")
             };
         }
 

@@ -17,8 +17,5 @@ namespace MeteorGame
             rb.velocity = new Vector3(0, -4, 0);
         }
 
-
-
-
     }
 }

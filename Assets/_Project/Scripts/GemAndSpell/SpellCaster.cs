@@ -11,7 +11,7 @@ namespace MeteorGame
 {
 
     [Serializable]
-    public class ProjectileSpawnInfo
+    public struct ProjectileSpawnInfo
     {
         //public void Setup(SpellSlot castBySlot, Vector3 aimingAt, Enemy hitEnemy, int castID, int projectileID, Vector3 castPos)
         public SpellSlot CastBy;
@@ -33,7 +33,7 @@ namespace MeteorGame
         [SerializeField] private Transform projectileHolder;
 
         // keep track of chilling areas so we can remove oldest when we reach spell limit
-        private List<ChillingArea> creepingFrostChillingAreas = new List<ChillingArea>();
+        private List<ChillingArea> creepingFrostChillingAreas = new();
         private int castID = 0;
 
         [Tooltip("After how many projectileCount the dummy scale should be halved")]
@@ -46,22 +46,19 @@ namespace MeteorGame
         [SerializeField] private float dummyScaleMin = 0.5f;
 
         // have a list for 2 slots and combine into dictionary
-        private Dictionary<SpellSlot, List<ProjectileDummy>> dummyDict = new Dictionary<SpellSlot, List<ProjectileDummy>>();
-        private Dictionary<SpellSlot, List<ProjectileBase>> projDict = new Dictionary<SpellSlot, List<ProjectileBase>>();
-        private Dictionary<SpellSlot, Transform> holderDict = new Dictionary<SpellSlot, Transform>();
+        private Dictionary<SpellSlot, List<ProjectileDummy>> dummyDict = new();
+        private Dictionary<SpellSlot, List<ProjectileBase>> projDict = new();
+        private Dictionary<SpellSlot, Transform> holderDict = new();
 
-
-        public Dictionary<SpellSO, ObjectPool<ProjectileBase>> projPool = new Dictionary<SpellSO, ObjectPool<ProjectileBase>>();
-        public Dictionary<SpellSO, ObjectPool<ProjectileDummy>> dummyPool = new Dictionary<SpellSO, ObjectPool<ProjectileDummy>>();
-        public Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new Dictionary<SpellSO, ObjectPool<Explosion>>();
+        public Dictionary<SpellSO, ObjectPool<ProjectileBase>> projPool = new();
+        public Dictionary<SpellSO, ObjectPool<ProjectileDummy>> dummyPool = new();
+        public Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new();
 
 
         WandAnim wandAnim1, wandAnim2;
 
         private void Awake()
         {
-
-
             Instance = this;
         }
 

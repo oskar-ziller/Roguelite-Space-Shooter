@@ -82,7 +82,7 @@ Material:
     m_Ints: []
     m_Floats:
     - Vector1_7c65fcdf45d7433f81fd609816fb5a7f: 0.1
-    - Vector1_7e699dfcff03480ea906f11fd1c6aa32: 0.424
+    - Vector1_7e699dfcff03480ea906f11fd1c6aa32: 0.6
     - Vector1_a43aa2c4d3d94ea083f0952d79aa3bf6: 0
     - Vector1_d107fd52ab704c028c0133fcfde0811f: 0.96
     - Vector1_df7ba4a7ed1e43ab8fb84267330fec18: 3.08
@@ -108,7 +108,7 @@ Material:
     - _DistortionStrengthScaled: 0
     - _DstBlend: 10
     - _EmissionEnabled: 0
-    - _EmissionMultip: 15
+    - _EmissionMultip: 3
     - _EnvironmentReflections: 1
     - _FlipbookBlending: 0
     - _FlipbookMode: 0

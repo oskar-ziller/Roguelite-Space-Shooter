@@ -46,15 +46,16 @@ namespace MeteorGame
         public bool IsGamePaused { get; private set; }
         public ScriptableObjectManager ScriptableObjects => scriptableObjects;
 
+        public TimeSpan PlayTime => gameplayTimeSW.Elapsed;
+
         public event Action GameOver;
         public event Action GameStart;
 
-        private float gameLaunchTime;
-        private float gamePlayTime;
         private float debugElapsedSeconds;
         private float debugGameLevel = 0;
         private int gameLevel = 1; // derived from minutes since start and difficultyCurve
         private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
+        private Stopwatch gameplayTimeSW = Stopwatch.StartNew();
 
         #endregion
 
@@ -65,30 +66,14 @@ namespace MeteorGame
         private void Awake()
         {
             Instance = this;
-            gameLaunchTime = Time.time;
         }
 
         private void Start()
         {
-            // load scriptable objects
-            scriptableObjects.Load();
-            gamePlayTime = Time.time;
-
-            SetCursorMode(CursorLockMode.Locked);
-
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 200;
-
-            EnemyManager.Instance.Setup();
-
-            tabMenuManager.Setup();
-
-            Player.Instance.Setup();
-
-            SpellCaster.Instance.Setup();
+            SetUnitySettings();
+            SetupManagers();
 
             Player.Instance.DebugAddStuff();
-
 
             StartCoroutine(StartGameWithDelay(1f));
         }
@@ -137,9 +122,6 @@ namespace MeteorGame
             {
                 gameLevel = maxGameLevel;
             }
-
-
-            KeepGameTime();
         }
 
 
@@ -148,6 +130,21 @@ namespace MeteorGame
 
         #region Methods
 
+
+        private void SetUnitySettings()
+        {
+            SetCursorMode(CursorLockMode.Locked);
+            QualitySettings.vSyncCount = 1;
+        }
+
+        private void SetupManagers()
+        {
+            scriptableObjects.Load();
+            EnemyManager.Instance.Setup();
+            tabMenuManager.Setup();
+            Player.Instance.Setup();
+            SpellCaster.Instance.Setup();
+        }
 
         public void SetCursorMode(CursorLockMode newMode)
         {
@@ -163,29 +160,22 @@ namespace MeteorGame
 
         public float HowFarIntoDifficulty()
         {
-            return gamePlayTime + debugElapsedSeconds;
+            return (int)gameplayTimeSW.Elapsed.TotalSeconds + debugElapsedSeconds;
         }
 
-        private void KeepGameTime()
-        {
-            gameLaunchTime += Time.deltaTime;
-
-            if (!IsGamePaused)
-            {
-                gamePlayTime += Time.deltaTime;
-            }
-        }
 
         public void PauseGame()
         {
             Time.timeScale = 0;
             IsGamePaused = true;
+            gameplayTimeSW.Stop();
         }
 
         public void UnPauseGame()
         {
             Time.timeScale = 1;
             IsGamePaused = false;
+            gameplayTimeSW.Start();
         }
 
         private void ShowHideTabMenu()
@@ -204,6 +194,7 @@ namespace MeteorGame
 
         private void StartGame()
         {
+            gameplayTimeSW.Restart();
             EnemyManager.Instance.DestroyAllEnemies();
             UnPauseGame();
             GameStart?.Invoke();

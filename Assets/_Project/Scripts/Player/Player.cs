@@ -1,5 +1,6 @@
 using DG.Tweening;
 using MeteorGame.Enemies;
+using MeteorGame.Flight;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace MeteorGame
         [SerializeField] private Inventory inventory;
 
         public Inventory Inv => inventory;
+
+        public float Speed => flightController.Speed;
 
         public float TweeningCurrency => currencyTweening;
 
@@ -38,7 +41,10 @@ namespace MeteorGame
         private Vector3 startingPos;
         private Quaternion startingRotation;
 
+        private FlightController flightController;
+
         public event Action Ready;
+
 
         #endregion
 
@@ -52,6 +58,8 @@ namespace MeteorGame
             Instance = this;
             startingPos = transform.position;
             startingRotation = transform.rotation;
+
+            flightController = GetComponent<FlightController>();
         }
 
         private void Start()

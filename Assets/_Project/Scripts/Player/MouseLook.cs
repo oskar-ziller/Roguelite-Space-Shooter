@@ -32,9 +32,8 @@ namespace MeteorGame
             return input;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-
             if (disabled)
             {
                 return;
