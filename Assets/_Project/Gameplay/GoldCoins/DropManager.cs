@@ -49,7 +49,7 @@ namespace MeteorGame
             }
 
 
-            private List<WeightedRandomEntry> entries = new List<WeightedRandomEntry>();
+            private List<WeightedRandomEntry> entries = new();
             private float totalWeight;
 
 
@@ -134,7 +134,7 @@ namespace MeteorGame
         /// HOW MANY COINS TO SPAWN DICTIONARIES ///
         ////////////////////////////////////////////
 
-        Dictionary<int, float> countDictNormal = new Dictionary<int, float>()
+        Dictionary<int, float> countDictNormal = new()
         {
             { 0, 85/100f },
             { 1, 10/100f },
@@ -143,7 +143,7 @@ namespace MeteorGame
             { 4, 1/100f },
         };
 
-        Dictionary<int, float> countDictMagic = new Dictionary<int, float>()
+        Dictionary<int, float> countDictMagic = new()
         {
             { 0, 80/100f },
             { 1, 10/100f },
@@ -152,7 +152,7 @@ namespace MeteorGame
             { 4, 2/100f },
         };
 
-        Dictionary<int, float> countDictRare = new Dictionary<int, float>()
+        Dictionary<int, float> countDictRare = new()
         {
             { 2, 50/100f },
             { 3, 30/100f },
@@ -162,7 +162,7 @@ namespace MeteorGame
             { 10, 1/100f },
         };
 
-        Dictionary<int, float> countDictUnique = new Dictionary<int, float>()
+        Dictionary<int, float> countDictUnique = new()
         {
             { 4, 40/100f },
             { 5, 30/100f },
@@ -177,7 +177,7 @@ namespace MeteorGame
         //////////////////////////////
 
 
-        Dictionary<CoinSize, float> coinSizeNormal = new Dictionary<CoinSize, float>()
+        Dictionary<CoinSize, float> coinSizeNormal = new()
         {
             { CoinSize.Small, 90/100f },
             { CoinSize.Medium, 9/100f },
@@ -185,21 +185,21 @@ namespace MeteorGame
         };
 
 
-        Dictionary<CoinSize, float> coinSizeMagic = new Dictionary<CoinSize, float>()
+        Dictionary<CoinSize, float> coinSizeMagic = new()
         {
             { CoinSize.Small, 80/100f },
             { CoinSize.Medium, 15/100f },
             { CoinSize.Big, 5/100f },
         };
 
-        Dictionary<CoinSize, float> coinSizeRare = new Dictionary<CoinSize, float>()
+        Dictionary<CoinSize, float> coinSizeRare = new()
         {
             { CoinSize.Small, 70/100f },
             { CoinSize.Medium, 25/100f },
             { CoinSize.Big, 5/100f },
         };
 
-        Dictionary<CoinSize, float> coinSizeUnique = new Dictionary<CoinSize, float>()
+        Dictionary<CoinSize, float> coinSizeUnique = new()
         {
             { CoinSize.Small, 50/100f },
             { CoinSize.Medium, 35/100f },

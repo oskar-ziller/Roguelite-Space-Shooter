@@ -38,6 +38,9 @@ namespace MeteorGame
 
         [Header("References")]
         [SerializeField] private TabMenuManager tabMenuManager;
+        [SerializeField] private EnemyManager enemyManager;
+        [SerializeField] private Player player;
+        [SerializeField] private SpellCaster spellCaster;
 
         public float MaxGameLevel => maxGameLevel;
         public AnimationCurve DifficultyCurve => difficultyCurve;
@@ -48,33 +51,30 @@ namespace MeteorGame
 
         public TimeSpan PlayTime => gameplayTimeSW.Elapsed;
 
+        public Action<int> OnDifficultyChanged;
+
         public event Action GameOver;
-        public event Action GameStart;
+        public event Action GameRestart;
 
         private float debugElapsedSeconds;
         private float debugGameLevel = 0;
         private int gameLevel = 1; // derived from minutes since start and difficultyCurve
-        private ScriptableObjectManager scriptableObjects = new ScriptableObjectManager();
+        private ScriptableObjectManager scriptableObjects = new();
         private Stopwatch gameplayTimeSW = Stopwatch.StartNew();
 
         #endregion
 
         #region Unity Methods
 
-        
-
         private void Awake()
         {
             Instance = this;
+            SetUnitySettings();
+            SetupManagers();
         }
 
         private void Start()
         {
-            SetUnitySettings();
-            SetupManagers();
-
-            Player.Instance.DebugAddStuff();
-
             StartCoroutine(StartGameWithDelay(1f));
         }
 
@@ -95,8 +95,7 @@ namespace MeteorGame
 
             if (Input.GetKeyDown(KeyCode.KeypadPlus))
             {
-                //debugElapsed += TimeSpan.FromSeconds(15);
-                debugGameLevel += 50;
+                debugGameLevel += 5;
             }
 
             if (Input.GetKeyDown(KeyCode.KeypadMinus))
@@ -107,6 +106,11 @@ namespace MeteorGame
             if (Input.GetKeyDown(KeyCode.Backspace))
             {
                 EnemyManager.Instance.DestroyAllEnemies();
+            }
+
+            if (Input.GetKeyDown(KeyCode.F6))
+            {
+                Player.Instance.ChangeCurrency(120);
             }
 
             var secondsToMax = minutesToHitMaxGameLevel * 60;
@@ -122,6 +126,8 @@ namespace MeteorGame
             {
                 gameLevel = maxGameLevel;
             }
+
+            OnDifficultyChanged?.Invoke(gameLevel);
         }
 
 
@@ -140,10 +146,11 @@ namespace MeteorGame
         private void SetupManagers()
         {
             scriptableObjects.Load();
-            EnemyManager.Instance.Setup();
             tabMenuManager.Setup();
-            Player.Instance.Setup();
-            SpellCaster.Instance.Setup();
+
+            enemyManager.Setup();
+            player.Setup();
+            spellCaster.Setup();
         }
 
         public void SetCursorMode(CursorLockMode newMode)
@@ -195,9 +202,10 @@ namespace MeteorGame
         private void StartGame()
         {
             gameplayTimeSW.Restart();
+            debugGameLevel = 0;
             EnemyManager.Instance.DestroyAllEnemies();
             UnPauseGame();
-            GameStart?.Invoke();
+            GameRestart?.Invoke();
         }
 
 

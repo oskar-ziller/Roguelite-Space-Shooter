@@ -75,7 +75,7 @@ namespace SimpleLightProbePlacer
 
             if (lightProbeVolumes.Length == 0) return new List<Vector3>();
 
-            List<Vector3> probes = new List<Vector3>();
+            List<Vector3> probes = new();
 
             for (int i = 0; i < lightProbeVolumes.Length; i++)
             {
@@ -91,7 +91,7 @@ namespace SimpleLightProbePlacer
 
             if (lights.Count == 0) return new List<Vector3>();
 
-            List<Vector3> probes = new List<Vector3>();
+            List<Vector3> probes = new();
 
             for (int i = 0; i < lights.Count; i++)
             {
@@ -114,7 +114,7 @@ namespace SimpleLightProbePlacer
 
             while (!done)
             {
-                Dictionary<Vector3, List<Vector3>> closest = new Dictionary<Vector3, List<Vector3>>();
+                Dictionary<Vector3, List<Vector3>> closest = new();
 
                 for (int i = 0; i < positions.Count; i++)
                 {

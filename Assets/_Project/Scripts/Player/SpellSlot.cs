@@ -18,7 +18,7 @@ namespace MeteorGame
 
         [SerializeField] private bool isUnlocked = false;
 
-        private List<GemItem> gems = new List<GemItem>();
+        private List<GemItem> gems = new();
 
         public int MaxLinksUnlocked { get; private set; }
 
@@ -112,7 +112,7 @@ namespace MeteorGame
                 return;
             }
 
-            SpellCaster.Cast(this);
+            SpellCaster.Instance.Cast(this);
         }
 
         public void IncreaseMaxLinks()

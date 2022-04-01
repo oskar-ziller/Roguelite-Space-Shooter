@@ -142,12 +142,6 @@ namespace MeteorGame.Enemies
 
             SetPosAndScale(info);
             gameObject.layer = stencilLayer;
-            //SetAlpha(0f);
-
-            //Spawned?.Invoke(this);
-
-            //StartFade();
-
 
             TotalHealth = CalculateHP(info.SO.HealthMultiplier);
             SetCurrnetHealth(TotalHealth);

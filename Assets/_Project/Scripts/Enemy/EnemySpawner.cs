@@ -74,8 +74,7 @@ namespace MeteorGame
         private void Start()
         {
             GameManager.Instance.GameOver += OnGameOver;
-            GameManager.Instance.GameStart += OnGameStart;
-
+            GameManager.Instance.GameRestart += OnGameStart;
         }
 
 
@@ -176,13 +175,13 @@ namespace MeteorGame
 
         public void BeginSpawning()
         {
-            //if (spawnLoop_Co != null)
-            //{
-            //    UnityEngine.Debug.LogError("Called BeginSpawning when spawnLoop_Co already running");
-            //    StopCoroutine(spawnLoop_Co);
-            //}
+            if (spawnLoop_Co != null)
+            {
+                UnityEngine.Debug.LogError("Called BeginSpawning when spawnLoop_Co already running");
+                StopCoroutine(spawnLoop_Co);
+            }
 
-            //spawnLoop_Co = StartCoroutine(SpawnLoop());
+            spawnLoop_Co = StartCoroutine(SpawnLoop());
         }
 
 
@@ -199,7 +198,6 @@ namespace MeteorGame
         public Enemy SpawnEnemyFromPool()
         {
             var e = EnemyManager.Instance.EnemyPool.Get();
-            //EnemyManager.Instance.AddEnemy(e);
             return e;
         }
 

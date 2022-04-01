@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace MeteorGame
+namespace MeteorGame.UI
 {
     public class CurrencyUI : MonoBehaviour
     {
@@ -16,25 +16,18 @@ namespace MeteorGame
 
         private void Awake()
         {
-
+            Player.Instance.OnCurrencyChanged += UpdateUI;
         }
 
-        private void Start()
-        {
-        
-        }
+        #endregion
 
-        private void Update()
+
+        private void UpdateUI(int newCurrency)
         {
+            Debug.Log("new: " + newCurrency);
             string currency = string.Format("{0:00000}", Player.Instance.TweeningCurrency);
             cucrrencyTMP.text = currency;
         }
-
-        #endregion
-
-        #region Methods
-
-        #endregion
 
     }
 }

@@ -41,6 +41,7 @@ namespace MeteorGame
         public void AddEnemy(Enemy e)
         {
             Enemies.Add(e);
+            EnemyManager.Instance.OnPackEnemyCreated(e);
         }
 
         public void ForceDie()
@@ -55,6 +56,7 @@ namespace MeteorGame
         public void OnPackEnemyDeath(Enemy e)
         {
             Enemies.Remove(e);
+            EnemyManager.Instance.OnPackEnemyDeath(e);
 
             if (Enemies.Count == 0)
             {

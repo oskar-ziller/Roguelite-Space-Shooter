@@ -16,7 +16,7 @@ namespace MeteorGame
 
         public void Move()
         {
-            List<Vector3> path = new List<Vector3>();
+            List<Vector3> path = new();
             var rigidBody = _moveable.Rigidbody;
             var projDir = (_moveable.spawnInfo.AimingAt - rigidBody.position).normalized;
 

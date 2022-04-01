@@ -92,13 +92,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minSpeed: 0.2
-  maxSpeed: 10
-  minRange: 0.001
-  maxRange: 0.012
+  maxSpeed: 2
+  minRange: 0.02
+  maxRange: 0.02
   speed: 0
   range: 0
-  distFromCenter: 0.06
-  rotateSpeed: 45
+  distFromCenter: 1.1
+  rotateSpeed: 55
   startDeg: 0
 --- !u!1 &8715521394957105094
 GameObject:
@@ -128,7 +128,7 @@ Transform:
   m_GameObject: {fileID: 8715521394957105094}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2834684555898613996}

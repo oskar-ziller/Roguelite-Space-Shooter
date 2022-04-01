@@ -7,7 +7,7 @@ namespace DissolveExample
     public class RotatorDissolveDir : MonoBehaviour
     {
         public Vector3 Speed;
-        List<Material> materials = new List<Material>();
+        List<Material> materials = new();
         // Start is called before the first frame update
         void Start()
         {

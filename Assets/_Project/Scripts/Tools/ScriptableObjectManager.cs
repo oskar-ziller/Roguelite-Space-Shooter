@@ -10,10 +10,10 @@ namespace MeteorGame
 {
     public class ScriptableObjectManager
     {
-        public Dictionary<string, ModifierSO> Modifiers = new Dictionary<string, ModifierSO>();
-        public List<SpellSO> Spells = new List<SpellSO>();
-        public List<GemSO> Gems = new List<GemSO>();
-        public List<EnemySO> Enemies = new List<EnemySO>();
+        public Dictionary<string, ModifierSO> Modifiers = new();
+        public List<SpellSO> Spells = new();
+        public List<GemSO> Gems = new();
+        public List<EnemySO> Enemies = new();
 
 
         public void Load()

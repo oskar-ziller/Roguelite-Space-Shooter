@@ -37,7 +37,7 @@ namespace MeteorGame
 
         private Sequence bgSequence, fadeSequence;
 
-        private Color darkBgColor = new Color(0, 0, 0, 0.5f);
+        private Color darkBgColor = new(0, 0, 0, 0.5f);
 
         private Coroutine currencyBlinkCoroutine;
 

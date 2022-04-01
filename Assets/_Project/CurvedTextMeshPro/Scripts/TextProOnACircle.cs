@@ -127,7 +127,7 @@ namespace ntw.CurvedTextMeshPro
             float x0 = Mathf.Cos(angle);            
             float y0 = Mathf.Sin(angle);
             float radiusForThisLine = m_radius - textInfo.lineInfo[0].lineExtents.max.y * textInfo.characterInfo[charIdx].lineNumber;
-            Vector2 newMideBaselinePos = new Vector2(x0 * radiusForThisLine, -y0 * radiusForThisLine); //actual new position of the character
+            Vector2 newMideBaselinePos = new(x0 * radiusForThisLine, -y0 * radiusForThisLine); //actual new position of the character
 
             //compute the trasformation matrix: move the points to the just found position, then rotate the character to fit the angle of the curve 
             //(-90 is because the text is already vertical, it is as if it were already rotated 90 degrees)

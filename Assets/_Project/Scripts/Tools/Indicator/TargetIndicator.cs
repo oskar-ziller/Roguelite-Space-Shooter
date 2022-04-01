@@ -48,7 +48,7 @@ namespace MeteorGame
         }
 
 
-        private List<EnemyPack> toRemove = new List<EnemyPack>();
+        private List<EnemyPack> toRemove = new();
 
         private void UpdateIndicators()
         {

@@ -11,7 +11,7 @@ namespace SimpleLightProbePlacer
     [AddComponentMenu("")]
     public class TransformVolume : MonoBehaviour
     {
-        [SerializeField] private Volume m_volume = new Volume(Vector3.zero, Vector3.one);
+        [SerializeField] private Volume m_volume = new(Vector3.zero, Vector3.one);
 
         public Volume Volume { get { return m_volume; } set { m_volume = value; } }
         public Vector3 Origin { get { return m_volume.Origin; } }
@@ -94,7 +94,7 @@ namespace SimpleLightProbePlacer
         {
             MeshRenderer[] meshRenderers = FindObjectsOfType<MeshRenderer>();
 
-            List<GameObject> list = new List<GameObject>();
+            List<GameObject> list = new();
 
             Bounds bounds = GetBounds();
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace MeteorGame
+namespace MeteorGame.UI
 {
     public class PlayTimeUI : MonoBehaviour
     {
@@ -28,10 +28,6 @@ namespace MeteorGame
             minutes.text = mins;
             seconds.text = secs;
         }
-
-        #endregion
-
-        #region Methods
 
         #endregion
 

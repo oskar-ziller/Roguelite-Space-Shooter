@@ -33,7 +33,7 @@ namespace MeteorGame
             tmpObj = GetComponent<TextMeshPro>();
             startingColor = tmpObj.color;
 
-            GameManager.Instance.GameStart += OnGameStart;
+            GameManager.Instance.GameRestart += OnGameStart;
         }
 
         private void Start()

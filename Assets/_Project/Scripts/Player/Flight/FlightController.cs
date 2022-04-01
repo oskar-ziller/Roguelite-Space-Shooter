@@ -29,6 +29,8 @@ namespace MeteorGame.Flight
         [Range(0, 50)] [SerializeField] private float maxSpeed = 5f;
 
 
+        public float Speed { get; private set; }
+
         private FrameInput inputs;
         private float boostAccel = 1f;
         private float boostDec = 1f;
@@ -36,14 +38,20 @@ namespace MeteorGame.Flight
 
         private Vector3 frameTravelVec = Vector3.zero;
 
+        private BoostManager boostManager;
+
         private float maxSpeedReal => maxSpeed / 100f;
 
-        public float Speed { get; private set; }
 
 
         #endregion
 
         #region Unity Methods
+
+        private void Awake()
+        {
+            TryGetComponent(out boostManager);
+        }
 
         private void Start()
         {
@@ -73,7 +81,7 @@ namespace MeteorGame.Flight
             boostDec = 1f;
             boostSpeed = 1f;
 
-            if (inputs.boostDown)
+            if (inputs.isBoosting)
             {
                 boostAccel = boostMultipAccel;
                 boostDec = boostMultipDec;
@@ -173,21 +181,27 @@ namespace MeteorGame.Flight
 
         private void GatherInput()
         {
-            inputs = new FrameInput
+
+            inputs = new FrameInput();
+
+            if (boostManager != null)
             {
-                boostDown = Input.GetKey(KeyCode.LeftShift),
-                x = Input.GetAxisRaw("Horizontal"),
-                z = Input.GetAxisRaw("Vertical"),
-                jump = Input.GetAxisRaw("Jump")
-            };
+                inputs.isBoosting = boostManager.IsBoosting;
+            }
+            else
+            {
+                inputs.isBoosting = Input.GetKey(KeyCode.LeftShift);
+            }
+
+            inputs.x = Input.GetAxisRaw("Horizontal");
+            inputs.z = Input.GetAxisRaw("Vertical");
+            inputs.jump = Input.GetAxisRaw("Jump");
         }
 
         public void TurnHorizontal(float amount)
         {
             transform.Rotate(Vector3.up, amount);
         }
-
-
 
         #endregion
     }

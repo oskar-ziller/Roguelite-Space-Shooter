@@ -33,6 +33,9 @@ namespace MeteorGame.Flight
         private float boostDec = 1f;
         private float boostSpeed = 1f;
         private Rigidbody rigidbody;
+        private BoostManager boostManager;
+
+        public float Speed => rigidbody.velocity.magnitude;
 
         #endregion
 
@@ -41,6 +44,7 @@ namespace MeteorGame.Flight
         private void Awake()
         {
             rigidbody = GetComponent<Rigidbody>();
+            TryGetComponent(out boostManager);
         }
 
         private void Start()
@@ -61,7 +65,23 @@ namespace MeteorGame.Flight
         private void FixedUpdate()
         {
             GatherInput();
-            rigidbody.AddForce(transform.forward * maxSpeed * inputs.z);
+
+            Vector3 locVel = transform.InverseTransformDirection(rigidbody.velocity);
+            rigidbody.drag = 0f;
+
+            float x = CalculateRight(locVel);
+            float y = CalculateUp(locVel);
+            float z = CalculateForward(locVel);
+
+            Vector3 v = new(x, y, z);
+
+            //if (v.magnitude > maxSpeed * boostSpeed)
+            //{
+            //    v = Vector3.MoveTowards(v, v.normalized * maxSpeed * boostSpeed, accel * boostAccel * Time.fixedDeltaTime);
+            //}
+
+            //rigidbody.velocity = new Vector3(x, y, z);
+            rigidbody.velocity = transform.TransformDirection(v);
         }
 
 
@@ -72,41 +92,33 @@ namespace MeteorGame.Flight
 
         private void GatherInput()
         {
-            inputs = new FrameInput
-            {
-                boostDown = Input.GetKey(KeyCode.LeftShift),
-                x = Input.GetAxisRaw("Horizontal"),
-                z = Input.GetAxisRaw("Vertical"),
-                jump = Input.GetAxisRaw("Jump")
-            };
+            inputs = new FrameInput();
 
+            if (boostManager != null)
+            {
+                inputs.isBoosting = boostManager.IsBoosting;
+            }
+            else
+            {
+                inputs.isBoosting = Input.GetKey(KeyCode.LeftShift);
+            }
+
+            inputs.x = Input.GetAxisRaw("Horizontal");
+            inputs.z = Input.GetAxisRaw("Vertical");
+            inputs.jump = Input.GetAxisRaw("Jump");
 
             boostAccel = 1f;
             boostDec = 1f;
             boostSpeed = 1f;
 
-            if (inputs.boostDown)
+            if (inputs.isBoosting)
             {
                 boostAccel = boostMultipAccel;
                 boostDec = boostMultipDec;
                 boostSpeed = boostMultipMaxVel;
             }
 
-            Vector3 locVel = transform.InverseTransformDirection(rigidbody.velocity);
 
-            float x = CalculateRight(locVel);
-            float y = CalculateUp(locVel);
-            float z = CalculateForward(locVel);
-
-            Vector3 v = new(x, y, z);
-
-            if (v.magnitude > maxSpeed * boostSpeed)
-            {
-                v = Vector3.MoveTowards(v, v.normalized * maxSpeed * boostSpeed, accel * boostAccel * Time.fixedDeltaTime);
-            }
-
-            //rigidbody.velocity = new Vector3(x, y, z);
-            rigidbody.velocity = transform.TransformDirection(v);
         }
 
         private float CalculateRight(Vector3 locVel)
@@ -116,7 +128,8 @@ namespace MeteorGame.Flight
 
             if (Math.Abs(locVel.x) > Math.Abs(targetSpeed))
             {
-                acc = decel * boostDec;
+                //acc = decel * boostDec;
+                //rigidbody.drag = 1.5f;
             }
 
             return Mathf.MoveTowards(locVel.x, targetSpeed, acc * Time.fixedDeltaTime);

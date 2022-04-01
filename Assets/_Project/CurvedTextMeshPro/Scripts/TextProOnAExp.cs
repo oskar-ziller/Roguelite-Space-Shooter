@@ -73,7 +73,7 @@ namespace ntw.CurvedTextMeshPro
             //Notice that we have to do some extra calculations because we have to take in count that text may be on multiple lines
             float x0 = charMidBaselinePos.x;
             float y0 = Mathf.Pow(m_expBase, x0);
-            Vector2 newMideBaselinePos = new Vector2(x0, y0 - textInfo.lineInfo[0].lineExtents.max.y * textInfo.characterInfo[charIdx].lineNumber); //actual new position of the character
+            Vector2 newMideBaselinePos = new(x0, y0 - textInfo.lineInfo[0].lineExtents.max.y * textInfo.characterInfo[charIdx].lineNumber); //actual new position of the character
 
             //compute the trasformation matrix: move the points to the just found position, then rotate the character to fit the angle of the curve 
             //(I do some calculations using derivative of the exp function for the orientation)

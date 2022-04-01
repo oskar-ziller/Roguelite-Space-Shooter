@@ -482,7 +482,7 @@ namespace MeteorGame
 
         //public float scaleTime = 0.5f;
 
-        private  void ScaleProjectileWhileMove()
+        private void ScaleProjectileWhileMove()
         {
             bodyMesh.localScale = Vector3.zero;
             bodyMesh.DOScale(MeshScaleMain, ScaleDur);

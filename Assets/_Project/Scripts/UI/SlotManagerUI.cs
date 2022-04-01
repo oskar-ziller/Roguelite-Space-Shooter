@@ -12,7 +12,7 @@ namespace MeteorGame
 
         public SpellSlot ownerSlot { get; private set; }
         private SlotHeaderUI header;
-        private List<SlotLinkUI> links = new List<SlotLinkUI>();
+        private List<SlotLinkUI> links = new();
         private TabMenuManager tabMenuManager;
         private RectTransform rectTransform;
 
@@ -20,7 +20,7 @@ namespace MeteorGame
         public SlotLinkUI prefab;
 
         [Tooltip("Unlock cost for each link")]
-        [SerializeField] private List<int> unlockCosts = new List<int>();
+        [SerializeField] private List<int> unlockCosts = new();
 
 
         private bool isSetup = false;

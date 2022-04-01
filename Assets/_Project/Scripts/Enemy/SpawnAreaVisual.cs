@@ -12,7 +12,7 @@ namespace MeteorGame.Enemies
         #region Variables
 
         private Material mat;
-        private Color endColor = new Color(0, 0, 0, 0);
+        private Color endColor = new(0, 0, 0, 0);
 
         #endregion
 

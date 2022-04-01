@@ -8,7 +8,7 @@ namespace MeteorGame
     [System.Serializable]
     public class Inventory
     {
-        [SerializeField] private List<GemItem> gems = new List<GemItem>();
+        [SerializeField] private List<GemItem> gems = new();
 
         public List<GemItem> Gems => gems;
 

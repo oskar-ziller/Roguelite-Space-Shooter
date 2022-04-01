@@ -7,7 +7,7 @@ namespace DissolveExample
     public class DissolveChilds : MonoBehaviour
     {
         // Start is called before the first frame update
-        List<Material> materials = new List<Material>();
+        List<Material> materials = new();
         bool PingPong = false;
         void Start()
         {

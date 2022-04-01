@@ -45,9 +45,19 @@ namespace MeteorGame
         public EnemySpawner EnemySpawner => enemySpawner;
         public Transform EnemyExplosionHolder => enemyExplosionHolder;
         public int MaxHpMultiplier => maxHpMultiplier;
+        public int AliveEnemyCount { get; private set; } = 0;
 
         public ObjectPool<Enemy> EnemyPool;
 
+        public AnimationCurve EnemyHealthCurve => enemyHealthCurve;
+
+        public int MaxEnemyLevel => maxEnemyLevel;
+        public int BaseEnemySpeed => baseEnemySpeed;
+        public int BaseEnemyHP => baseHP;
+
+        public Action<EnemyPack> OnPackCreatedOrDied;
+
+        public event Action<Enemy> OnEnemyCreatedOrDied;
 
         //void OnGUI()
         //{
@@ -55,7 +65,7 @@ namespace MeteorGame
         //    GUI.Label(new Rect(10, 30, 200, 20), $"CountInactive: {EnemyPool.CountInactive}");
         //    GUI.Label(new Rect(10, 50, 200, 20), $"CountAll: {EnemyPool.CountAll}");
         //}
-        
+
         public void Setup()
         {
             EnemyPool = new ObjectPool<Enemy>(OnCreateEnemy, OnTakeFromPool, OnReturnToPool);
@@ -90,25 +100,19 @@ namespace MeteorGame
 
 
 
+        internal void OnPackEnemyDeath(Enemy enemy)
+        {
+            AliveEnemyCount--;
+            OnEnemyCreatedOrDied?.Invoke(enemy);
+        }
+
+        internal void OnPackEnemyCreated(Enemy enemy)
+        {
+            AliveEnemyCount++;
+            OnEnemyCreatedOrDied?.Invoke(enemy);
+        }
 
 
-
-        //private DropManager dropManager = new DropManager();
-
-
-        #region Variables
-
-        public AnimationCurve EnemyHealthCurve => enemyHealthCurve;
-
-        public int MaxEnemyLevel => maxEnemyLevel;
-
-
-        public int BaseEnemySpeed => baseEnemySpeed;
-
-        public int BaseEnemyHP => baseHP;
-
-
-        #endregion
 
         #region Unity Methods
 
@@ -122,6 +126,8 @@ namespace MeteorGame
 
 
         #endregion
+
+
 
         #region Methods
 
@@ -166,6 +172,7 @@ namespace MeteorGame
         public void OnPackDeath(EnemyPack p)
         {
             AlivePacks.Remove(p);
+            OnPackCreatedOrDied?.Invoke(p);
         }
 
         internal void OnEnemyDied(Enemy e, bool _)
@@ -179,6 +186,7 @@ namespace MeteorGame
         internal void AddPack(EnemyPack p)
         {
             AlivePacks.Add(p);
+            OnPackCreatedOrDied?.Invoke(p);
         }
 
         internal void DestroyAllEnemies()

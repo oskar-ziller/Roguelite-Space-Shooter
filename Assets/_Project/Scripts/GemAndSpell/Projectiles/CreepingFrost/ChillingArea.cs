@@ -43,25 +43,25 @@ namespace MeteorGame
 
         internal void Init(SpellSlot castBy)
         {
-            this.castBy = castBy;
-            transform.parent = null;
-            gameObject.SetActive(true);
-            SpellCaster.AddCreepingFrostChillingArea(this);
-            transform.DOScale(castBy.Modifiers.ExplosionRadi * 2, expandDur).SetEase(easingExpand);
+            //this.castBy = castBy;
+            //transform.parent = null;
+            //gameObject.SetActive(true);
+            //SpellCaster.AddCreepingFrostChillingArea(this);
+            //transform.DOScale(castBy.Modifiers.ExplosionRadi * 2, expandDur).SetEase(easingExpand);
 
-            // setup destruction
+            //// setup destruction
             
-            //StartCoroutine(DestroyWithDelay(castBy.Modifiers.ProjectileLifetime));
+            ////StartCoroutine(DestroyWithDelay(castBy.Modifiers.ProjectileLifetime));
 
-            // if have too many, destroy oldest
-            var countLimit = castBy.GetTotal("ChillingAreaLimit");
+            //// if have too many, destroy oldest
+            //var countLimit = castBy.GetTotal("ChillingAreaLimit");
 
-            if (SpellCaster.CreepingFrostChillingAreaCount() > countLimit)
-            {
-                print("we have too many ChillingArea");
-                var oldest = SpellCaster.GetOldestCreepingFrostChillingArea();
-                oldest.DestroySelf();
-            }
+            //if (SpellCaster.CreepingFrostChillingAreaCount() > countLimit)
+            //{
+            //    print("we have too many ChillingArea");
+            //    var oldest = SpellCaster.GetOldestCreepingFrostChillingArea();
+            //    oldest.DestroySelf();
+            //}
         }
 
         #endregion
@@ -77,7 +77,7 @@ namespace MeteorGame
         private void DestroySelf()
         {
             transform.DOKill();
-            SpellCaster.RemoveCreepingFrostChillingArea(this);
+            //SpellCaster.RemoveCreepingFrostChillingArea(this);
 
             transform.DOScale(Vector3.zero, shrinkDur).SetEase(easingShrink).OnComplete(() => {
                 AreaExpired?.Invoke(this);

@@ -30,7 +30,7 @@ public class SnapshotMode : MonoBehaviour
     private Shader paintingShader;
     private Shader prideShader;
 
-    private List<SnapshotFilter> filters = new List<SnapshotFilter>();
+    private List<SnapshotFilter> filters = new();
 
     private int filterIndex = 0;
 

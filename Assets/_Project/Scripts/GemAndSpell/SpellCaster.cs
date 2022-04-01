@@ -50,9 +50,9 @@ namespace MeteorGame
         private Dictionary<SpellSlot, List<ProjectileBase>> projDict = new();
         private Dictionary<SpellSlot, Transform> holderDict = new();
 
-        public Dictionary<SpellSO, ObjectPool<ProjectileBase>> projPool = new();
-        public Dictionary<SpellSO, ObjectPool<ProjectileDummy>> dummyPool = new();
-        public Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new();
+        private Dictionary<SpellSO, ObjectPool<ProjectileBase>> projPool = new();
+        private Dictionary<SpellSO, ObjectPool<ProjectileDummy>> dummyPool = new();
+        private Dictionary<SpellSO, ObjectPool<Explosion>> explosionPool = new();
 
 
         WandAnim wandAnim1, wandAnim2;
@@ -62,6 +62,23 @@ namespace MeteorGame
             Instance = this;
         }
 
+        private void Update()
+        {
+            if (GameManager.Instance.IsGamePaused)
+            {
+                return;
+            }
+
+            if (Input.GetKey(KeyCode.Mouse0))
+            {
+                Player.Instance.SpellSlot(1).Cast();
+            }
+
+            if (Input.GetKey(KeyCode.Mouse1))
+            {
+                Player.Instance.SpellSlot(2).Cast();
+            }
+        }
 
         public void Setup()
         {
@@ -88,6 +105,10 @@ namespace MeteorGame
 
             holderDict.Add(slot1, dummyHolder1);
             holderDict.Add(slot2, dummyHolder2);
+
+
+            SpawnDummies(slot1);
+            ScaleDummies(slot1, 0.4f);
         }
 
         private void OnGemAddedRemoved(SpellSlot slot, GemItem gem)
@@ -96,14 +117,14 @@ namespace MeteorGame
         }
 
 
-        private static void ClearDummyDict(SpellSlot slot)
+        private void ClearDummyDict(SpellSlot slot)
         {
-            for (int i = Instance.dummyDict[slot].Count - 1; i >= 0; i--)
+            for (int i = dummyDict[slot].Count - 1; i >= 0; i--)
             {
-                Destroy(Instance.dummyDict[slot][i].gameObject);
+                Destroy(dummyDict[slot][i].gameObject);
             }
 
-            Instance.dummyDict[slot].Clear();
+            dummyDict[slot].Clear();
         }
 
         private void OnSpellChanged(SpellSlot slot, SpellItem spell)
@@ -119,12 +140,12 @@ namespace MeteorGame
 
         }
 
-        private static void SpawnDummies(SpellSlot slot)
+        private void SpawnDummies(SpellSlot slot)
         {
-            List<ProjectileDummy> dummies = Instance.dummyDict[slot];
+            List<ProjectileDummy> dummies = dummyDict[slot];
 
             // starts at this and rotates counter clockwise as a whole group
-            float randomStartDeg = UnityEngine.Random.Range(0, 350);
+            float randomStartDeg = UnityEngine.Random.Range(0, 360);
 
             for (int i = 0; i < slot.ProjectileCount; i++)
             {
@@ -134,43 +155,70 @@ namespace MeteorGame
             }
         }
 
-        
+
+        private float CalculateDummyScale(int dummyCount)
+        {
+            switch (dummyCount)
+            {
+                case 1:
+                    return 0.1f;
+                case 2:
+                    return 0.08f;
+                case 3:
+                    return 0.08f;
+                case 4:
+                    return 0.07f;
+                case 5:
+                    return 0.06f;
+                case 6:
+                    return 0.05f;
+                case 7:
+                    return 0.05f;
+                case 8:
+                    return 0.04f;
+                case 9:
+                    return 0.04f;
+                case 10:
+                    return 0.03f;
+                case 11:
+                    return 0.03f;
+                case 12:
+                    return 0.02f;
+                default:
+                    return 0.02f;
+            }
+        }
+
 
         /// <summary>
-        /// Scales dummies at start from 0->1
+        /// Scales dummies after spawning. The more dummies the smaller they scale to. 
         /// </summary>
         /// <param name="slot"></param>
-        private static void ScaleDummies(SpellSlot slot, float dur)
+        private void ScaleDummies(SpellSlot slot, float dur)
         {
-            var dummies = Instance.dummyDict[slot];
+            var dummies = dummyDict[slot];
 
-            var calculatedScale = Helper.Map(dummies.Count, 1, Instance.dummyHalfScaleProjectileCount, Instance.dummyScaleMax, Instance.dummyScaleMin);
+            var calculatedScale = CalculateDummyScale(dummies.Count);
 
             foreach (var item in dummies)
             {
-                item.transform.DOScale(calculatedScale, dur).SetUpdate(true);
-                item.transform.DOScale(1f / dummies.Count, dur);
+                item.transform.DOScale(calculatedScale, dur);
             }
         }
 
-        private static ProjectileDummy SpawnDummy(SpellSlot slot)
+        private ProjectileDummy SpawnDummy(SpellSlot slot)
         {
-            var parent = Instance.holderDict[slot];
-            var d = Instantiate(slot.Spell.dummyPrefab);
-            d.transform.SetParent(parent);
-            d.transform.localPosition = Vector3.zero;
-            d.transform.localScale = Vector3.zero;
+            var parent = holderDict[slot];
+            var dummy = Instantiate(slot.Spell.dummyPrefab);
+            dummy.transform.SetParent(parent);
+            dummy.transform.localPosition = Vector3.zero;
+            dummy.transform.localScale = Vector3.zero;
 
-            return d;
+            return dummy;
         }
 
-        public static void Cast(SpellSlot slot)
+        public void Cast(SpellSlot slot)
         {
-            if (GameManager.Instance.IsGamePaused)
-            {
-                return;
-            }
-
             var spell = slot.Spell;
 
             if (spell == null || !spell.CanCast())
@@ -182,20 +230,19 @@ namespace MeteorGame
 
             if (slot.slotNo == 1)
             {
-                Instance.wandAnim1.Shoot(dur);
+                wandAnim1.Shoot(dur);
             }
             else
             {
-                Instance.wandAnim2.Shoot(dur);
+                wandAnim2.Shoot(dur);
             }
-
 
             SpawnProjectilesFromDummes(slot);
             MoveProjectiles(slot);
             ClearProjectilesDict(slot);
 
             spell.Cast();
-            Instance.castID++;
+            castID++;
 
             ClearDummyDict(slot);
             SpawnDummies(slot);
@@ -205,14 +252,14 @@ namespace MeteorGame
 
 
 
-        private static void ClearProjectilesDict(SpellSlot slot)
+        private void ClearProjectilesDict(SpellSlot slot)
         {
-            Instance.projDict[slot].Clear();
+            projDict[slot].Clear();
         }
 
-        private static void MoveProjectiles(SpellSlot slot)
+        private void MoveProjectiles(SpellSlot slot)
         {
-            var list = Instance.projDict[slot];
+            var list = projDict[slot];
 
             foreach (var proj in list)
             {
@@ -223,7 +270,7 @@ namespace MeteorGame
 
         private ProjectileBase SpawnProjectile(SpellSlot slot)
         {
-            var parent = Instance.projectileHolder;
+            var parent = projectileHolder;
             var p = Instantiate(slot.Spell.projPrefab);
             p.transform.SetParent(parent);
 
@@ -231,36 +278,38 @@ namespace MeteorGame
         }
 
 
-        private static void SpawnProjectilesFromDummes(SpellSlot slot)
+        private void SpawnProjectilesFromDummes(SpellSlot slot)
         {
-            List<ProjectileDummy> dummies = Instance.dummyDict[slot];
+            List<ProjectileDummy> dummies = dummyDict[slot];
 
             if (dummies.Count == 0)
             {
                 return;
             }
 
-            var projList = Instance.projDict[slot];
-            var aimingAt = Player.Instance.AimingAt(out var hitEnemy);
+            List<ProjectileBase> projList = projDict[slot];
+            Vector3 aimingAt = Player.Instance.AimingAt(out Enemy hitEnemy);
 
             for (int i = 0; i < dummies.Count; i++)
             {
                 var dummy = dummies[i];
 
-                var p = Instance.SpawnProjectile(slot);
+                var p = SpawnProjectile(slot);
                 p.transform.position = dummy.transform.position;
                 p.transform.localScale = dummy.transform.localScale;
 
-                var info = new ProjectileSpawnInfo();
-                info.CastBy = slot;
+                var info = new ProjectileSpawnInfo
+                {
+                    CastBy = slot,
 
-                info.AimingAt = aimingAt;
-                info.HitEnemy = hitEnemy;
+                    AimingAt = aimingAt,
+                    HitEnemy = hitEnemy,
 
-                info.CastID = Instance.castID;
-                info.ProjID = i;
+                    CastID = castID,
+                    ProjID = i,
 
-                info.CastPos = Instance.holderDict[slot].position;
+                    CastPos = holderDict[slot].position
+                };
 
                 p.Setup(info);
 
@@ -272,24 +321,24 @@ namespace MeteorGame
 
         #region chillingareastuff
 
-        public static void AddCreepingFrostChillingArea(ChillingArea area)
+        public void AddCreepingFrostChillingArea(ChillingArea area)
         {
-            Instance.creepingFrostChillingAreas.Add(area);
+            creepingFrostChillingAreas.Add(area);
         }
 
-        public static int CreepingFrostChillingAreaCount()
+        public int CreepingFrostChillingAreaCount()
         {
-            return Instance.creepingFrostChillingAreas.Count;
+            return creepingFrostChillingAreas.Count;
         }
 
-        public static ChillingArea GetOldestCreepingFrostChillingArea()
+        public ChillingArea GetOldestCreepingFrostChillingArea()
         {
-            return Instance.creepingFrostChillingAreas[0];
+            return creepingFrostChillingAreas[0];
         }
 
-        public static void RemoveCreepingFrostChillingArea(ChillingArea a)
+        public void RemoveCreepingFrostChillingArea(ChillingArea a)
         {
-            Instance.creepingFrostChillingAreas.Remove(a);
+            creepingFrostChillingAreas.Remove(a);
         }
 
         #endregion

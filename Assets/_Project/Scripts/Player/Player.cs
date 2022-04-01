@@ -19,9 +19,11 @@ namespace MeteorGame
 
         public Inventory Inv => inventory;
 
-        public float Speed => flightController.Speed;
+        public float Speed => flightController != null ? flightController.Speed : 0;
 
         public float TweeningCurrency => currencyTweening;
+
+        public Action<int> OnCurrencyChanged;
 
         private float currencyTweening = 0; // used to tween and display currency
 
@@ -41,10 +43,11 @@ namespace MeteorGame
         private Vector3 startingPos;
         private Quaternion startingRotation;
 
-        private FlightController flightController;
+        private PhysicsFlight2 flightController;
 
         public event Action Ready;
 
+        public BoostManager BoostManager { get; private set; }
 
         #endregion
 
@@ -59,36 +62,48 @@ namespace MeteorGame
             startingPos = transform.position;
             startingRotation = transform.rotation;
 
-            flightController = GetComponent<FlightController>();
+            flightController = GetComponent<PhysicsFlight2>();
+            BoostManager = GetComponent<BoostManager>();
         }
 
         private void Start()
         {
-            GameManager.Instance.GameStart += OnGameStart;
+            GameManager.Instance.GameRestart += OnGameRestart;
         }
-
-
-        
 
         #endregion
 
         #region Methods
 
 
-        private void OnGameStart()
+        private void OnGameRestart()
         {
             var dist = Vector3.Distance(transform.position, startingPos);
             var dur = MathF.Min(dist / 50f, 2f);
 
             transform.DOMove(startingPos, dur);
-            transform.DORotate(startingRotation.eulerAngles, dur);
-            StartCoroutine(ReadyAfterDelay(dur));
+            transform.DORotate(startingRotation.eulerAngles, dur).OnComplete(() => Ready?.Invoke());
+
+
+            ResetCurrency();
         }
 
-        private IEnumerator ReadyAfterDelay(float delay)
+
+        private void ResetCurrency()
         {
-            yield return new WaitForSeconds(delay);
-            Ready?.Invoke();
+            ResetCurrencyTween();
+
+            currency = 0;
+            currencyTweening = 0;
+        }
+
+        private void ResetCurrencyTween()
+        {
+            if (currencyTween != null && currencyTween.active)
+            {
+                currencyTween.Complete();
+                currencyTween.Kill();
+            }
         }
 
         public SpellSlot SpellSlot(int i)
@@ -121,11 +136,11 @@ namespace MeteorGame
             spellSlot2.GemLinkedOrRemoved += OnGemAddedOrRemoved;
             spellSlot2.SpellChanged += OnSpellChanged;
 
-
-
             //GameManager.Instance.TabMenuManager.RebuildTabMenu();
 
             currencyTweening = currency;
+
+            DebugAddStuff();
 
             isSetup = true;
         }
@@ -144,7 +159,7 @@ namespace MeteorGame
         {
             foreach (GemSO gemSO in GameManager.Instance.ScriptableObjects.Gems)
             {
-                GemItem gem = new GemItem(gemSO, level: 0);
+                GemItem gem = new(gemSO, level: 0);
                 inventory.AddGem(gem);
             }
         }
@@ -221,16 +236,14 @@ namespace MeteorGame
 
         internal void ChangeCurrency(int amount)
         {
-            if (currencyTween != null && currencyTween.active)
-            {
-                currencyTween.Complete();
-                currencyTween.Kill();
-            }
+            ResetCurrencyTween();
 
             var curr = currency;
             var target = curr + amount;
             currency = target;
-            currencyTween = DOTween.To(() => currencyTweening, x => currencyTweening = x, target, 0.5f).SetUpdate(true);
+            currencyTween = DOTween.To(() => currencyTweening, x => currencyTweening = x, target, 0.5f).SetUpdate(true)
+                .OnUpdate(() => OnCurrencyChanged?.Invoke((int)currencyTweening))
+                .OnComplete(() => OnCurrencyChanged?.Invoke((int)target));
         }
 
         public bool CanAfford(int amount)

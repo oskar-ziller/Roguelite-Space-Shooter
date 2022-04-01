@@ -9,13 +9,15 @@ namespace MeteorGame
     {
         #region Variables
 
+
+
         #endregion
 
         #region Unity Methods
 
-        private void OnTriggerEnter(Collider other)
+        private void OnCollisionEnter(Collision collision)
         {
-            Enemy e = other.gameObject.GetComponent<Enemy>();
+            Enemy e = collision.collider.gameObject.GetComponent<Enemy>();
 
             if (e != null)
             {

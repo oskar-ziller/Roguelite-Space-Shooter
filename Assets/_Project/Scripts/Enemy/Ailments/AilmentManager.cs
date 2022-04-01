@@ -186,7 +186,7 @@ namespace MeteorGame
 
             duration *= durationIncreasedBy;
 
-            Ailment a = new Ailment();
+            Ailment a = new();
             a.type = Ailments.Weaken;
             a.duration = duration;
             a.magnitude = effect;
@@ -258,7 +258,7 @@ namespace MeteorGame
                 dur = maxFreezeDur;
             }
 
-            Ailment a = new Ailment();
+            Ailment a = new();
             a.type = Ailments.Freeze;
             a.duration = dur;
             a.magnitude = dur;
@@ -294,7 +294,7 @@ namespace MeteorGame
 
             duration *= durationIncreasedBy;
 
-            Ailment a = new Ailment();
+            Ailment a = new();
             a.type = Ailments.Chill;
             a.duration = duration;
             a.magnitude = effect;
@@ -348,7 +348,7 @@ namespace MeteorGame
             int totalDamage = (int)(damageAmount * increasedDamage * baseBurnDPSMultip);
 
 
-            Ailment a = new Ailment();
+            Ailment a = new();
             a.type = Ailments.Burn;
             a.duration = duration;
             a.magnitude = totalDamage;

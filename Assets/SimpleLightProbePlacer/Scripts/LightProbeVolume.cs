@@ -39,7 +39,7 @@ namespace SimpleLightProbePlacer
 
         public static List<Vector3> CreatePositionsFixed(Transform volumeTransform, Vector3 origin, Vector3 size, Vector3 density)
         {
-            List<Vector3> posList = new List<Vector3>();
+            List<Vector3> posList = new();
             var offset = origin;
 
             var moveX = size.x / Mathf.FloorToInt(density.x);
@@ -66,7 +66,7 @@ namespace SimpleLightProbePlacer
 
         public static List<Vector3> CreatePositionsFloat(Transform volumeTransform, Vector3 origin, Vector3 size, Vector3 density)
         {
-            List<Vector3> posList = new List<Vector3>();
+            List<Vector3> posList = new();
             var offset = origin;
             
             var stepX = Mathf.FloorToInt(size.x / density.x);
