@@ -188,7 +188,7 @@ namespace MeteorGame
 
         internal void CollidedWithDroppedGold(GoldCoinDrop goldCoinDrop)
         {
-            ChangeCurrency(goldCoinDrop.goldAmount);
+            AddCurrency(goldCoinDrop.goldAmount);
             goldCoinDrop.PlayAuidoWithPitch(pitch);
             pitch += 0.05f;
 
@@ -234,7 +234,7 @@ namespace MeteorGame
         }
 
 
-        internal void ChangeCurrency(int amount)
+        internal void AddCurrency(int amount)
         {
             ResetCurrencyTween();
 

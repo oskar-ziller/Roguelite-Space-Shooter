@@ -97,7 +97,7 @@ namespace MeteorGame.Enemies
             isActive = true;
             gameObject.layer = enemiesLayer;
 
-            MoveToWorldOrigin(from: spawnInfo.pack.Position);
+            MoveToWorldOrigin(from: spawnInfo.pack.Centroid);
         }
 
         private void SetValuesToDefaults()
@@ -125,7 +125,7 @@ namespace MeteorGame.Enemies
         private void SetPosAndScale(EnemySpawnInfo spawninfo)
         {
             //spawnPos = spawninfo.spawnPos;
-            transform.position = spawnInfo.pack.Position + spawninfo.spawnPos;
+            transform.position = spawnInfo.pack.Centroid + spawninfo.spawnPos;
             transform.localScale = spawninfo.SO.ShapeRadi * Vector3.one * 2f;
         }
 

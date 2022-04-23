@@ -34,17 +34,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaTween: 1
-    - _FresnelPower: 0
-    - _NoiseAmount: 0.596
-    - _NoisePower: 2.8
-    - _NoiseScale: 1000
+    - _FresnelPower: 0.03
+    - _NoiseAmount: 0.334
+    - _NoisePower: 0.73
+    - _NoiseScale: 800
     - _QueueControl: 0
     - _QueueOffset: 2
-    - _alpha: 0.511
+    - _alpha: 0.16
     m_Colors:
     - _Color: {r: 0.047058824, g: 2.9960785, b: 0, a: 1}
-    - _NoiseSpeed: {r: 4, g: 0, b: 0, a: 0}
-    - _NoiseTiling: {r: 11, g: 0, b: 0, a: 0}
+    - _NoiseSpeed: {r: 0.05, g: -0.01, b: 0, a: 0}
+    - _NoiseTiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &2915398771839604794
 MonoBehaviour:

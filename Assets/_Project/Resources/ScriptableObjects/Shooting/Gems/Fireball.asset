@@ -17,8 +17,8 @@ MonoBehaviour:
     min: 200
     max: 1095
   - modifierSO: {fileID: 11400000, guid: 27ce9b7d829526c46996886d56c399e1, type: 2}
-    min: 18
-    max: 24
+    min: 24
+    max: 48
   - modifierSO: {fileID: 11400000, guid: e71cf720cf27e4b4296f190dda0f7dd0, type: 2}
     min: 10
     max: 80

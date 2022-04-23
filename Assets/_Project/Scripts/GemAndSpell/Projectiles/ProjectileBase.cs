@@ -53,37 +53,22 @@ namespace MeteorGame
 
         protected Enemy collidingWith;
 
-        private Enemy ForkingFrom;
+        protected Enemy ForkingFrom;
         private Enemy PiercingFrom;
 
         private float spawnTime;
         private float expireTime;
-        private bool collided;
         private bool isSetup = false;
-        private bool isDummy = false;
 
         private List<Enemy> PiercedFrom;
-        private List<Enemy> ChainedFrom;
+        protected List<Enemy> ChainedFrom;
         private List<Enemy> ForkedFrom;
 
-        private Collider collider;
-
-        //private SphereCollider collider;
+        private SphereCollider collider;
 
 
-        //protected HashSet<GameObject> InExplosionRange => inExplosionRange;
-        //protected HashSet<GameObject> InChainRange => inChainRange;
-        //protected HashSet<GameObject> InAimAssistRange => inAimAssistRange;
-
-        //private List<TrailRenderer> trailRenderers;
-
-        //private SpinAround spinner;
-
-
-        //private HashSet<GameObject> inExplosionRange = new HashSet<GameObject>();
-        //private HashSet<GameObject> inChainRange = new HashSet<GameObject>();
-        //private HashSet<GameObject> inAimAssistRange = new HashSet<GameObject>();
-
+        float forkSpeed = 110f;
+        float forkRadi = 0.9f;
 
         private Rigidbody rigidbody;
 
@@ -109,6 +94,11 @@ namespace MeteorGame
             var final = baseLifetime * inceasedBy;
 
             expireTime = spawnTime + final;
+        }
+
+        internal void OverrideExpireDuration(float newExpireDuration)
+        {
+            expireTime = Time.time + newExpireDuration;
         }
 
         public virtual void Move()
@@ -143,8 +133,10 @@ namespace MeteorGame
 
             if (ShouldChain())
             {
-                DoChain();
-                return true;
+                if (DoChain())
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -156,70 +148,10 @@ namespace MeteorGame
             ChainedFrom = new List<Enemy>();
             ForkedFrom = new List<Enemy>();
 
-            //var trails = GetComponentsInChildren<TrailRenderer>();
-
-            //if (trails != null)
-            //{
-            //    trailRenderers = trails.ToList();
-
-            //    if (trailRenderers.Count > 0)
-            //    {
-            //        maxTrailDur = trailRenderers.Max(t => t.time);
-            //    }
-            //}
-
-
-
-
-            //spinner = GetComponent<SpinAround>();
             rigidbody = GetComponent<Rigidbody>();
             collider = GetComponent<SphereCollider>();
-
-
-            //collider.radius = meshScaleMain / 2f;
-            //projectileCollider = GetComponent<SphereCollider>();
-
-            //explTrigger.TriggerEnter += OnExpTriggerEnter;
-            //explTrigger.TriggerExit += OnExpTriggerExit;
-
-            //chainTrigger.TriggerEnter += OnChainTriggerEnter;
-            //chainTrigger.TriggerExit += OnChainTriggerExit;
-
-            //aimAssistTrigger.TriggerEnter += OnAimAssistTriggerEnter;
-            //aimAssistTrigger.TriggerExit += OnAimAssistTriggerExit;
         }
 
-        //private void OnAimAssistTriggerExit(Collider obj)
-        //{
-        //    InAimAssistRange.Remove(obj.gameObject);
-        //}
-
-        //private void OnAimAssistTriggerEnter(Collider obj)
-        //{
-        //    InAimAssistRange.Add(obj.gameObject);
-        //}
-
-        //private void OnChainTriggerExit(Collider obj)
-        //{
-        //    InChainRange.Remove(obj.gameObject);
-        //}
-
-        //private void OnChainTriggerEnter(Collider obj)
-        //{
-        //    InChainRange.Add(obj.gameObject);
-        //}
-
-
-        //public virtual void OnExpTriggerEnter(Collider obj)
-        //{
-        //    InExplosionRange.Add(obj.gameObject);
-        //}
-
-
-        //public virtual void OnExpTriggerExit(Collider obj)
-        //{
-        //    InExplosionRange.Remove(obj.gameObject);
-        //}
 
 
 
@@ -234,57 +166,22 @@ namespace MeteorGame
         }
 
 
-        protected void Die()
+        protected virtual void Die()
         {
             transform.DOKill();
             Destroy(gameObject);
         }
 
 
-
-        private void DoAimAssist()
-        {
-            //var dir = InAimAssistRange.First().transform.position - transform.position;
-
-            //Rigidbody.DOKill();
-            //Rigidbody.isKinematic = false;
-
-            //Rigidbody.velocity = dir.normalized * StartingSpeed;
-            //aimAssisted = true;
-        }
-
-
         public virtual void Update()
         {
-            if (isDummy)
-            {
-                return;
-            }
-
-            // scales back to original size as it moves away from player
         }
 
         public virtual void FixedUpdate()
         {
-            if (isDummy)
-            {
-                return;
-            }
-
-           
-
             if (ShouldExpire())
             {
                 Expire();
-            }
-
-            //bool shouldAimAssist = !aimAssisted && aimAssist && AimingAtEnemy == null
-            //    && !collided && ForkedFrom.Count == 0 && ChainedFrom.Count == 0
-            //    && InAimAssistRange.Count > 0;
-
-            if (false)
-            {
-                DoAimAssist();
             }
         }
 
@@ -295,7 +192,7 @@ namespace MeteorGame
 
         public virtual void OnTriggerEnter(Collider collider)
         {
-            if (isDummy || !collider.gameObject.activeInHierarchy)
+            if (!collider.gameObject.activeInHierarchy)
             {
                 return;
             }
@@ -319,7 +216,6 @@ namespace MeteorGame
                     return;
                 }
 
-                collided = true;
                 collidingWith = collidedEnemy;
 
                 bodyMesh.DOKill();
@@ -370,25 +266,28 @@ namespace MeteorGame
             return true;
         }
 
-        public void DoChain()
+        public virtual bool DoChain()
         {
-            //var chainRangeSqr = GameManager.Instance.ChainAndForkRange * GameManager.Instance.ChainAndForkRange;
-
             //var potentials = EnemyManager.Instance.AliveEnemies.Where(e => e != null
             //&& e.gameObject != collidingWith.gameObject
             //&& (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
-            
-            //Enemy e = potentials.Count() > 0 ?
-            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
-            //if (e != null)
-            //{
-            //    SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
-            //    ChainedFrom.Add(collidingWith);
-            //    return;
-            //}
+            var pack = collidingWith.BelongsToPack;
+            var potentials = pack.EnemiesInPack.Where(p => p != collidingWith);
 
-            //print("enemyToChainTo == null");
+            Enemy e = potentials.Count() > 0 ?
+                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+
+            if (e != null)
+            {
+                ScaleProjectile(forkRadi);
+                SetVelocityTowards(e.transform.position, forkSpeed);
+                ChainedFrom.Add(collidingWith);
+                return true;
+            }
+
+            print("enemyToChainTo == null");
+            return false;
         }
 
         public bool ShouldFork()
@@ -401,9 +300,9 @@ namespace MeteorGame
             return true;
         }
 
-        public bool DoFork()
+        public virtual bool DoFork()
         {
-            ///* When a projectile forks, it splits into two identical projectiles
+            // * When a projectile forks, it splits into two identical projectiles
             // * that continue travelling at 60 and -60 degree angles
             // * from the projectile's original trajectory. */
 
@@ -413,44 +312,45 @@ namespace MeteorGame
             //&& e.gameObject != collidingWith.gameObject
             //&& (e.transform.position - transform.position).sqrMagnitude < chainRangeSqr);
 
-            //Enemy e = potentials.Count() > 0 ?
-            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+            var pack = collidingWith.BelongsToPack;
+            var potentials = pack.EnemiesInPack.Where(p => p != collidingWith);
 
+            Enemy e = potentials.Count() > 0 ?
+                potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
 
-            //if (e == null)
-            //{
-            //    print("can't fork");
-            //    return false;
-            //}
+            if (e == null)
+            {
+                print("can't fork, not enough enemies");
+                return false;
+            }
 
-            //ForkedFrom.Add(collidingWith);
-            //ForkingFrom = collidingWith;
+            ForkedFrom.Add(collidingWith);
+            ForkingFrom = collidingWith;
 
+            var potentialExceptFirst = potentials.Where(p => p != e);
 
-            //potentials = potentials.Where(p => p != e);
+            Enemy e2 = potentialExceptFirst.Count() > 0 ?
+                potentialExceptFirst.ElementAt(UnityEngine.Random.Range(0, potentialExceptFirst.Count())) : null;
 
-            //Enemy e2 = potentials.Count() > 0 ?
-            //    potentials.ElementAt(UnityEngine.Random.Range(0, potentials.Count())) : null;
+            if (e2 == null)
+            {
+                print("use same enemy for fork");
+                e2 = e;
+            }
 
-            //if (e2 == null)
-            //{
-            //    print("use same enemy for fork");
-            //    e2 = e;
-            //}
+            ProjectileBase clone = Instantiate(this, transform.position, Quaternion.identity);
+            ProjectileBase clone2 = Instantiate(this, transform.position, Quaternion.identity);
 
+            clone.CopyFrom(this);
+            clone2.CopyFrom(this);
 
-            //ProjectileBase clone = Instantiate(this, transform.position, Quaternion.identity);
-            //ProjectileBase clone2 = Instantiate(this, transform.position, Quaternion.identity);
+            clone.ScaleProjectile(forkRadi);
+            clone2.ScaleProjectile(forkRadi);
 
-            //clone.CopyFrom(this);
-            //clone2.CopyFrom(this);
+            clone.SetVelocityTowards(e.transform.position, forkSpeed);
+            clone2.SetVelocityTowards(e2.transform.position, forkSpeed);
 
-            //clone.SetVelocityTowards(e.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
-            //clone2.SetVelocityTowards(e2.transform.position, spawnInfo.CastBy.Modifiers.ProjectileSpeedCalcd);
-
-            //return true;
-
-            return false;
+            return true;
         }
 
         private void SetVelocityTowards(Vector3 position, float speed)
@@ -469,6 +369,8 @@ namespace MeteorGame
             this.ForkedFrom = new List<Enemy>(p.ForkedFrom);
             this.ChainedFrom = new List<Enemy>(p.ChainedFrom);
             this.PiercedFrom = new List<Enemy>(p.PiercedFrom);
+            this.expireTime = p.expireTime;
+            this.isSetup = true;
         }
 
 
@@ -489,48 +391,11 @@ namespace MeteorGame
             transform.DOScale(1f, ScaleDur);
         }
 
-        //protected void DestroySelfSoft()
-        //{
-        //    mainMesh.gameObject.SetActive(false);
-        //    DisableRigidBody();
-        //    collider.enabled = false;
-        //    transform.DOKill();
-
-        //    Destroy(gameObject);
-        //}
-
-        //public void EnableSpinner()
-        //{
-        //    spinner.enabled = true;
-        //}
-
-
-
-        //private void EnableTrails()
-        //{
-        //    foreach (var tr in trailRenderers)
-        //    {
-        //        tr.enabled = true;
-        //    }
-        //}
-
-
-
-        //public void MakeDummy(float dur)
-        //{
-        //    CachedDummyScale = (dummyScale / CastBy.ProjectileCount);
-        //    DisableRigidBody();
-
-        //    isDummy = true;
-        //}
-
-        //public void MakeNormal()
-        //{
-        //    Rigidbody.isKinematic = false;
-        //    isDummy = false;
-        //    //spinner.enabled = false;
-        //}
-
+        private void ScaleProjectile(float newScale)
+        {
+            bodyMesh.localScale = Vector3.one * newScale;
+            collider.radius = newScale / 2f;
+        }
 
     }
 }

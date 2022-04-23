@@ -21,14 +21,14 @@ namespace MeteorGame.Enemies
 
         #region Variables
 
-        [Tooltip("Transform to mark position of 1st wave spawning on new game")]
-        [SerializeField] private Transform firstWaveSpawnPos;
-
         [Tooltip("Trasnparant object to spawn and fade during pack spawn visual effects")]
         [SerializeField] private SpawnAreaVisual spawnAreaVisual;
 
         [Tooltip("SpawnBox animation controller")]
         [SerializeField] private SpawnBox spawnBox;
+
+        [Tooltip("PackBox to spawn with pack")]
+        [SerializeField] private PackBox packBox;
 
         public float waitAfterSpawn = 0.15f;
         public Action<EnemyPack> PackSpawned;
@@ -39,6 +39,7 @@ namespace MeteorGame.Enemies
         private bool isSetup = false;
         private WaitForSeconds waitAfterSpawnCached;
         private int packCount = 0;
+
 
 
 
@@ -103,7 +104,7 @@ namespace MeteorGame.Enemies
             var holder = new GameObject("Pack " + packCount);
             var packObj = holder.AddComponent<EnemyPack>();
             packObj.Info = info;
-            packObj.Position = info.spawner.PackPos;
+            packObj.Centroid = info.spawner.PackPos;
             holder.transform.parent = EnemyManager.Instance.EnemiesHolder;
 
             return packObj;
@@ -126,7 +127,6 @@ namespace MeteorGame.Enemies
             foreach (FindSpawnPosResult result in candidates)
             {
                 var e = EnemyManager.Instance.EnemySpawner.SpawnEnemyFromPool();
-                e.transform.SetParent(pack.transform);
                 e.gameObject.name = result.EnemySO.Name;
 
                 var spawninfo = new EnemySpawnInfo
@@ -149,7 +149,7 @@ namespace MeteorGame.Enemies
 
             box.SetSize(pack.PackSize * 2.5f);
 
-            box.transform.position = pack.Position;
+            box.transform.position = pack.Centroid;
             box.AnimCompleted += pack.OnSpawnAnimCompleted;
             box.transform.SetParent(pack.transform);
         }
@@ -159,10 +159,22 @@ namespace MeteorGame.Enemies
             SpawnAreaVisual visual = Instantiate(spawnAreaVisual);
 
             visual.transform.localScale = pack.PackSize * 2.1f * Vector3.one;
-            visual.transform.position = pack.Position;
+            visual.transform.position = pack.Centroid;
             visual.transform.SetParent(pack.transform);
 
             return visual;
+        }
+
+        private PackBox CreatePackBox(EnemyPack pack)
+        {
+            PackBox pb = Instantiate(packBox);
+
+            pb.SetPack(pack);
+
+            pb.transform.position = pack.Centroid;
+            pb.transform.SetParent(pack.transform);
+
+            return pb;
         }
 
         private IEnumerator CreateAll(PackSpawnInfo info, List<FindSpawnPosResult> candidates, int regionSize)
@@ -176,6 +188,7 @@ namespace MeteorGame.Enemies
 
             CreateSpawnBoxAnim(pack);
             pack.SpawnAreaVisual = CreateSpawnAreaVisual(pack);
+            pack.PackBox = CreatePackBox(pack);
 
             PackSpawned?.Invoke(pack);
         }

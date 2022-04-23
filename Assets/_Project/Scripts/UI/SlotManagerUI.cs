@@ -126,7 +126,7 @@ namespace MeteorGame
         {
             if (Player.Instance.CanAfford(cost))
             {
-                Player.Instance.ChangeCurrency(-cost);
+                Player.Instance.AddCurrency(-cost);
                 return true;
             }
             else

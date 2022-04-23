@@ -20,7 +20,12 @@ namespace MeteorGame.Enemies
 
         private void Awake()
         {
-            mat = GetComponentInChildren<MeshRenderer>().material;
+            var rend = GetComponentInChildren<MeshRenderer>();
+
+            if (rend != null)
+            {
+                mat = rend.material;
+            }
         }
 
         private void Start()
@@ -41,13 +46,16 @@ namespace MeteorGame.Enemies
 
         internal void FadeOut()
         {
-            // 1 tane child var ama loop kurdum
-            foreach (Transform child in transform)
+            if (mat != null)
             {
-                child.gameObject.layer = LayerMask.NameToLayer("Default");
-            }
+                // 1 tane child var ama loop kurdum
+                foreach (Transform child in transform)
+                {
+                    child.gameObject.layer = LayerMask.NameToLayer("Default");
+                }
 
-            mat.DOColor(endColor, .5f); 
+                mat.DOColor(endColor, .5f);
+            }
         }
 
         #endregion

@@ -10442,8 +10442,8 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 2000
-  field of view: 58.683304
+  far clip plane: 4000
+  field of view: 58.70745
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -10635,7 +10635,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   accel: 270
-  boostMultipAccel: 3
+  boostMultipAccel: 4
   maxSpeed: 250
   maxDrag: 3
   minDrag: 2.6
@@ -10651,7 +10651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974365a5f0ef3fd49b78a8f33e4f11e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxBoost: 2
+  maxBoost: 3.5
   chargeDuration: 30
   canOnlyBoostWhenFull: 0
 --- !u!114 &8454831337768183200
@@ -10695,7 +10695,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 4
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5161389037377674083
 GameObject:

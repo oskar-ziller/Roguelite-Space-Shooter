@@ -73,7 +73,7 @@ namespace MeteorGame
             // update remaining
             foreach (var item in indicators)
             {
-                SetIndicatorPos(item.Key.Position, item.Value);
+                SetIndicatorPos(item.Key.Centroid, item.Value);
             }
 
             // update core

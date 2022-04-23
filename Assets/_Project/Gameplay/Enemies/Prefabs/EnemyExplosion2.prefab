@@ -215,9 +215,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 60
-      minScalar: 60
+      minMaxState: 0
+      scalar: 40
+      minScalar: 80
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5122,8 +5122,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 20
-      minScalar: 14
+      scalar: 15
+      minScalar: 10
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9031,8 +9031,8 @@ ParticleSystem:
       maxColor: {r: 0.9972334, g: 1, b: 0, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 0, g: 0, b: 0, a: 0.11764706}
+        key0: {r: 1, g: 0.94960225, b: 0, a: 1}
+        key1: {r: 1, g: 0.9490197, b: 0, a: 0.11764706}
         key2: {r: 0.972549, g: 0.12116981, b: 0.039215706, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -9060,8 +9060,8 @@ ParticleSystem:
         m_NumAlphaKeys: 3
       minGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 0, g: 0, b: 0, a: 0.19607843}
+        key0: {r: 1, g: 0.7328316, b: 0, a: 1}
+        key1: {r: 1, g: 0.73333335, b: 0, a: 0.19607843}
         key2: {r: 0.972549, g: 0.12116981, b: 0.039215706, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -9090,7 +9090,7 @@ ParticleSystem:
     widthOverTrail:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.5
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -9791,7 +9791,7 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: c46d65a65b3cea043b52ef823363dab8, type: 2}
-  - {fileID: 2100000, guid: 469386dbfe3493747b4b18226cc72e14, type: 2}
+  - {fileID: 2100000, guid: 7fc0ca103af94a64690ef1adedcb9284, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

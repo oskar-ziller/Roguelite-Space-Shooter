@@ -29,8 +29,6 @@ namespace MeteorGame
 
         [Header("Misc Settings")]
 
-        [Tooltip("Max chain range for projectiles")]
-        public float ChainAndForkRange = 45f;
         [Tooltip("Max aim assist range for projectiles")]
         public float AimAssistRange = 45f;
         [Tooltip("Max links allowed per spell slot")]
@@ -110,7 +108,7 @@ namespace MeteorGame
 
             if (Input.GetKeyDown(KeyCode.F6))
             {
-                Player.Instance.ChangeCurrency(120);
+                Player.Instance.AddCurrency(999999999);
             }
 
             var secondsToMax = minutesToHitMaxGameLevel * 60;
