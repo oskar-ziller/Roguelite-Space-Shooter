@@ -1,7 +1,11 @@
-# UntitledMeteorGame2
+# Roguelite-Space-Shooter
 
 Entire sci-fi space shooter project with assets.
 
-Can be played here: https://c-b-t.itch.io/rogue-like-space-shooter-wip-2
+![space_ss_2](https://github.com/cnbrk13/Roguelite-Space-Shooter/assets/53381468/0f74c3df-71b5-42c6-9459-5ae48cb31820)
 
-Watch gameplay here: https://www.youtube.com/watch?v=4LDhIGgyvCk
+**Can be played here:** https://c-b-t.itch.io/rogue-lite-space-shooter
+
+**Watch Gameplay Here:** https://www.youtube.com/watch?v=4LDhIGgyvCk
+
+**Learn more here:** https://www.canberkturakan.com/stencil-buffer-magic/
