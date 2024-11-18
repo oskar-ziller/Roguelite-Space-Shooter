@@ -7,5 +7,3 @@ Entire sci-fi space shooter project with assets.
 **Can be played here:** https://c-b-t.itch.io/rogue-lite-space-shooter
 
 **Watch Gameplay Here:** https://www.youtube.com/watch?v=4LDhIGgyvCk
-
-**Learn more here:** https://www.canberkturakan.com/stencil-buffer-magic/
